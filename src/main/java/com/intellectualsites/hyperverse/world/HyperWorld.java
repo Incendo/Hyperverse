@@ -19,9 +19,11 @@
 package com.intellectualsites.hyperverse.world;
 
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
+import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -63,6 +65,16 @@ public class HyperWorld {
         }
         world = Bukkit.createWorld(hyperWorldCreator);
         return this.bukkitWorld = world;
+    }
+
+    public void teleportPlayer(@NotNull final Player player) {
+        if (this.bukkitWorld == null) {
+            throw new IllegalStateException("Cannot teleport a player to a world before it has been generated");
+        }
+        if (player.getWorld().equals(this.bukkitWorld)) {
+            return;
+        }
+        PaperLib.teleportAsync(player, this.bukkitWorld.getSpawnLocation());
     }
 
     @Override public boolean equals(Object o) {

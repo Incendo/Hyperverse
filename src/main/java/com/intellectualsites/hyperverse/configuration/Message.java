@@ -16,25 +16,17 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.intellectualsites.hyperverse;
+package com.intellectualsites.hyperverse.configuration;
 
-import com.intellectualsites.hyperverse.listeners.WorldListener;
-import com.intellectualsites.hyperverse.world.WorldManager;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import lombok.Value;
 
-public final class Hyperverse extends JavaPlugin {
+@Value public class Message {
 
-    @Getter private WorldManager worldManager;
+    private final String key;
+    private final String defaultValue;
 
-    @Override public void onEnable() {
-        this.worldManager = new WorldManager(this);
-        // Register event listeners
-        this.getServer().getPluginManager()
-            .registerEvents(new WorldListener(this.worldManager), this);
+    @Override public String toString() {
+        return Messages.getConfigured(this);
     }
 
-    @Override public void onDisable() {
-        // Plugin shutdown logic
-    }
 }

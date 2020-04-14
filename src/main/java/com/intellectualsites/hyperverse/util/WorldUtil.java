@@ -16,25 +16,19 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.intellectualsites.hyperverse;
+package com.intellectualsites.hyperverse.util;
 
-import com.intellectualsites.hyperverse.listeners.WorldListener;
-import com.intellectualsites.hyperverse.world.WorldManager;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
-public final class Hyperverse extends JavaPlugin {
+import java.util.regex.Pattern;
 
-    @Getter private WorldManager worldManager;
+@UtilityClass public class WorldUtil {
 
-    @Override public void onEnable() {
-        this.worldManager = new WorldManager(this);
-        // Register event listeners
-        this.getServer().getPluginManager()
-            .registerEvents(new WorldListener(this.worldManager), this);
+    private static final Pattern worldNamePattern = Pattern.compile("[A-Za-z\\-_0-9]{1,16}");
+
+    public static boolean validateName(@NotNull final String worldName) {
+        return worldNamePattern.matcher(worldName).matches();
     }
 
-    @Override public void onDisable() {
-        // Plugin shutdown logic
-    }
 }

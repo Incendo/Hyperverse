@@ -5,3 +5,10 @@ api-version: 1.13
 load: STARTUP
 authors: [Citymonstret]
 description: A minecraft world management plugin
+permissions:
+  hyperverse.worlds:
+    description: Allows players to use the Hyperverse command
+    default: op
+  hyperverse.create:
+    description: Allows players to create new worlds
+    default: op

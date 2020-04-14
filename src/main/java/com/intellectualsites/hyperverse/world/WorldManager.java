@@ -41,7 +41,7 @@ public class WorldManager {
 
     @Getter private final Hyperverse hyperverse;
 
-    WorldManager(@NotNull final Hyperverse hyperverse) {
+    public WorldManager(@NotNull final Hyperverse hyperverse) {
         this.hyperverse = Objects.requireNonNull(hyperverse);
         // Find all files in the worlds folder and load them
         final Path worldsPath = this.hyperverse.getDataFolder().toPath()
