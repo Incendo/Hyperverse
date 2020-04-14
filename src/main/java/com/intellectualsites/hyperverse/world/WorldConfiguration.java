@@ -18,15 +18,14 @@
 
 package com.intellectualsites.hyperverse.world;
 
-import com.intellectualsites.hyperverse.util.GeneratorUtil;
-import com.intellectualsites.hyperverse.util.SeedUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.intellectualsites.hyperverse.util.GeneratorUtil;
+import com.intellectualsites.hyperverse.util.SeedUtil;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,7 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-@Builder @Getter @NoArgsConstructor public class WorldConfiguration {
+@Builder @Getter public class WorldConfiguration {
 
     private static final Gson gson
         = new GsonBuilder().setPrettyPrinting().create();
