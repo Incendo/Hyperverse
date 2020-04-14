@@ -42,6 +42,8 @@ public class Messages {
     public static final Message messageWorldProperty = createMessage("world.property", "&8- &6%property%&8: &6%value%");
     public static final Message messageWorldCreationFinished = createMessage("world.creation_finished",
         "&7The world was created successfully");
+    public static final Message messageWorldImportedOnLoad = createMessage("world.load_imported",
+        "&7Hyperverse detected that %world% initialized, and successfully imported it");
 
     public static Message createMessage(@NotNull final String key, @NotNull final String defaultValue) {
         final Message message = new Message(Objects.requireNonNull(key), Objects.requireNonNull(defaultValue));

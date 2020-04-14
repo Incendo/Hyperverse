@@ -18,9 +18,12 @@
 
 package com.intellectualsites.hyperverse.listeners;
 
+import com.intellectualsites.hyperverse.configuration.Messages;
+import com.intellectualsites.hyperverse.util.MessageUtil;
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.WorldManager;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,6 +41,16 @@ import org.bukkit.event.world.WorldInitEvent;
             (hyperWorld = this.worldManager.getWorld(world.getName())) != null) {
             if (hyperWorld.getBukkitWorld() != null) {
                 hyperWorld.setBukkitWorld(world);
+            }
+        } else {
+            // Assume it's a non-vanilla world, but don't guess the generator
+            // This can be done because if it's the default level, we don't have
+            // any control over the generator, and otherwise we just take on
+            // responsibility over the world
+            if (this.worldManager.importWorld(world, false, null) ==
+                WorldManager.WorldImportResult.SUCCESS) {
+                MessageUtil.sendMessage(Bukkit.getConsoleSender(),
+                    Messages.messageWorldImportedOnLoad, "%world%", world.getName());
             }
         }
     }

@@ -22,10 +22,13 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import co.aikar.commands.annotation.Values;
 import com.intellectualsites.hyperverse.Hyperverse;
 import com.intellectualsites.hyperverse.configuration.Messages;
@@ -43,7 +46,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.UUID;
 
-@CommandAlias("worlds|hyperverse|hv")
+@CommandAlias("worlds|world|hyperverse|hv")
 @CommandPermission("hyperverse.worlds")
 public class HyperCommandManager extends BaseCommand {
 
@@ -71,11 +74,14 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("create")
+    @Syntax("<world> [generator: plugin name, vanilla] [type: overworld, nether, end] [seed]"
+        + " [generate-structures: true, false] [settings...]")
     @CommandPermission("hyperverse.create")
+    @Description("Create a new world")
     public void createWorld(final CommandSender sender, final String world,
         @Values("@generators") @Default("vanilla") final String generator,
         @Default("overworld") final WorldType type, @Default("0") final long seed,
-        @Default("true") final boolean generateStructures, final String settings) {
+        @Default("true") final boolean generateStructures, @Default final String settings) {
         // Check if the name already exists
         for (final HyperWorld hyperWorld : this.hyperverse.getWorldManager().getWorlds()) {
             if (hyperWorld.getConfiguration().getName().equalsIgnoreCase(world)) {
@@ -106,11 +112,13 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%key%", "settings", "%value%", settings);
         try {
             hyperWorld.createBukkitWorld();
-            MessageUtil.sendMessage(sender, Messages.messageWorldProperty);
+            MessageUtil.sendMessage(sender, Messages.messageWorldCreationFinished);
             if (sender instanceof Player) {
                 // Attempt to teleport them to the world
                 hyperWorld.teleportPlayer((Player) sender);
             }
+            // Register the world
+            this.hyperverse.getWorldManager().addWorld(hyperWorld);
         } catch (final HyperWorldValidationException validationException) {
             switch (validationException.getValidationResult()) {
                 case UNKNOWN_GENERATOR:
@@ -123,6 +131,19 @@ public class HyperCommandManager extends BaseCommand {
                     break;
             }
         }
+    }
+
+    @Subcommand("list|l|worlds")
+    @CommandPermission("hyperverse.list")
+    @Description("List hyperverse worlds")
+    public void doList(final CommandSender sender) {
+    }
+
+    @Subcommand("teleport|tp")
+    @CommandAlias("hvtp")
+    @CommandPermission("hyperverse.teleport")
+    @CommandCompletion("@hyperworlds")
+    public void doTeleport(final CommandSender sender, final HyperWorld world) {
     }
 
 }

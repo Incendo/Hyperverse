@@ -12,3 +12,9 @@ permissions:
   hyperverse.create:
     description: Allows players to create new worlds
     default: op
+  hyperverse.list:
+    description: Allows players to list worlds
+    default: op
+  hyperverse.teleport:
+    description: Allows players to teleport between worlds
+    default: op
