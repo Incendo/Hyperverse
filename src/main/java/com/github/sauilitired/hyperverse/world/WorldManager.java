@@ -21,23 +21,50 @@ package com.github.sauilitired.hyperverse.world;
 import com.github.sauilitired.hyperverse.Hyperverse;
 import com.google.common.collect.Maps;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-@RequiredArgsConstructor public class WorldManager {
+public class WorldManager {
 
     private final Map<UUID, HyperWorld> worldMap = Maps.newHashMap();
     private final Map<String, UUID> uuidMap = Maps.newHashMap();
 
     @Getter private final Hyperverse hyperverse;
+
+    WorldManager(@NotNull final Hyperverse hyperverse) {
+        this.hyperverse = Objects.requireNonNull(hyperverse);
+        // Find all files in the worlds folder and load them
+        final Path worldsPath = this.hyperverse.getDataFolder().toPath()
+            .resolve("worlds");
+        if (Files.exists(worldsPath) && Files.isDirectory(worldsPath)) {
+            try {
+                Files.list(worldsPath).filter(path -> path.getFileName().endsWith("json"))
+                    .forEach(path -> {
+                    final WorldConfiguration worldConfiguration = WorldConfiguration.fromFile(path);
+                    if (worldConfiguration == null) {
+                        this.hyperverse.getLogger().warning(String.format("Failed to parse world file: %s",
+                            path.getFileName().toString()));
+                    } else {
+                        final HyperWorld hyperWorld = new HyperWorld(UUID.randomUUID(), worldConfiguration);
+                        this.registerWorld(hyperWorld);
+                    }
+                });
+            } catch (IOException e) {
+                hyperverse.getLogger().severe("Failed to load world configurations");
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * Attempt to import a world that has already been loaded by bukkit
@@ -70,7 +97,15 @@ import java.util.UUID;
         return WorldImportResult.SUCCESS;
     }
 
-    public void addWorld(@NotNull final HyperWorld hyperWorld) {
+    public boolean addWorld(@NotNull final HyperWorld hyperWorld) {
+        this.registerWorld(hyperWorld);
+        // Create configuration file
+        final Path path = this.hyperverse.getDataFolder().toPath()
+            .resolve("worlds").resolve(String.format("%s.json", hyperWorld.getConfiguration().getName()));
+        return hyperWorld.getConfiguration().writeToFile(path);
+    }
+
+    public void registerWorld(@NotNull final HyperWorld hyperWorld) {
         Objects.requireNonNull(hyperWorld);
         if (this.worldMap.containsKey(hyperWorld.getWorldUUID())) {
             throw new IllegalArgumentException(String.format("World %s already exists",
@@ -78,7 +113,6 @@ import java.util.UUID;
         }
         this.worldMap.put(hyperWorld.getWorldUUID(), hyperWorld);
         this.uuidMap.put(hyperWorld.getConfiguration().getName(), hyperWorld.getWorldUUID());
-        // Create configuration file
     }
 
     @NotNull public Collection<HyperWorld> getWorlds() {
