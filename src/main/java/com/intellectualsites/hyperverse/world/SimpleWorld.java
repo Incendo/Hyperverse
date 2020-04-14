@@ -23,7 +23,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import com.intellectualsites.hyperverse.modules.HyperWorldCreatorFactory;
 import io.papermc.lib.PaperLib;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -34,15 +33,17 @@ import java.util.UUID;
 
 public class SimpleWorld implements HyperWorld {
 
-    @Getter private final UUID worldUUID;
-    @Getter private final WorldConfiguration configuration;
-    @Getter private World bukkitWorld;
-    @Getter private HyperWorldCreatorFactory hyperWorldCreatorFactory;
+    private final UUID worldUUID;
+    private final WorldConfiguration configuration;
+    private final HyperWorldCreatorFactory hyperWorldCreatorFactory;
+    private World bukkitWorld;
 
     @Inject public SimpleWorld(@Assisted final UUID worldUUID,
-        @Assisted final WorldConfiguration configuration) {
+        @Assisted final WorldConfiguration configuration,
+        final HyperWorldCreatorFactory hyperWorldCreatorFactory) {
         this.worldUUID = Objects.requireNonNull(worldUUID);
         this.configuration = Objects.requireNonNull(configuration);
+        this.hyperWorldCreatorFactory = Objects.requireNonNull(hyperWorldCreatorFactory);
     }
 
     @Override public void setBukkitWorld(@NotNull final World world) {
@@ -52,14 +53,15 @@ public class SimpleWorld implements HyperWorld {
         this.bukkitWorld = Objects.requireNonNull(world);
     }
 
-    @Override @NotNull public World createBukkitWorld() throws HyperWorldValidationException {
+    @Override public void createBukkitWorld() throws HyperWorldValidationException {
         if (this.bukkitWorld != null) {
             throw new IllegalStateException("A bukkit world already exist");
         }
         // First check if the bukkit world already exists
         World world = Bukkit.getWorld(this.worldUUID);
         if (world != null) {
-            return this.bukkitWorld = world;
+            this.bukkitWorld = world;
+            return;
         }
         // Otherwise we need to create the world
         final HyperWorldCreator hyperWorldCreator = this.hyperWorldCreatorFactory.create(this);
@@ -67,13 +69,18 @@ public class SimpleWorld implements HyperWorld {
         if (validationResult != HyperWorldCreator.ValidationResult.SUCCESS) {
             throw new HyperWorldValidationException(validationResult, this);
         }
+        hyperWorldCreator.configure();
         world = Bukkit.createWorld(hyperWorldCreator);
-        return this.bukkitWorld = world;
+        if (world == null) {
+            throw new IllegalStateException("Failed to create the world");
+        }
+        this.bukkitWorld = world;
     }
 
     @Override public void teleportPlayer(@NotNull final Player player) {
         if (this.bukkitWorld == null) {
-            throw new IllegalStateException("Cannot teleport a player to a world before it has been generated");
+            throw new IllegalStateException(
+                "Cannot teleport a player to a world before it has been generated");
         }
         if (player.getWorld().equals(this.bukkitWorld)) {
             return;
@@ -100,4 +107,19 @@ public class SimpleWorld implements HyperWorld {
         return "HyperWorld{" + "worldUUID=" + worldUUID + ", configuration=" + configuration + '}';
     }
 
+    public HyperWorldCreatorFactory getHyperWorldCreatorFactory() {
+        return this.hyperWorldCreatorFactory;
+    }
+
+    @Override public UUID getWorldUUID() {
+        return this.worldUUID;
+    }
+
+    @Override public World getBukkitWorld() {
+        return this.bukkitWorld;
+    }
+
+    @Override public WorldConfiguration getConfiguration() {
+        return this.configuration;
+    }
 }

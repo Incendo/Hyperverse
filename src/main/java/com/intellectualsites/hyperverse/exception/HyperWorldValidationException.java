@@ -20,7 +20,6 @@ package com.intellectualsites.hyperverse.exception;
 
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.HyperWorldCreator;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,13 +27,19 @@ import org.jetbrains.annotations.NotNull;
  */
 public class HyperWorldValidationException extends HyperException {
 
-    @Getter private final HyperWorldCreator.ValidationResult validationResult;
+    private final HyperWorldCreator.ValidationResult validationResult;
 
-    public HyperWorldValidationException(@NotNull final HyperWorldCreator.ValidationResult validationResult,
+    public HyperWorldValidationException(
+        @NotNull final HyperWorldCreator.ValidationResult validationResult,
         @NotNull final HyperWorld world) {
-        super(world, String.format("Failed to validate world configuration for world %s. Result: %s",
-            world.getConfiguration().getName(), validationResult.name()));
+        super(world, String
+            .format("Failed to validate world configuration for world %s. Result: %s",
+                world.getConfiguration().getName(), validationResult.name()));
         this.validationResult = validationResult;
+    }
+
+    @NotNull public HyperWorldCreator.ValidationResult getValidationResult() {
+        return this.validationResult;
     }
 
 }

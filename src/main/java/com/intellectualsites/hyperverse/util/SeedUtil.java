@@ -18,11 +18,12 @@
 
 package com.intellectualsites.hyperverse.util;
 
-import lombok.experimental.UtilityClass;
-
 import java.util.concurrent.ThreadLocalRandom;
 
-@UtilityClass public class SeedUtil {
+public final class SeedUtil {
+
+    private SeedUtil() {
+    }
 
     public static long randomSeed() {
         return ThreadLocalRandom.current().nextLong();

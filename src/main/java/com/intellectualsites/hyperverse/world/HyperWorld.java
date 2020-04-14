@@ -25,9 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface HyperWorld {
 
-    void setBukkitWorld(@NotNull World world);
-
-    @NotNull World createBukkitWorld() throws HyperWorldValidationException;
+    void createBukkitWorld() throws HyperWorldValidationException;
 
     void teleportPlayer(@NotNull Player player);
 
@@ -36,5 +34,7 @@ public interface HyperWorld {
     WorldConfiguration getConfiguration();
 
     World getBukkitWorld();
+
+    void setBukkitWorld(@NotNull World world);
 
 }

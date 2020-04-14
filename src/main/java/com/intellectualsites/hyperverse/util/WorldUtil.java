@@ -18,14 +18,16 @@
 
 package com.intellectualsites.hyperverse.util;
 
-import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
-@UtilityClass public class WorldUtil {
+public final class WorldUtil {
 
     private static final Pattern worldNamePattern = Pattern.compile("[A-Za-z\\-_0-9]{1,16}");
+
+    private WorldUtil() {
+    }
 
     public static boolean validateName(@NotNull final String worldName) {
         return worldNamePattern.matcher(worldName).matches();

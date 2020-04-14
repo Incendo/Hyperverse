@@ -24,7 +24,8 @@ import com.intellectualsites.hyperverse.Hyperverse;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
-@Singleton public class PluginFileHyperConfiguration implements HyperConfiguration {
+@Singleton
+public class PluginFileHyperConfiguration implements HyperConfiguration {
 
     private final boolean importAutomatically;
 

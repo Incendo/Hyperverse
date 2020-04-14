@@ -18,7 +18,6 @@
 
 package com.intellectualsites.hyperverse.util;
 
-import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.generator.ChunkGenerator;
@@ -31,11 +30,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-@UtilityClass public class GeneratorUtil {
+public final class GeneratorUtil {
 
     private static Method generatorGetter;
     private static Class<?> pluginClassLoaderClass;
     private static Field pluginGetter;
+
+    private GeneratorUtil() {
+    }
 
     @Nullable public static ChunkGenerator getGenerator(@NotNull final String world)
         throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -44,7 +46,8 @@ import java.util.Objects;
             generatorGetter = serverClass.getDeclaredMethod("getGenerator", String.class);
             generatorGetter.setAccessible(true);
         }
-        return (ChunkGenerator) generatorGetter.invoke(Bukkit.getServer(), Objects.requireNonNull(world));
+        return (ChunkGenerator) generatorGetter
+            .invoke(Bukkit.getServer(), Objects.requireNonNull(world));
     }
 
     @Nullable public static JavaPlugin matchGenerator(@NotNull final ChunkGenerator generator)
@@ -60,6 +63,15 @@ import java.util.Objects;
             return (JavaPlugin) pluginGetter.get(classLoader);
         }
         return null;
+    }
+
+    public static boolean isGeneratorAvailable(@Nullable final String generatorName) {
+        if (generatorName == null ||
+            generatorName.isEmpty() ||
+            generatorName.equalsIgnoreCase("vanilla")) {
+            return true;
+        }
+        return Bukkit.getPluginManager().isPluginEnabled(generatorName);
     }
 
 }

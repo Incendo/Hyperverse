@@ -18,9 +18,6 @@
 
 package com.intellectualsites.hyperverse.util;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -38,10 +35,16 @@ import java.util.Set;
  * {@link CommandSender} which does nothing at all
  * Use {@link #getInstance()} to get the singleton instance
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NullRouteCommandSender implements CommandSender {
 
-    @Getter private static final NullRouteCommandSender instance = new NullRouteCommandSender();
+    private static final NullRouteCommandSender instance = new NullRouteCommandSender();
+
+    @NotNull public static NullRouteCommandSender getInstance() {
+        return instance;
+    }
+
+    private NullRouteCommandSender() {
+    }
 
     @Override public void sendMessage(@NotNull String message) {
     }
@@ -87,8 +90,8 @@ public final class NullRouteCommandSender implements CommandSender {
         return new PermissionAttachment(plugin, this);
     }
 
-    @Override @Nullable public PermissionAttachment addAttachment(@NotNull Plugin plugin,
-        @NotNull String name, boolean value, int ticks) {
+    @Override @NotNull public PermissionAttachment addAttachment(@NotNull Plugin plugin, @NotNull String name,
+        boolean value, int ticks) {
         return new PermissionAttachment(plugin, this);
     }
 

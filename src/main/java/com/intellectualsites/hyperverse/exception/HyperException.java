@@ -19,7 +19,6 @@
 package com.intellectualsites.hyperverse.exception;
 
 import com.intellectualsites.hyperverse.world.HyperWorld;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -29,11 +28,15 @@ import java.util.Objects;
  */
 public class HyperException extends Exception {
 
-    @Getter private final HyperWorld world;
+    private final HyperWorld world;
 
     public HyperException(@NotNull final HyperWorld world, @NotNull final String message) {
         super(Objects.requireNonNull(message));
         this.world = Objects.requireNonNull(world);
+    }
+
+    @NotNull public HyperWorld getWorld() {
+        return this.world;
     }
 
 }

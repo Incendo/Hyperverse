@@ -18,15 +18,23 @@
 
 package com.intellectualsites.hyperverse.world;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.intellectualsites.hyperverse.Hyperverse;
 import com.intellectualsites.hyperverse.configuration.Messages;
+import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import com.intellectualsites.hyperverse.modules.HyperWorldFactory;
+import com.intellectualsites.hyperverse.util.GeneratorUtil;
 import com.intellectualsites.hyperverse.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,23 +47,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-@Singleton public class SimpleWorldManager implements WorldManager {
+@Singleton
+public class SimpleWorldManager implements WorldManager, Listener {
 
     private final Map<UUID, HyperWorld> worldMap = Maps.newHashMap();
     private final Map<String, UUID> uuidMap = Maps.newHashMap();
+    private final Multimap<String, HyperWorld> waitingForPlugin = HashMultimap.create();
 
     private final Hyperverse hyperverse;
     private final HyperWorldFactory hyperWorldFactory;
 
-    @Inject public SimpleWorldManager(final Hyperverse hyperverse, final HyperWorldFactory hyperWorldFactory) {
+    @Inject public SimpleWorldManager(final Hyperverse hyperverse,
+        final HyperWorldFactory hyperWorldFactory) {
         this.hyperverse = Objects.requireNonNull(hyperverse);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
+        // Register the listener
+        Bukkit.getPluginManager().registerEvents(this, hyperverse);
     }
 
     @Override public void loadWorlds() {
         // Find all files in the worlds folder and load them
-        final Path worldsPath = this.hyperverse.getDataFolder().toPath()
-            .resolve("worlds");
+        final Path worldsPath = this.hyperverse.getDataFolder().toPath().resolve("worlds");
         if (!Files.exists(worldsPath)) {
             try {
                 Files.createDirectories(worldsPath);
@@ -64,20 +76,22 @@ import java.util.UUID;
             }
         }
         if (Files.exists(worldsPath) && Files.isDirectory(worldsPath)) {
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldsLoading, "%path%",
-                worldsPath.toString());
+            MessageUtil
+                .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldsLoading, "%path%",
+                    worldsPath.toString());
             try {
-                Files.list(worldsPath)
-                    .forEach(path -> {
-                        final WorldConfiguration worldConfiguration = WorldConfiguration.fromFile(path);
-                        if (worldConfiguration == null) {
-                            this.hyperverse.getLogger().warning(String.format("Failed to parse world file: %s",
+                Files.list(worldsPath).forEach(path -> {
+                    final WorldConfiguration worldConfiguration = WorldConfiguration.fromFile(path);
+                    if (worldConfiguration == null) {
+                        this.hyperverse.getLogger().warning(String
+                            .format("Failed to parse world file: %s",
                                 path.getFileName().toString()));
-                        } else {
-                            final HyperWorld hyperWorld = hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
-                            this.registerWorld(hyperWorld);
-                        }
-                    });
+                    } else {
+                        final HyperWorld hyperWorld =
+                            hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
+                        this.registerWorld(hyperWorld);
+                    }
+                });
             } catch (IOException e) {
                 hyperverse.getLogger().severe("Failed to load world configurations");
                 e.printStackTrace();
@@ -93,8 +107,88 @@ import java.util.UUID;
             Integer.toString(this.worldMap.size()));
     }
 
-    @Override public WorldImportResult importWorld(@NotNull final World world,
-        final boolean vanilla, @Nullable final String generator) {
+    @Override public void createWorlds() {
+        // Loop over all the worlds again to see if anything has been loaded while
+        // we were idle
+        for (final World world : Bukkit.getWorlds()) {
+            final HyperWorld hyperWorld = this.getWorld(world.getName());
+            if (hyperWorld != null) {
+                hyperWorld.setBukkitWorld(world);
+            }
+        }
+        // Now loop over the worlds again and create the ones that are
+        // definitely missing
+        for (final HyperWorld hyperWorld : this.getWorlds()) {
+            if (hyperWorld.getBukkitWorld() == null) {
+                if (!GeneratorUtil.isGeneratorAvailable(hyperWorld.getConfiguration().getGenerator())) {
+                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorNotAvailable,
+                        "%world%", hyperWorld.getConfiguration().getName(),
+                        "%generator%", hyperWorld.getConfiguration().getGenerator());
+                    waitingForPlugin.put(hyperWorld.getConfiguration().getGenerator().toLowerCase(), hyperWorld);
+                } else {
+                    this.attemptCreate(hyperWorld);
+                }
+            }
+        }
+    }
+
+    @EventHandler public void onServerLoadEvent(final ServerLoadEvent event) {
+        this.createWorlds();
+    }
+
+    @EventHandler public void onPluginLoad(final PluginEnableEvent enableEvent) {
+        for (final HyperWorld hyperWorld : this.waitingForPlugin.get(enableEvent.getPlugin().getName().toLowerCase())) {
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorAvailable,
+                "%world%", hyperWorld.getConfiguration().getName());
+            this.attemptCreate(hyperWorld);
+        }
+        this.waitingForPlugin.removeAll(enableEvent.getPlugin().getName().toLowerCase());
+    }
+
+    private void attemptCreate(@NotNull final HyperWorld hyperWorld) {
+        try {
+            // A last check before it's too late
+            if (hyperWorld.getBukkitWorld() != null) {
+                return;
+            }
+            // Make sure to spam a little
+            final WorldConfiguration world = hyperWorld.getConfiguration();
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldCreationStarted);
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
+                "%property%", "name", "%value%", world.getName());
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
+                "%property%", "type", "%value%", world.getType().name());
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
+                "%property%", "seed", "%value%",
+                Long.toString(world.getSeed()));
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
+                "%property%", "structures", "%value%",
+                    Boolean.toString(world.isGenerateStructures()));
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
+                "%property%", "settings", "%value%", world.getSettings());
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
+                "%property%", "generator", "%value%", world.getGenerator());
+            // Here we go...
+            hyperWorld.createBukkitWorld();
+        } catch (final HyperWorldValidationException validationException) {
+            switch (validationException.getValidationResult()) {
+                case UNKNOWN_GENERATOR:
+                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorInvalid,
+                        "%world%", hyperWorld.getConfiguration().getName(),
+                        "%generator%", hyperWorld.getConfiguration().getGenerator());
+                    break;
+                case SUCCESS:
+                    break;
+                default:
+                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageCreationUnknownFailure);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public WorldImportResult importWorld(@NotNull final World world, final boolean vanilla,
+        @Nullable final String generator) {
         if (this.worldMap.containsKey(world.getUID())) {
             return WorldManager.WorldImportResult.ALREADY_IMPORTED;
         }
@@ -104,8 +198,8 @@ import java.util.UUID;
             if (generator == null && worldGenerator == null) {
                 return WorldManager.WorldImportResult.GENERATOR_NOT_FOUND;
             } else if (generator != null) {
-                if (worldGenerator == null || worldGenerator.isEmpty() ||
-                    !generator.equalsIgnoreCase(worldGenerator)) {
+                if (worldGenerator == null || worldGenerator.isEmpty() || !generator
+                    .equalsIgnoreCase(worldGenerator)) {
                     return WorldManager.WorldImportResult.GENERATOR_NOT_FOUND;
                 }
             }
@@ -118,19 +212,19 @@ import java.util.UUID;
     @Override public boolean addWorld(@NotNull final HyperWorld hyperWorld) {
         this.registerWorld(hyperWorld);
         // Create configuration file
-        final Path path = this.hyperverse.getDataFolder().toPath()
-            .resolve("worlds").resolve(String.format("%s.json", hyperWorld.getConfiguration().getName()));
+        final Path path = this.hyperverse.getDataFolder().toPath().resolve("worlds")
+            .resolve(String.format("%s.json", hyperWorld.getConfiguration().getName()));
         return hyperWorld.getConfiguration().writeToFile(path);
     }
 
     @Override public void registerWorld(@NotNull final HyperWorld hyperWorld) {
         Objects.requireNonNull(hyperWorld);
         if (this.worldMap.containsKey(hyperWorld.getWorldUUID())) {
-            throw new IllegalArgumentException(String.format("World %s already exists",
-                hyperWorld.getConfiguration().getName()));
+            throw new IllegalArgumentException(
+                String.format("World %s already exists", hyperWorld.getConfiguration().getName()));
         }
         this.worldMap.put(hyperWorld.getWorldUUID(), hyperWorld);
-        this.uuidMap.put(hyperWorld.getConfiguration().getName(), hyperWorld.getWorldUUID());
+        this.uuidMap.put(hyperWorld.getConfiguration().getName().toLowerCase(), hyperWorld.getWorldUUID());
     }
 
     @Override @NotNull public Collection<HyperWorld> getWorlds() {
@@ -138,7 +232,7 @@ import java.util.UUID;
     }
 
     @Override @Nullable public HyperWorld getWorld(@NotNull final String name) {
-        final UUID uuid = this.uuidMap.get(Objects.requireNonNull(name));
+        final UUID uuid = this.uuidMap.get(Objects.requireNonNull(name).toLowerCase());
         if (uuid == null) {
             return null;
         }

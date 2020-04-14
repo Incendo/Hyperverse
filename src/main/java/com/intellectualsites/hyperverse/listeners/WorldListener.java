@@ -31,6 +31,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 
+import java.util.Objects;
+
 public class WorldListener implements Listener {
 
     private final SimpleWorldManager worldManager;
@@ -42,14 +44,13 @@ public class WorldListener implements Listener {
         this.hyperConfiguration = hyperConfiguration;
     }
 
-    @EventHandler
-    public void onWorldInit(final WorldInitEvent event) {
+    @EventHandler public void onWorldInit(final WorldInitEvent event) {
         final World world = event.getWorld();
-        MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldLoadDetected,
-            "%world%", world.getName());
+        MessageUtil.sendMessage(Bukkit.getConsoleSender(),
+            Messages.messageWorldLoadDetected, "%world%", world.getName());
         HyperWorld hyperWorld = this.worldManager.getWorld(world.getUID());
-        if (hyperWorld != null ||
-            (hyperWorld = this.worldManager.getWorld(world.getName())) != null) {
+        if (hyperWorld != null
+            || (hyperWorld = this.worldManager.getWorld(world.getName())) != null) {
             if (hyperWorld.getBukkitWorld() != null) {
                 hyperWorld.setBukkitWorld(world);
             }
@@ -58,14 +59,18 @@ public class WorldListener implements Listener {
             // This can be done because if it's the default level, we don't have
             // any control over the generator, and otherwise we just take on
             // responsibility over the world
-            final WorldManager.WorldImportResult result = this.worldManager.importWorld(world, false, null);
+            final WorldManager.WorldImportResult result =
+                this.worldManager.importWorld(world, false, null);
             if (result == WorldManager.WorldImportResult.SUCCESS) {
-                MessageUtil.sendMessage(Bukkit.getConsoleSender(),
-                    Messages.messageWorldImportedOnLoad, "%world%", world.getName(), "%generator%",
-                    this.worldManager.getWorld(world.getUID()).getConfiguration().getGenerator());
+                MessageUtil
+                    .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportedOnLoad,
+                        "%world%", world.getName(), "%generator%",
+                        Objects.requireNonNull(this.worldManager.getWorld(world.getUID())).getConfiguration()
+                            .getGenerator());
             } else {
-                MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
-                    "%world%", world.getName(), "%result%", result.getDescription());
+                MessageUtil
+                    .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
+                        "%world%", world.getName(), "%result%", result.getDescription());
             }
         }
     }

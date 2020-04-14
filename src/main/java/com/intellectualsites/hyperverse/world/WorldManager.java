@@ -18,7 +18,6 @@
 
 package com.intellectualsites.hyperverse.world;
 
-import lombok.Getter;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +31,8 @@ public interface WorldManager {
     /**
      * Attempt to import a world that has already been loaded by bukkit
      *
-     * @param world Loaded world
-     * @param vanilla Whether or not the world is a vanilla world
+     * @param world     Loaded world
+     * @param vanilla   Whether or not the world is a vanilla world
      * @param generator The generator name. If this is null, the generator
      *                  will be guessed from the chunk generator
      * @return The result of the import
@@ -42,6 +41,8 @@ public interface WorldManager {
         @Nullable String generator);
 
     void loadWorlds();
+
+    void createWorlds();
 
     boolean addWorld(@NotNull HyperWorld hyperWorld);
 
@@ -54,15 +55,18 @@ public interface WorldManager {
     @Nullable HyperWorld getWorld(@NotNull UUID uuid);
 
     enum WorldImportResult {
-        SUCCESS("Success"),
-        ALREADY_IMPORTED("The world was already imported"),
-        GENERATOR_NOT_FOUND("The specified generator could not be found");
+        SUCCESS("Success"), ALREADY_IMPORTED("The world was already imported"), GENERATOR_NOT_FOUND(
+            "The specified generator could not be found");
+
+        final String description;
 
         WorldImportResult(@NotNull final String description) {
             this.description = Objects.requireNonNull(description);
         }
 
-        @Getter final String description;
+        @NotNull public String getDescription() {
+            return this.description;
+        }
     }
 
 }

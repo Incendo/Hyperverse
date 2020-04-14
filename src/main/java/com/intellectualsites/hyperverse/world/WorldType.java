@@ -18,7 +18,6 @@
 
 package com.intellectualsites.hyperverse.world;
 
-import lombok.Getter;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,10 +25,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
-@Getter public enum WorldType {
+
+public enum WorldType {
     OVER_WORLD(World.Environment.NORMAL, Arrays.asList("overworld", "over_world", "normal")),
-    NETHER(World.Environment.NETHER, Arrays.asList("the_nether", "nether")),
-    END(World.Environment.THE_END, Arrays.asList("end", "the_end", "hell"));
+    NETHER(World.Environment.NETHER, Arrays.asList("the_nether", "nether", "hell")),
+    END(World.Environment.THE_END, Arrays.asList("end", "the_end"));
 
     private final World.Environment bukkitType;
     private final Collection<String> aliases;
@@ -37,6 +37,14 @@ import java.util.Optional;
     WorldType(final World.Environment bukkitType, final Collection<String> aliases) {
         this.bukkitType = bukkitType;
         this.aliases = aliases;
+    }
+
+    @NotNull public World.Environment getBukkitType() {
+        return this.bukkitType;
+    }
+
+    @NotNull public Collection<String> getAliases() {
+        return this.aliases;
     }
 
     @NotNull public static Optional<WorldType> fromString(@NotNull final String string) {

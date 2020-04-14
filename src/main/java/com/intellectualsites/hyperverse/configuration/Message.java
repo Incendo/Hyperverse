@@ -18,12 +18,27 @@
 
 package com.intellectualsites.hyperverse.configuration;
 
-import lombok.Value;
+import org.jetbrains.annotations.NotNull;
 
-@Value public class Message {
+import java.util.Objects;
+
+public final class Message {
 
     private final String key;
     private final String defaultValue;
+
+    public Message(@NotNull final String key, @NotNull final String defaultValue) {
+        this.key = Objects.requireNonNull(key);
+        this.defaultValue = Objects.requireNonNull(defaultValue);
+    }
+
+    @NotNull public String getKey() {
+        return this.key;
+    }
+
+    @NotNull public String getDefaultValue() {
+        return this.defaultValue;
+    }
 
     @Override public String toString() {
         return Messages.getConfigured(this);

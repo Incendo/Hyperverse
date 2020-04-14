@@ -38,9 +38,9 @@ public class HyperverseModule extends AbstractModule {
         bind(HyperConfiguration.class).to(PluginFileHyperConfiguration.class).in(Singleton.class);
         bind(WorldManager.class).to(SimpleWorldManager.class).in(Singleton.class);
         install(new FactoryModuleBuilder().implement(WorldCreator.class, HyperWorldCreator.class)
-        .build(HyperWorldCreatorFactory.class));
+            .build(HyperWorldCreatorFactory.class));
         install(new FactoryModuleBuilder().implement(HyperWorld.class, SimpleWorld.class)
-        .build(HyperWorldFactory.class));
+            .build(HyperWorldFactory.class));
     }
 
 }

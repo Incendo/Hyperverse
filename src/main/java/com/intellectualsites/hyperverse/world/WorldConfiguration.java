@@ -23,9 +23,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.intellectualsites.hyperverse.util.GeneratorUtil;
-import com.intellectualsites.hyperverse.util.SeedUtil;
-import lombok.Builder;
-import lombok.Getter;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,25 +36,38 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-@Builder @Getter public class WorldConfiguration {
+public class WorldConfiguration {
 
-    private static final Gson gson
-        = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private String name;
-    @Builder.Default private WorldType type = WorldType.OVER_WORLD;
-    @Builder.Default private String settings = "";
-    @Builder.Default private long seed = SeedUtil.randomSeed();
-    @Builder.Default private boolean generateStructures = true;
-    @Builder.Default private String generator = "";
+    private WorldType type;
+    private String settings;
+    private long seed;
+    private boolean generateStructures;
+    private String generator;
+
+    WorldConfiguration(final String name, final WorldType type, final String settings, final long seed,
+        final boolean generateStructures, final String generator) {
+        this.name = name;
+        this.type = type;
+        this.settings = settings;
+        this.seed = seed;
+        this.generateStructures = generateStructures;
+        this.generator = generator;
+    }
+
+    public static WorldConfigurationBuilder builder() {
+        return new WorldConfigurationBuilder();
+    }
 
     @NotNull public static WorldConfiguration fromWorld(@NotNull final World world) {
         Objects.requireNonNull(world);
         final WorldConfigurationBuilder worldConfigurationBuilder = builder();
-        worldConfigurationBuilder.name(world.getName());
-        worldConfigurationBuilder.type(WorldType.fromBukkit(world.getEnvironment()));
-        worldConfigurationBuilder.seed(world.getSeed());
-        worldConfigurationBuilder.generateStructures(world.canGenerateStructures());
+        worldConfigurationBuilder.setName(world.getName());
+        worldConfigurationBuilder.setType(WorldType.fromBukkit(world.getEnvironment()));
+        worldConfigurationBuilder.setSeed(world.getSeed());
+        worldConfigurationBuilder.setGenerateStructures(world.canGenerateStructures());
         // Try to retrieve the generator
         try {
             ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());
@@ -67,13 +77,50 @@ import java.util.Objects;
             if (chunkGenerator != null) {
                 final JavaPlugin plugin = GeneratorUtil.matchGenerator(chunkGenerator);
                 if (plugin != null) {
-                    worldConfigurationBuilder.generator(plugin.getName());
+                    worldConfigurationBuilder.setGenerator(plugin.getName());
                 }
             }
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        return worldConfigurationBuilder.build();
+        return worldConfigurationBuilder.createWorldConfiguration();
+    }
+
+    @Nullable public static WorldConfiguration fromFile(@NotNull final Path path) {
+        if (!Files.exists(path)) {
+            return null;
+        }
+        try (final BufferedReader bufferedReader = Files.newBufferedReader(path);
+            final JsonReader jsonReader = new JsonReader(bufferedReader)) {
+            return gson.fromJson(jsonReader, WorldConfiguration.class);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public WorldType getType() {
+        return this.type;
+    }
+
+    public String getSettings() {
+        return this.settings;
+    }
+
+    public long getSeed() {
+        return this.seed;
+    }
+
+    public boolean isGenerateStructures() {
+        return this.generateStructures;
+    }
+
+    public String getGenerator() {
+        return this.generator;
     }
 
     public boolean writeToFile(@NotNull final Path path) {
@@ -85,27 +132,15 @@ import java.util.Objects;
                 return false;
             }
         }
-        try (final BufferedWriter bufferedWriter = Files.newBufferedWriter(Objects.requireNonNull(path));
-             final JsonWriter jsonWriter = new JsonWriter(bufferedWriter)) {
-             gson.toJson(this, WorldConfiguration.class, jsonWriter);
-             return true;
+        try (final BufferedWriter bufferedWriter = Files
+            .newBufferedWriter(Objects.requireNonNull(path));
+            final JsonWriter jsonWriter = new JsonWriter(bufferedWriter)) {
+            gson.toJson(this, WorldConfiguration.class, jsonWriter);
+            return true;
         } catch (final Exception e) {
             e.printStackTrace();
         }
         return false;
-    }
-
-    @Nullable public static WorldConfiguration fromFile(@NotNull final Path path) {
-        if (!Files.exists(path)) {
-            return null;
-        }
-        try (final BufferedReader bufferedReader = Files.newBufferedReader(path);
-             final JsonReader jsonReader = new JsonReader(bufferedReader)) {
-            return gson.fromJson(jsonReader, WorldConfiguration.class);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override public String toString() {

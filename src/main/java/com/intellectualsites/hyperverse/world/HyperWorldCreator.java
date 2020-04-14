@@ -21,7 +21,6 @@ package com.intellectualsites.hyperverse.world;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.intellectualsites.hyperverse.util.NullRouteCommandSender;
-import lombok.Getter;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.generator.ChunkGenerator;
@@ -31,18 +30,24 @@ import java.util.Objects;
 
 public final class HyperWorldCreator extends WorldCreator {
 
-    @Getter private final HyperWorld hyperWorld;
+    private final HyperWorld hyperWorld;
 
     @Inject public HyperWorldCreator(@Assisted final HyperWorld hyperWorld) {
         super(Objects.requireNonNull(hyperWorld).getConfiguration().getName());
         this.hyperWorld = hyperWorld;
     }
 
+    public HyperWorld getHyperWorld() {
+        return this.hyperWorld;
+    }
+
     @NotNull public ValidationResult validate() {
         final WorldConfiguration worldConfiguration = this.hyperWorld.getConfiguration();
-        if (!worldConfiguration.getGenerator().isEmpty()) {
-            final ChunkGenerator chunkGenerator = getGeneratorForName(worldConfiguration.getName(),
-                worldConfiguration.getName(), NullRouteCommandSender.getInstance());
+        if (!worldConfiguration.getGenerator().isEmpty() &&
+            !worldConfiguration.getGenerator().equalsIgnoreCase("vanilla")) {
+            final ChunkGenerator chunkGenerator =
+                getGeneratorForName(worldConfiguration.getName(), worldConfiguration.getGenerator(),
+                    NullRouteCommandSender.getInstance());
             if (chunkGenerator == null) {
                 return ValidationResult.UNKNOWN_GENERATOR;
             }
@@ -62,8 +67,7 @@ public final class HyperWorldCreator extends WorldCreator {
     }
 
     public enum ValidationResult {
-        SUCCESS,
-        UNKNOWN_GENERATOR;
+        SUCCESS, UNKNOWN_GENERATOR
     }
 
 }
