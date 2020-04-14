@@ -24,6 +24,7 @@ import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.listeners.WorldListener;
 import com.intellectualsites.hyperverse.modules.HyperverseModule;
+import com.intellectualsites.hyperverse.world.WorldManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
@@ -33,6 +34,8 @@ public final class Hyperverse extends JavaPlugin {
         final Injector injector = Guice.createInjector(Stage.PRODUCTION,
             new HyperverseModule());
         // Register event listeners
+        final WorldManager worldManager = injector.getInstance(WorldManager.class);
+        worldManager.loadWorlds();
         this.getServer().getPluginManager()
             .registerEvents(injector.getInstance(WorldListener.class), this);
     }
@@ -40,4 +43,6 @@ public final class Hyperverse extends JavaPlugin {
     @Override public void onDisable() {
         // Plugin shutdown logic
     }
+
+
 }

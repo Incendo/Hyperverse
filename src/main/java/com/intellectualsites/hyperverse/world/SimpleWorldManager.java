@@ -22,7 +22,10 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.intellectualsites.hyperverse.Hyperverse;
+import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.modules.HyperWorldFactory;
+import com.intellectualsites.hyperverse.util.MessageUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,27 +50,47 @@ import java.util.UUID;
     @Inject public SimpleWorldManager(final Hyperverse hyperverse, final HyperWorldFactory hyperWorldFactory) {
         this.hyperverse = Objects.requireNonNull(hyperverse);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
+    }
+
+    @Override public void loadWorlds() {
         // Find all files in the worlds folder and load them
         final Path worldsPath = this.hyperverse.getDataFolder().toPath()
             .resolve("worlds");
-        if (Files.exists(worldsPath) && Files.isDirectory(worldsPath)) {
+        if (!Files.exists(worldsPath)) {
             try {
-                Files.list(worldsPath).filter(path -> path.getFileName().endsWith("json"))
+                Files.createDirectories(worldsPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (Files.exists(worldsPath) && Files.isDirectory(worldsPath)) {
+            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldsLoading, "%path%",
+                worldsPath.toString());
+            try {
+                Files.list(worldsPath)
                     .forEach(path -> {
-                    final WorldConfiguration worldConfiguration = WorldConfiguration.fromFile(path);
-                    if (worldConfiguration == null) {
-                        this.hyperverse.getLogger().warning(String.format("Failed to parse world file: %s",
-                            path.getFileName().toString()));
-                    } else {
-                        final HyperWorld hyperWorld = hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
-                        this.registerWorld(hyperWorld);
-                    }
-                });
+                        final WorldConfiguration worldConfiguration = WorldConfiguration.fromFile(path);
+                        if (worldConfiguration == null) {
+                            this.hyperverse.getLogger().warning(String.format("Failed to parse world file: %s",
+                                path.getFileName().toString()));
+                        } else {
+                            final HyperWorld hyperWorld = hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
+                            this.registerWorld(hyperWorld);
+                        }
+                    });
             } catch (IOException e) {
                 hyperverse.getLogger().severe("Failed to load world configurations");
                 e.printStackTrace();
             }
         }
+        // Also loop over all other worlds to see if anything was loaded sneakily
+        for (final World world : Bukkit.getWorlds()) {
+            if (!this.worldMap.containsKey(world.getUID())) {
+                this.importWorld(world, false, "");
+            }
+        }
+        MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldLoaded, "%num%",
+            Integer.toString(this.worldMap.size()));
     }
 
     @Override public WorldImportResult importWorld(@NotNull final World world,
@@ -78,7 +101,7 @@ import java.util.UUID;
         final WorldConfiguration worldConfiguration = WorldConfiguration.fromWorld(world);
         if (!vanilla) {
             final String worldGenerator = worldConfiguration.getGenerator();
-            if (generator == null && (worldGenerator == null || worldGenerator.isEmpty())) {
+            if (generator == null && worldGenerator == null) {
                 return WorldManager.WorldImportResult.GENERATOR_NOT_FOUND;
             } else if (generator != null) {
                 if (worldGenerator == null || worldGenerator.isEmpty() ||

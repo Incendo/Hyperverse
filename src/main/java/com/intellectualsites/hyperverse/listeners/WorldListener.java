@@ -45,6 +45,8 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onWorldInit(final WorldInitEvent event) {
         final World world = event.getWorld();
+        MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldLoadDetected,
+            "%world%", world.getName());
         HyperWorld hyperWorld = this.worldManager.getWorld(world.getUID());
         if (hyperWorld != null ||
             (hyperWorld = this.worldManager.getWorld(world.getName())) != null) {
@@ -56,10 +58,14 @@ public class WorldListener implements Listener {
             // This can be done because if it's the default level, we don't have
             // any control over the generator, and otherwise we just take on
             // responsibility over the world
-            if (this.worldManager.importWorld(world, false, null) ==
-                WorldManager.WorldImportResult.SUCCESS) {
+            final WorldManager.WorldImportResult result = this.worldManager.importWorld(world, false, null);
+            if (result == WorldManager.WorldImportResult.SUCCESS) {
                 MessageUtil.sendMessage(Bukkit.getConsoleSender(),
-                    Messages.messageWorldImportedOnLoad, "%world%", world.getName());
+                    Messages.messageWorldImportedOnLoad, "%world%", world.getName(), "%generator%",
+                    this.worldManager.getWorld(world.getUID()).getConfiguration().getGenerator());
+            } else {
+                MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
+                    "%world%", world.getName(), "%result%", result.getDescription());
             }
         }
     }

@@ -42,6 +42,7 @@ import java.util.Objects;
         if (generatorGetter == null) {
             final Class<? extends Server> serverClass = Bukkit.getServer().getClass();
             generatorGetter = serverClass.getDeclaredMethod("getGenerator", String.class);
+            generatorGetter.setAccessible(true);
         }
         return (ChunkGenerator) generatorGetter.invoke(Bukkit.getServer(), Objects.requireNonNull(world));
     }
@@ -53,6 +54,7 @@ import java.util.Objects;
         if (pluginClassLoaderClass == null) {
             pluginClassLoaderClass = Class.forName("org.bukkit.plugin.java.PluginClassLoader");
             pluginGetter = pluginClassLoaderClass.getDeclaredField("plugin");
+            pluginGetter.setAccessible(true);
         }
         if (pluginClassLoaderClass.isInstance(classLoader)) {
             return (JavaPlugin) pluginGetter.get(classLoader);

@@ -160,6 +160,7 @@ public class HyperCommandManager extends BaseCommand {
     @CommandAlias("hvtp")
     @CommandPermission("hyperverse.teleport")
     @CommandCompletion("@hyperworlds")
+    @Description("Teleport between hyperverse worlds")
     public void doTeleport(final CommandSender sender, final HyperWorld world) {
     }
 

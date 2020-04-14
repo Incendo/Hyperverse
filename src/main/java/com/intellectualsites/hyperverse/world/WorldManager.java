@@ -18,11 +18,13 @@
 
 package com.intellectualsites.hyperverse.world;
 
+import lombok.Getter;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.UUID;
 
 public interface WorldManager {
@@ -39,6 +41,8 @@ public interface WorldManager {
     WorldImportResult importWorld(@NotNull World world, boolean vanilla,
         @Nullable String generator);
 
+    void loadWorlds();
+
     boolean addWorld(@NotNull HyperWorld hyperWorld);
 
     void registerWorld(@NotNull HyperWorld hyperWorld);
@@ -50,9 +54,15 @@ public interface WorldManager {
     @Nullable HyperWorld getWorld(@NotNull UUID uuid);
 
     enum WorldImportResult {
-        SUCCESS,
-        ALREADY_IMPORTED,
-        GENERATOR_NOT_FOUND
+        SUCCESS("Success"),
+        ALREADY_IMPORTED("The world was already imported"),
+        GENERATOR_NOT_FOUND("The specified generator could not be found");
+
+        WorldImportResult(@NotNull final String description) {
+            this.description = Objects.requireNonNull(description);
+        }
+
+        @Getter final String description;
     }
 
 }

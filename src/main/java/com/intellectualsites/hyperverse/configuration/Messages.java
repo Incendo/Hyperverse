@@ -43,7 +43,14 @@ public class Messages {
     public static final Message messageWorldCreationFinished = createMessage("world.creation_finished",
         "&7The world was created successfully");
     public static final Message messageWorldImportedOnLoad = createMessage("world.load_imported",
-        "&7Hyperverse detected that %world% initialized, and successfully imported it");
+        "&7Hyperverse detected that %world% initialized, and successfully imported it (Generator: %generator%)");
+    public static final Message messageWorldLoaded = createMessage("world.loaded", "&7Loaded %num% worlds");
+    public static final Message messageWorldImportFailure = createMessage("world.load_failure",
+        "&cHyperverse failed to import world '%world%'. Result: %result%");
+    public static final Message messageWorldLoadDetected = createMessage("world.load_detected",
+        "&7Detected loading world: '%world%'");
+    public static final Message messageWorldsLoading = createMessage("world.loading",
+        "&7Loading stored worlds from configuration files. Path: %path%");
 
     public static Message createMessage(@NotNull final String key, @NotNull final String defaultValue) {
         final Message message = new Message(Objects.requireNonNull(key), Objects.requireNonNull(defaultValue));

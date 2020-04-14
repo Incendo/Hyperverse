@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -59,7 +60,10 @@ import java.util.Objects;
         worldConfigurationBuilder.generateStructures(world.canGenerateStructures());
         // Try to retrieve the generator
         try {
-            final ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());
+            ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());
+            if (chunkGenerator == null) {
+                chunkGenerator = world.getGenerator();
+            }
             if (chunkGenerator != null) {
                 final JavaPlugin plugin = GeneratorUtil.matchGenerator(chunkGenerator);
                 if (plugin != null) {
@@ -73,6 +77,14 @@ import java.util.Objects;
     }
 
     public boolean writeToFile(@NotNull final Path path) {
+        if (!Files.exists(path)) {
+            try {
+                Files.createFile(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
         try (final BufferedWriter bufferedWriter = Files.newBufferedWriter(Objects.requireNonNull(path));
              final JsonWriter jsonWriter = new JsonWriter(bufferedWriter)) {
              gson.toJson(this, WorldConfiguration.class, jsonWriter);
