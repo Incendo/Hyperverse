@@ -1,0 +1,4 @@
+worlds:
+  # Whether or not worlds should be automatically imported
+  # into Hyperverse on load
+  import-automatically: true

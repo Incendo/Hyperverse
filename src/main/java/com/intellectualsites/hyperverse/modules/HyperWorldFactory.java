@@ -16,25 +16,15 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.intellectualsites.hyperverse.world;
+package com.intellectualsites.hyperverse.modules;
 
-import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import com.intellectualsites.hyperverse.world.HyperWorld;
+import com.intellectualsites.hyperverse.world.WorldConfiguration;
 
-public interface HyperWorld {
+import java.util.UUID;
 
-    void setBukkitWorld(@NotNull World world);
+public interface HyperWorldFactory {
 
-    @NotNull World createBukkitWorld() throws HyperWorldValidationException;
-
-    void teleportPlayer(@NotNull Player player);
-
-    java.util.UUID getWorldUUID();
-
-    WorldConfiguration getConfiguration();
-
-    World getBukkitWorld();
+    HyperWorld create(final UUID uuid, final WorldConfiguration worldConfiguration);
 
 }

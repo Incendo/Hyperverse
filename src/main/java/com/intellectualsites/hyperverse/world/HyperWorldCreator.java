@@ -18,6 +18,8 @@
 
 package com.intellectualsites.hyperverse.world;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import com.intellectualsites.hyperverse.util.NullRouteCommandSender;
 import lombok.Getter;
 import org.bukkit.WorldCreator;
@@ -31,7 +33,7 @@ public final class HyperWorldCreator extends WorldCreator {
 
     @Getter private final HyperWorld hyperWorld;
 
-    public HyperWorldCreator(@NotNull final HyperWorld hyperWorld) {
+    @Inject public HyperWorldCreator(@Assisted final HyperWorld hyperWorld) {
         super(Objects.requireNonNull(hyperWorld).getConfiguration().getName());
         this.hyperWorld = hyperWorld;
     }

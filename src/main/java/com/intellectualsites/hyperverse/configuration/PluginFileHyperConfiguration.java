@@ -16,28 +16,26 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.intellectualsites.hyperverse;
+package com.intellectualsites.hyperverse.configuration;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.Stage;
-import com.intellectualsites.hyperverse.listeners.WorldListener;
-import com.intellectualsites.hyperverse.modules.HyperverseModule;
-import org.bukkit.plugin.java.JavaPlugin;
+import com.intellectualsites.hyperverse.Hyperverse;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
 
-@Singleton
-public final class Hyperverse extends JavaPlugin {
+@Singleton public class PluginFileHyperConfiguration implements HyperConfiguration {
 
-    @Override public void onEnable() {
-        final Injector injector = Guice.createInjector(Stage.PRODUCTION,
-            new HyperverseModule());
-        // Register event listeners
-        this.getServer().getPluginManager()
-            .registerEvents(injector.getInstance(WorldListener.class), this);
+    private final boolean importAutomatically;
+
+    @Inject public PluginFileHyperConfiguration(@NotNull final Hyperverse hyperverse) {
+        hyperverse.saveDefaultConfig();
+        final FileConfiguration config = hyperverse.getConfig();
+        this.importAutomatically = config.getBoolean("worlds.import-automatically", true);
     }
 
-    @Override public void onDisable() {
-        // Plugin shutdown logic
+    @Override public boolean shouldImportAutomatically() {
+        return this.importAutomatically;
     }
+
 }

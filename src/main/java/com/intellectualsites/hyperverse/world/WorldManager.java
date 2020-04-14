@@ -18,53 +18,14 @@
 
 package com.intellectualsites.hyperverse.world;
 
-import com.intellectualsites.hyperverse.Hyperverse;
-import com.google.common.collect.Maps;
-import lombok.Getter;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
-public class WorldManager {
-
-    private final Map<UUID, HyperWorld> worldMap = Maps.newHashMap();
-    private final Map<String, UUID> uuidMap = Maps.newHashMap();
-
-    @Getter private final Hyperverse hyperverse;
-
-    public WorldManager(@NotNull final Hyperverse hyperverse) {
-        this.hyperverse = Objects.requireNonNull(hyperverse);
-        // Find all files in the worlds folder and load them
-        final Path worldsPath = this.hyperverse.getDataFolder().toPath()
-            .resolve("worlds");
-        if (Files.exists(worldsPath) && Files.isDirectory(worldsPath)) {
-            try {
-                Files.list(worldsPath).filter(path -> path.getFileName().endsWith("json"))
-                    .forEach(path -> {
-                    final WorldConfiguration worldConfiguration = WorldConfiguration.fromFile(path);
-                    if (worldConfiguration == null) {
-                        this.hyperverse.getLogger().warning(String.format("Failed to parse world file: %s",
-                            path.getFileName().toString()));
-                    } else {
-                        final HyperWorld hyperWorld = new HyperWorld(UUID.randomUUID(), worldConfiguration);
-                        this.registerWorld(hyperWorld);
-                    }
-                });
-            } catch (IOException e) {
-                hyperverse.getLogger().severe("Failed to load world configurations");
-                e.printStackTrace();
-            }
-        }
-    }
+public interface WorldManager {
 
     /**
      * Attempt to import a world that has already been loaded by bukkit
@@ -75,63 +36,20 @@ public class WorldManager {
      *                  will be guessed from the chunk generator
      * @return The result of the import
      */
-    public WorldImportResult importWorld(@NotNull final World world, final boolean vanilla,
-        @Nullable final String generator) {
-        if (this.worldMap.containsKey(world.getUID())) {
-            return WorldImportResult.ALREADY_IMPORTED;
-        }
-        final WorldConfiguration worldConfiguration = WorldConfiguration.fromWorld(world);
-        if (!vanilla) {
-            final String worldGenerator = worldConfiguration.getGenerator();
-            if (generator == null && (worldGenerator == null || worldGenerator.isEmpty())) {
-                return WorldImportResult.GENERATOR_NOT_FOUND;
-            } else if (generator != null) {
-                if (worldGenerator == null || worldGenerator.isEmpty() ||
-                    !generator.equalsIgnoreCase(worldGenerator)) {
-                    return WorldImportResult.GENERATOR_NOT_FOUND;
-                }
-            }
-        }
-        final HyperWorld hyperWorld = new HyperWorld(world.getUID(), worldConfiguration);
-        this.addWorld(hyperWorld);
-        return WorldImportResult.SUCCESS;
-    }
+    WorldImportResult importWorld(@NotNull World world, boolean vanilla,
+        @Nullable String generator);
 
-    public boolean addWorld(@NotNull final HyperWorld hyperWorld) {
-        this.registerWorld(hyperWorld);
-        // Create configuration file
-        final Path path = this.hyperverse.getDataFolder().toPath()
-            .resolve("worlds").resolve(String.format("%s.json", hyperWorld.getConfiguration().getName()));
-        return hyperWorld.getConfiguration().writeToFile(path);
-    }
+    boolean addWorld(@NotNull HyperWorld hyperWorld);
 
-    public void registerWorld(@NotNull final HyperWorld hyperWorld) {
-        Objects.requireNonNull(hyperWorld);
-        if (this.worldMap.containsKey(hyperWorld.getWorldUUID())) {
-            throw new IllegalArgumentException(String.format("World %s already exists",
-                hyperWorld.getConfiguration().getName()));
-        }
-        this.worldMap.put(hyperWorld.getWorldUUID(), hyperWorld);
-        this.uuidMap.put(hyperWorld.getConfiguration().getName(), hyperWorld.getWorldUUID());
-    }
+    void registerWorld(@NotNull HyperWorld hyperWorld);
 
-    @NotNull public Collection<HyperWorld> getWorlds() {
-        return Collections.unmodifiableCollection(this.worldMap.values());
-    }
+    @NotNull Collection<HyperWorld> getWorlds();
 
-    @Nullable public HyperWorld getWorld(@NotNull final String name) {
-        final UUID uuid = this.uuidMap.get(Objects.requireNonNull(name));
-        if (uuid == null) {
-            return null;
-        }
-        return this.worldMap.get(uuid);
-    }
+    @Nullable HyperWorld getWorld(@NotNull String name);
 
-    @Nullable public HyperWorld getWorld(@NotNull final UUID uuid) {
-        return this.worldMap.get(Objects.requireNonNull(uuid));
-    }
+    @Nullable HyperWorld getWorld(@NotNull UUID uuid);
 
-    public enum WorldImportResult {
+    enum WorldImportResult {
         SUCCESS,
         ALREADY_IMPORTED,
         GENERATOR_NOT_FOUND
