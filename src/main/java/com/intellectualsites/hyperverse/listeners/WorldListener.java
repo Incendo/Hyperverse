@@ -16,10 +16,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.github.sauilitired.hyperverse.listeners;
+package com.intellectualsites.hyperverse.listeners;
 
-import com.github.sauilitired.hyperverse.world.HyperWorld;
-import com.github.sauilitired.hyperverse.world.WorldManager;
+import com.intellectualsites.hyperverse.world.HyperWorld;
+import com.intellectualsites.hyperverse.world.WorldManager;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;

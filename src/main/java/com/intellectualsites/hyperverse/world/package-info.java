@@ -19,4 +19,4 @@
 /**
  * Classes related to worlds, world creation, world properties, etc
  */
-package com.github.sauilitired.hyperverse.world;
+package com.intellectualsites.hyperverse.world;

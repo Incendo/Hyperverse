@@ -16,9 +16,9 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.github.sauilitired.hyperverse.world;
+package com.intellectualsites.hyperverse.world;
 
-import com.github.sauilitired.hyperverse.util.NullRouteCommandSender;
+import com.intellectualsites.hyperverse.util.NullRouteCommandSender;
 import lombok.Getter;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;

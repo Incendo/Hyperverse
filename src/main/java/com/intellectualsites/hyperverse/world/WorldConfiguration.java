@@ -16,10 +16,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.github.sauilitired.hyperverse.world;
+package com.intellectualsites.hyperverse.world;
 
-import com.github.sauilitired.hyperverse.util.GeneratorUtil;
-import com.github.sauilitired.hyperverse.util.SeedUtil;
+import com.intellectualsites.hyperverse.util.GeneratorUtil;
+import com.intellectualsites.hyperverse.util.SeedUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;

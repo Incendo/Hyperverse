@@ -16,9 +16,9 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.github.sauilitired.hyperverse.world;
+package com.intellectualsites.hyperverse.world;
 
-import com.github.sauilitired.hyperverse.exception.HyperWorldValidationException;
+import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

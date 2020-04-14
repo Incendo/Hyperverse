@@ -16,24 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.github.sauilitired.hyperverse;
-
-import com.github.sauilitired.hyperverse.listeners.WorldListener;
-import com.github.sauilitired.hyperverse.world.WorldManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
-public final class Hyperverse extends JavaPlugin {
-
-    private WorldManager worldManager;
-
-    @Override public void onEnable() {
-        this.worldManager = new WorldManager(this);
-        // Register event listeners
-        this.getServer().getPluginManager()
-            .registerEvents(new WorldListener(this.worldManager), this);
-    }
-
-    @Override public void onDisable() {
-        // Plugin shutdown logic
-    }
-}
+/**
+ * Custom exceptions, mostly related to worlds
+ */
+package com.intellectualsites.hyperverse.exception;

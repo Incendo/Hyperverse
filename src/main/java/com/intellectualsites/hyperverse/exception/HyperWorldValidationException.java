@@ -16,10 +16,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.github.sauilitired.hyperverse.exception;
+package com.intellectualsites.hyperverse.exception;
 
-import com.github.sauilitired.hyperverse.world.HyperWorld;
-import com.github.sauilitired.hyperverse.world.HyperWorldCreator;
+import com.intellectualsites.hyperverse.world.HyperWorld;
+import com.intellectualsites.hyperverse.world.HyperWorldCreator;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 

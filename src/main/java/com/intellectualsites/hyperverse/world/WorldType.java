@@ -16,7 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.github.sauilitired.hyperverse.world;
+package com.intellectualsites.hyperverse.world;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

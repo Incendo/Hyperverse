@@ -16,7 +16,16 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-/**
- * Utility classes
- */
-package com.github.sauilitired.hyperverse.util;
+package com.intellectualsites.hyperverse.util;
+
+import lombok.experimental.UtilityClass;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+@UtilityClass public class SeedUtil {
+
+    public static long randomSeed() {
+        return ThreadLocalRandom.current().nextLong();
+    }
+
+}
