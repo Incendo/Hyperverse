@@ -1,0 +1,7 @@
+name: Hyperverse
+version: ${project.version}
+main: com.github.sauilitired.hyperverse.Hyperverse
+api-version: 1.13
+load: STARTUP
+authors: [Citymonstret]
+description: A minecraft world management plugin
