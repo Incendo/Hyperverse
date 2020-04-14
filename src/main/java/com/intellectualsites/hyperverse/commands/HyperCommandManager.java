@@ -26,7 +26,6 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
 import co.aikar.commands.annotation.Values;
 import com.intellectualsites.hyperverse.Hyperverse;
 import com.intellectualsites.hyperverse.configuration.Messages;
@@ -72,7 +71,6 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("create")
-    @Syntax("<name> <generator>")
     @CommandPermission("hyperverse.create")
     public void createWorld(final CommandSender sender, final String world,
         @Values("@generators") @Default("vanilla") final String generator,
