@@ -54,6 +54,8 @@ public interface WorldManager {
 
     @Nullable HyperWorld getWorld(@NotNull UUID uuid);
 
+    void ignoreWorld(@NotNull final String world);
+
     enum WorldImportResult {
         SUCCESS("Success"), ALREADY_IMPORTED("The world was already imported"), GENERATOR_NOT_FOUND(
             "The specified generator could not be found");
@@ -68,5 +70,7 @@ public interface WorldManager {
             return this.description;
         }
     }
+
+    boolean shouldIgnore(@NotNull final String name);
 
 }

@@ -20,6 +20,7 @@ package com.intellectualsites.hyperverse.world;
 
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,5 +37,7 @@ public interface HyperWorld {
     World getBukkitWorld();
 
     void setBukkitWorld(@NotNull World world);
+
+    void sendWorldInfo(@NotNull final CommandSender sender);
 
 }

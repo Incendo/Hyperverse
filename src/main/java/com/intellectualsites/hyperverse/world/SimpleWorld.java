@@ -20,11 +20,14 @@ package com.intellectualsites.hyperverse.world;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import com.intellectualsites.hyperverse.modules.HyperWorldCreatorFactory;
+import com.intellectualsites.hyperverse.util.MessageUtil;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,6 +54,23 @@ public class SimpleWorld implements HyperWorld {
             throw new IllegalStateException("Cannot replace bukkit world");
         }
         this.bukkitWorld = Objects.requireNonNull(world);
+    }
+
+    @Override public void sendWorldInfo(@NotNull CommandSender sender) {
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "name", "%value%", configuration.getName());
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "type", "%value%", configuration.getType().name());
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "seed", "%value%", Long.toString(configuration.getSeed()));
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "structures", "%value%", Boolean.toString(configuration.isGenerateStructures()));
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "settings", "%value%", configuration.getSettings());
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "generator", "%value%", configuration.getGenerator());
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "generator arg", "%value%", configuration.getGeneratorArg());
     }
 
     @Override public void createBukkitWorld() throws HyperWorldValidationException {

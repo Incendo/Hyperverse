@@ -46,15 +46,17 @@ public class WorldConfiguration {
     private long seed;
     private boolean generateStructures;
     private String generator;
+    private String generatorArg;
 
     WorldConfiguration(final String name, final WorldType type, final String settings, final long seed,
-        final boolean generateStructures, final String generator) {
+        final boolean generateStructures, final String generator, final String generatorArg) {
         this.name = name;
         this.type = type;
         this.settings = settings;
         this.seed = seed;
         this.generateStructures = generateStructures;
         this.generator = generator;
+        this.generatorArg = generatorArg;
     }
 
     public static WorldConfigurationBuilder builder() {
@@ -123,6 +125,10 @@ public class WorldConfiguration {
         return this.generator;
     }
 
+    public String getGeneratorArg() {
+        return this.generatorArg;
+    }
+
     public boolean writeToFile(@NotNull final Path path) {
         if (!Files.exists(path)) {
             try {
@@ -146,7 +152,6 @@ public class WorldConfiguration {
     @Override public String toString() {
         return "WorldConfiguration{" + "name='" + name + '\'' + ", type=" + type + ", settings='"
             + settings + '\'' + ", seed=" + seed + ", generateStructures=" + generateStructures
-            + ", generator='" + generator + '\'' + '}';
+            + ", generator='" + generator + '\'' + ", generatorArg='" + generatorArg + '\'' + '}';
     }
-
 }

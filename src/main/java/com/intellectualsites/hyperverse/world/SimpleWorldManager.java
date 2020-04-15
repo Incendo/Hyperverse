@@ -19,6 +19,7 @@
 package com.intellectualsites.hyperverse.world;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -53,6 +54,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
     private final Map<UUID, HyperWorld> worldMap = Maps.newHashMap();
     private final Map<String, UUID> uuidMap = Maps.newHashMap();
     private final Multimap<String, HyperWorld> waitingForPlugin = HashMultimap.create();
+    private final Collection<String> ignoredWorlds = Lists.newLinkedList();
 
     private final Hyperverse hyperverse;
     private final HyperWorldFactory hyperWorldFactory;
@@ -151,23 +153,10 @@ public class SimpleWorldManager implements WorldManager, Listener {
             if (hyperWorld.getBukkitWorld() != null) {
                 return;
             }
+            this.ignoreWorld(hyperWorld.getConfiguration().getName());
             // Make sure to spam a little
-            final WorldConfiguration world = hyperWorld.getConfiguration();
             MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldCreationStarted);
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
-                "%property%", "name", "%value%", world.getName());
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
-                "%property%", "type", "%value%", world.getType().name());
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
-                "%property%", "seed", "%value%",
-                Long.toString(world.getSeed()));
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
-                "%property%", "structures", "%value%",
-                    Boolean.toString(world.isGenerateStructures()));
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
-                "%property%", "settings", "%value%", world.getSettings());
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldProperty,
-                "%property%", "generator", "%value%", world.getGenerator());
+            hyperWorld.sendWorldInfo(Bukkit.getConsoleSender());
             // Here we go...
             hyperWorld.createBukkitWorld();
         } catch (final HyperWorldValidationException validationException) {
@@ -219,7 +208,8 @@ public class SimpleWorldManager implements WorldManager, Listener {
 
     @Override public void registerWorld(@NotNull final HyperWorld hyperWorld) {
         Objects.requireNonNull(hyperWorld);
-        if (this.worldMap.containsKey(hyperWorld.getWorldUUID())) {
+        if (this.worldMap.containsKey(hyperWorld.getWorldUUID()) ||
+            this.uuidMap.containsKey(hyperWorld.getConfiguration().getName())) {
             throw new IllegalArgumentException(
                 String.format("World %s already exists", hyperWorld.getConfiguration().getName()));
         }
@@ -229,6 +219,14 @@ public class SimpleWorldManager implements WorldManager, Listener {
 
     @Override @NotNull public Collection<HyperWorld> getWorlds() {
         return Collections.unmodifiableCollection(this.worldMap.values());
+    }
+
+    @Override public boolean shouldIgnore(@NotNull final String name) {
+        return this.ignoredWorlds.contains(name.toLowerCase());
+    }
+
+    @Override public void ignoreWorld(@NotNull final String name) {
+        this.ignoredWorlds.add(name.toLowerCase());
     }
 
     @Override @Nullable public HyperWorld getWorld(@NotNull final String name) {

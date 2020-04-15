@@ -28,6 +28,7 @@ public class WorldConfigurationBuilder {
     private long seed = SeedUtil.randomSeed();
     private boolean generateStructures = true;
     private String generator = "";
+    private String generatorArg = "";
 
     public WorldConfigurationBuilder setName(String name) {
         this.name = name;
@@ -59,7 +60,13 @@ public class WorldConfigurationBuilder {
         return this;
     }
 
-    public WorldConfiguration createWorldConfiguration() {
-        return new WorldConfiguration(name, type, settings, seed, generateStructures, generator);
+    public WorldConfigurationBuilder setGeneratorArg(String generatorArg) {
+        this.generatorArg = generatorArg;
+        return this;
     }
+
+    public WorldConfiguration createWorldConfiguration() {
+        return new WorldConfiguration(name, type, settings, seed, generateStructures, generator, generatorArg);
+    }
+
 }

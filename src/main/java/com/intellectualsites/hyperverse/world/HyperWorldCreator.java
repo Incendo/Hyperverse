@@ -46,7 +46,7 @@ public final class HyperWorldCreator extends WorldCreator {
         if (!worldConfiguration.getGenerator().isEmpty() &&
             !worldConfiguration.getGenerator().equalsIgnoreCase("vanilla")) {
             final ChunkGenerator chunkGenerator =
-                getGeneratorForName(worldConfiguration.getName(), worldConfiguration.getGenerator(),
+                getGeneratorForName(worldConfiguration.getName(), getJoinedName(),
                     NullRouteCommandSender.getInstance());
             if (chunkGenerator == null) {
                 return ValidationResult.UNKNOWN_GENERATOR;
@@ -63,7 +63,15 @@ public final class HyperWorldCreator extends WorldCreator {
         this.seed(worldConfiguration.getSeed());
         this.hardcore(false);
         this.generateStructures(worldConfiguration.isGenerateStructures());
-        this.generator(worldConfiguration.getGenerator(), NullRouteCommandSender.getInstance());
+        this.generator(getJoinedName(), NullRouteCommandSender.getInstance());
+    }
+
+    private String getJoinedName() {
+        if (this.hyperWorld.getConfiguration().getGeneratorArg().isEmpty()) {
+            return this.hyperWorld.getConfiguration().getGenerator();
+        }
+        return String.format("%s:%s", this.hyperWorld.getConfiguration().getGenerator(),
+            this.hyperWorld.getConfiguration().getGeneratorArg());
     }
 
     public enum ValidationResult {

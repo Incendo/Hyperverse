@@ -46,6 +46,10 @@ public class WorldListener implements Listener {
 
     @EventHandler public void onWorldInit(final WorldInitEvent event) {
         final World world = event.getWorld();
+        // We ignore our own world loads
+        if (worldManager.shouldIgnore(world.getName())) {
+            return;
+        }
         MessageUtil.sendMessage(Bukkit.getConsoleSender(),
             Messages.messageWorldLoadDetected, "%world%", world.getName());
         HyperWorld hyperWorld = this.worldManager.getWorld(world.getUID());

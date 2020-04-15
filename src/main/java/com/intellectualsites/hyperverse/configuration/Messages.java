@@ -37,7 +37,7 @@ public class Messages {
     public static final Message messageWorldCreationStarted =
         createMessage("world.creation_started", "&7Creating a world with the following properties");
     public static final Message messageWorldProperty =
-        createMessage("world.property", "&8- &6%property%&8: &6%value%");
+        createMessage("world.property", "&8- &7%property%&8: &7%value%");
     public static final Message messageWorldCreationFinished =
         createMessage("world.creation_finished", "&7The world was created successfully");
     public static final Message messageWorldImportedOnLoad = createMessage("world.load_imported",
@@ -64,6 +64,10 @@ public class Messages {
         "&cThere is no world with that name");
     public static final Message messageTeleporting = createMessage("teleport.teleporting",
         "&7You are being teleported to %world%");
+    public static final Message messageInfoHeader = createMessage("info.header",
+        "&7World Information");
+    public static final Message messageWorldCreationFailed = createMessage("world.creation_failed",
+        "&cWorld creation failed: Reason: %reason%");
 
     public static Message createMessage(@NotNull final String key,
         @NotNull final String defaultValue) {
