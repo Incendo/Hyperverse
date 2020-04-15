@@ -21,3 +21,9 @@ permissions:
   hyperverse.info:
     description: Allows players to view world info
     default: op
+  hyperverse.unload:
+    description: Allows players to unload worlds
+    default: op
+  hyperverse.load:
+    description: Allows players to load worlds
+    default: op

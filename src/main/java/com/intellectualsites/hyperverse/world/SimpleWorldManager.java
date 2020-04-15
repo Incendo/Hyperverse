@@ -58,6 +58,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
 
     private final Hyperverse hyperverse;
     private final HyperWorldFactory hyperWorldFactory;
+    private final Path worldDirectory;
 
     @Inject public SimpleWorldManager(final Hyperverse hyperverse,
         final HyperWorldFactory hyperWorldFactory) {
@@ -65,6 +66,8 @@ public class SimpleWorldManager implements WorldManager, Listener {
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
         // Register the listener
         Bukkit.getPluginManager().registerEvents(this, hyperverse);
+        // Create configuration file
+        this.worldDirectory = this.hyperverse.getDataFolder().toPath().resolve("worlds");
     }
 
     @Override public void loadWorlds() {
@@ -121,6 +124,10 @@ public class SimpleWorldManager implements WorldManager, Listener {
         // Now loop over the worlds again and create the ones that are
         // definitely missing
         for (final HyperWorld hyperWorld : this.getWorlds()) {
+            if (!hyperWorld.getConfiguration().isLoaded()) {
+                // These worlds are unloaded and should remain that way
+                continue;
+            }
             if (hyperWorld.getBukkitWorld() == null) {
                 if (!GeneratorUtil.isGeneratorAvailable(hyperWorld.getConfiguration().getGenerator())) {
                     MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorNotAvailable,
@@ -198,12 +205,9 @@ public class SimpleWorldManager implements WorldManager, Listener {
         return WorldManager.WorldImportResult.SUCCESS;
     }
 
-    @Override public boolean addWorld(@NotNull final HyperWorld hyperWorld) {
+    @Override public void addWorld(@NotNull final HyperWorld hyperWorld) {
         this.registerWorld(hyperWorld);
-        // Create configuration file
-        final Path path = this.hyperverse.getDataFolder().toPath().resolve("worlds")
-            .resolve(String.format("%s.json", hyperWorld.getConfiguration().getName()));
-        return hyperWorld.getConfiguration().writeToFile(path);
+        hyperWorld.saveConfiguration();
     }
 
     @Override public void registerWorld(@NotNull final HyperWorld hyperWorld) {
@@ -239,6 +243,10 @@ public class SimpleWorldManager implements WorldManager, Listener {
 
     @Override @Nullable public HyperWorld getWorld(@NotNull final UUID uuid) {
         return this.worldMap.get(Objects.requireNonNull(uuid));
+    }
+
+    @NotNull @Override public Path getWorldDirectory() {
+        return this.worldDirectory;
     }
 
 }

@@ -20,8 +20,6 @@ package com.intellectualsites.hyperverse.world;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.intellectualsites.hyperverse.util.GeneratorUtil;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
@@ -40,6 +38,7 @@ public class WorldConfiguration {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+    // Immutable Properties
     private String name;
     private WorldType type;
     private String settings;
@@ -47,6 +46,8 @@ public class WorldConfiguration {
     private boolean generateStructures;
     private String generator;
     private String generatorArg;
+    // Mutable properties
+    private boolean loaded = true;
 
     WorldConfiguration(final String name, final WorldType type, final String settings, final long seed,
         final boolean generateStructures, final String generator, final String generatorArg) {
@@ -92,9 +93,8 @@ public class WorldConfiguration {
         if (!Files.exists(path)) {
             return null;
         }
-        try (final BufferedReader bufferedReader = Files.newBufferedReader(path);
-            final JsonReader jsonReader = new JsonReader(bufferedReader)) {
-            return gson.fromJson(jsonReader, WorldConfiguration.class);
+        try (final BufferedReader bufferedReader = Files.newBufferedReader(path)) {
+            return gson.fromJson(gson.newJsonReader(bufferedReader), WorldConfiguration.class);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -129,6 +129,14 @@ public class WorldConfiguration {
         return this.generatorArg;
     }
 
+    public boolean isLoaded() {
+        return this.loaded;
+    }
+
+    public void setLoaded(final boolean loaded) {
+        this.loaded = loaded;
+    }
+
     public boolean writeToFile(@NotNull final Path path) {
         if (!Files.exists(path)) {
             try {
@@ -139,9 +147,8 @@ public class WorldConfiguration {
             }
         }
         try (final BufferedWriter bufferedWriter = Files
-            .newBufferedWriter(Objects.requireNonNull(path));
-            final JsonWriter jsonWriter = new JsonWriter(bufferedWriter)) {
-            gson.toJson(this, WorldConfiguration.class, jsonWriter);
+            .newBufferedWriter(Objects.requireNonNull(path))) {
+            gson.toJson(this, WorldConfiguration.class, gson.newJsonWriter(bufferedWriter));
             return true;
         } catch (final Exception e) {
             e.printStackTrace();

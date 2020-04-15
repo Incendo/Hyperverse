@@ -25,22 +25,29 @@ import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.commands.HyperCommandManager;
 import com.intellectualsites.hyperverse.listeners.WorldListener;
 import com.intellectualsites.hyperverse.modules.HyperverseModule;
+import com.intellectualsites.hyperverse.modules.TaskChainModule;
 import com.intellectualsites.hyperverse.world.WorldManager;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 public final class Hyperverse extends JavaPlugin {
 
+    public static final int BSTATS_ID = 7177;
+
     private WorldManager worldManager;
     private Injector injector;
 
     @Override public void onEnable() {
-        this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule());
+        this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
         this.worldManager = injector.getInstance(WorldManager.class);
         this.worldManager.loadWorlds();
         this.getServer().getPluginManager()
             .registerEvents(injector.getInstance(WorldListener.class), this);
-        final HyperCommandManager hyperCommandManager = injector.getInstance(HyperCommandManager.class);
+        // Create the command manager instance
+        injector.getInstance(HyperCommandManager.class);
+        // Initialize bStats metrics tracking
+        new Metrics(this, BSTATS_ID);
     }
 
     @Override public void onDisable() {

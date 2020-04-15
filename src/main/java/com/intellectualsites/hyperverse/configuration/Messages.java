@@ -59,7 +59,7 @@ public class Messages {
         "&7Available Worlds: ");
     public static final Message messageListEntry = createMessage("list.entry",
         "&8- <hover:show_text:\"<gray>Click to teleport to the world</gray>\"><click:run_command:/hvtp %name%>"
-            + "&7%name%</click></hover> &8(&7%generator%&8: &7%type%&8)");
+            + "&7%name%</click></hover> &8(&7%generator%&8: &7%type%&8) - %load_status%");
     public static final Message messageNoSuchWorld = createMessage("world.non_existent",
         "&cThere is no world with that name");
     public static final Message messageTeleporting = createMessage("teleport.teleporting",
@@ -68,6 +68,16 @@ public class Messages {
         "&7World Information");
     public static final Message messageWorldCreationFailed = createMessage("world.creation_failed",
         "&cWorld creation failed: Reason: %reason%");
+    public static final Message messageWorldUnloaded = createMessage("world.unload_success",
+        "&7The world was successfully unloaded");
+    public static final Message messageWorldUnloadFailed = createMessage("world.unload_failure",
+        "&cThe world could not be unloaded: %reason%");
+    public static final Message messageWorldNotLoaded = createMessage("world.world_not_loaded",
+        "&cThat world is not loaded");
+    public static final Message messageWorldAlreadyLoaded = createMessage("world.already_loaded",
+        "&cThat world is already loaded");
+    public static final Message messageWorldLoadedSuccessfully = createMessage("world.load_success",
+        "&7The world has been loaded");
 
     public static Message createMessage(@NotNull final String key,
         @NotNull final String defaultValue) {

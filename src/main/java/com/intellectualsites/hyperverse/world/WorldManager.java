@@ -22,6 +22,7 @@ import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public interface WorldManager {
 
     void createWorlds();
 
-    boolean addWorld(@NotNull HyperWorld hyperWorld);
+    void addWorld(@NotNull HyperWorld hyperWorld);
 
     void registerWorld(@NotNull HyperWorld hyperWorld);
 
@@ -72,5 +73,7 @@ public interface WorldManager {
     }
 
     boolean shouldIgnore(@NotNull final String name);
+
+    @NotNull Path getWorldDirectory();
 
 }

@@ -40,4 +40,27 @@ public interface HyperWorld {
 
     void sendWorldInfo(@NotNull final CommandSender sender);
 
+    void saveConfiguration();
+
+    boolean isLoaded();
+
+    @NotNull WorldUnloadResult unloadWorld();
+
+    enum WorldUnloadResult {
+        SUCCESS(""),
+        FAILURE_HAS_PLAYERS("The world has players in it"),
+        FAILURE_ONLY_WORLD("You cannot unload the main world"),
+        FAILURE_OTHER("Unknown reason");
+
+        private final String description;
+
+        WorldUnloadResult(@NotNull final String description) {
+            this.description = description;
+        }
+
+        @NotNull public final String getDescription() {
+            return this.description;
+        }
+    }
+
 }

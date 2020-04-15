@@ -161,14 +161,11 @@ public class HyperCommandManager extends BaseCommand {
         try {
             hyperWorld.createBukkitWorld();
             // Register the world
-            if (this.worldManager.addWorld(hyperWorld)) {
-                MessageUtil.sendMessage(sender, Messages.messageWorldCreationFinished);
-                if (sender instanceof Player) {
-                    // Attempt to teleport them to the world
-                    hyperWorld.teleportPlayer((Player) sender);
-                }
-            } else {
-                MessageUtil.sendMessage(sender, Messages.messageCreationUnknownFailure);
+            this.worldManager.addWorld(hyperWorld);
+            MessageUtil.sendMessage(sender, Messages.messageWorldCreationFinished);
+            if (sender instanceof Player) {
+                // Attempt to teleport them to the world
+                hyperWorld.teleportPlayer((Player) sender);
             }
         } catch (final HyperWorldValidationException validationException) {
             switch (validationException.getValidationResult()) {
@@ -203,8 +200,17 @@ public class HyperCommandManager extends BaseCommand {
                 generator = generator.toLowerCase();
             }
 
+            final String loadStatus;
+            if (hyperWorld.isLoaded()) {
+                loadStatus = "<green><hover:show_text:\"<gray>Click to unload</gray>\"><click:run_command:/hyperverse unload "
+                    + configuration.getName() + ">loaded</click></hover></green>";
+            } else {
+                loadStatus = "<red><hover:show_text:\"<gray>Click to load</gray>\"><click:run_command:/hyperverse load "
+                    + configuration.getName() + ">unloaded</click></hover></red>";
+            }
+
             MessageUtil.sendMessage(sender, Messages.messageListEntry, "%name%", configuration.getName(),
-                "%generator%", generator, "%type%", configuration.getType().name());
+                "%generator%", generator, "%type%", configuration.getType().name(), "%load_status%", loadStatus);
         }
     }
 
@@ -212,6 +218,10 @@ public class HyperCommandManager extends BaseCommand {
     @CommandCompletion("@hyperworlds") @Description("Teleport between hyperverse worlds")
     public void doTeleport(final Player player, final HyperWorld world) {
         if (world == null) {
+            return;
+        }
+        if (!world.isLoaded()) {
+            MessageUtil.sendMessage(player, Messages.messageWorldNotLoaded);
             return;
         }
         MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%",
@@ -227,6 +237,49 @@ public class HyperCommandManager extends BaseCommand {
         }
         MessageUtil.sendMessage(sender, Messages.messageInfoHeader);
         world.sendWorldInfo(sender);
+    }
+
+    @Subcommand("unload") @CommandPermission("hyperverse.unload")
+    @CommandCompletion("@hyperworlds") @Description("Unload a world")
+    public void doUnload(final CommandSender sender, final HyperWorld world) {
+        if (world == null) {
+            return;
+        }
+        if (!world.isLoaded()) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
+            return;
+        }
+        final HyperWorld.WorldUnloadResult worldUnloadResult = world.unloadWorld();
+        if (worldUnloadResult == HyperWorld.WorldUnloadResult.SUCCESS) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldUnloaded);
+        } else {
+            MessageUtil.sendMessage(sender, Messages.messageWorldUnloadFailed,
+                "%reason%", worldUnloadResult.getDescription());
+        }
+    }
+
+    @Subcommand("load") @CommandPermission("hyperverse.load")
+    @CommandCompletion("@hyperworlds") @Description("Load a world")
+    public void doLoad(final CommandSender sender, final HyperWorld world) {
+        if (world == null) {
+            return;
+        }
+        if (world.isLoaded()) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldAlreadyLoaded);
+            return;
+        }
+        try {
+            world.createBukkitWorld();
+        } catch (final HyperWorldValidationException e) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldImportFailure,
+                    "%world%", world.getConfiguration().getName(), "%result%", e.getMessage());
+            return;
+        }
+
+        world.getConfiguration().setLoaded(true);
+        world.saveConfiguration();
+
+        MessageUtil.sendMessage(sender, Messages.messageWorldLoadedSuccessfully);
     }
 
 }

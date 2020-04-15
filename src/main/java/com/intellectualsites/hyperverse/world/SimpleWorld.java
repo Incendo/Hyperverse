@@ -18,6 +18,7 @@
 
 package com.intellectualsites.hyperverse.world;
 
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.intellectualsites.hyperverse.configuration.Messages;
@@ -39,14 +40,19 @@ public class SimpleWorld implements HyperWorld {
     private final UUID worldUUID;
     private final WorldConfiguration configuration;
     private final HyperWorldCreatorFactory hyperWorldCreatorFactory;
+    private final WorldManager worldManager;
+    private final TaskChainFactory taskChainFactory;
     private World bukkitWorld;
 
     @Inject public SimpleWorld(@Assisted final UUID worldUUID,
         @Assisted final WorldConfiguration configuration,
-        final HyperWorldCreatorFactory hyperWorldCreatorFactory) {
+        final HyperWorldCreatorFactory hyperWorldCreatorFactory, final WorldManager worldManager,
+        final TaskChainFactory taskChainFactory) {
         this.worldUUID = Objects.requireNonNull(worldUUID);
         this.configuration = Objects.requireNonNull(configuration);
         this.hyperWorldCreatorFactory = Objects.requireNonNull(hyperWorldCreatorFactory);
+        this.worldManager = Objects.requireNonNull(worldManager);
+        this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
     }
 
     @Override public void setBukkitWorld(@NotNull final World world) {
@@ -54,6 +60,39 @@ public class SimpleWorld implements HyperWorld {
             throw new IllegalStateException("Cannot replace bukkit world");
         }
         this.bukkitWorld = Objects.requireNonNull(world);
+    }
+
+    @Override public void saveConfiguration() {
+        this.taskChainFactory.newChain().async(() ->
+            getConfiguration().writeToFile(this.worldManager.getWorldDirectory().
+            resolve(String.format("%s.json", this.getConfiguration().getName()))))
+            .execute();
+    }
+
+    @Override public boolean isLoaded() {
+        return this.bukkitWorld != null;
+    }
+
+    @Override @NotNull public WorldUnloadResult unloadWorld() {
+        if (!this.isLoaded()) {
+            return WorldUnloadResult.SUCCESS;
+        }
+        if (Bukkit.getWorlds().get(0).equals(this.bukkitWorld)) {
+            return WorldUnloadResult.FAILURE_ONLY_WORLD;
+        }
+        if (!this.bukkitWorld.getPlayers().isEmpty()) {
+            return WorldUnloadResult.FAILURE_HAS_PLAYERS;
+        }
+        if (!Bukkit.unloadWorld(this.bukkitWorld, true)) {
+            return WorldUnloadResult.FAILURE_OTHER;
+        }
+
+        // Update the load status in the configuration file
+        this.configuration.setLoaded(false);
+        this.saveConfiguration();
+
+        this.bukkitWorld = null;
+        return WorldUnloadResult.SUCCESS;
     }
 
     @Override public void sendWorldInfo(@NotNull CommandSender sender) {
@@ -125,10 +164,6 @@ public class SimpleWorld implements HyperWorld {
 
     @Override public String toString() {
         return "HyperWorld{" + "worldUUID=" + worldUUID + ", configuration=" + configuration + '}';
-    }
-
-    public HyperWorldCreatorFactory getHyperWorldCreatorFactory() {
-        return this.hyperWorldCreatorFactory;
     }
 
     @Override public UUID getWorldUUID() {

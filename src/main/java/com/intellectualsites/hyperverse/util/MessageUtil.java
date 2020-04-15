@@ -34,6 +34,7 @@ public final class MessageUtil {
 
     public static void sendMessage(@NotNull final CommandSender recipient,
         @NotNull final Message message, @NotNull final String... replacements) {
+        Objects.requireNonNull(recipient);
         if (replacements.length % 2 != 0) {
             throw new IllegalArgumentException("Replacement length must be a multiple of two");
         }
@@ -41,9 +42,13 @@ public final class MessageUtil {
         for (int i = 0; i < replacements.length; i += 2) {
             replacedMessage = replacedMessage.replace(replacements[i], replacements[i + 1]);
         }
-        Objects.requireNonNull(recipient).spigot().sendMessage(
-            MiniMessageParser.parseFormat(ChatColor.translateAlternateColorCodes('&',
-                Messages.messagePrefix.toString() + replacedMessage)));
+        final String prefixedMessage = ChatColor.translateAlternateColorCodes('&',
+            Messages.messagePrefix.toString() + replacedMessage);
+        if (prefixedMessage.contains("<") && prefixedMessage.contains(">")) {
+            recipient.spigot().sendMessage(MiniMessageParser.parseFormat(prefixedMessage));
+        } else {
+            recipient.sendMessage(prefixedMessage);
+        }
     }
 
 }
