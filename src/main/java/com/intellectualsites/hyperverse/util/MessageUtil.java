@@ -27,11 +27,24 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Message utility methods
+ */
 public final class MessageUtil {
 
     private MessageUtil() {
     }
 
+    /**
+     * Format a string. Replacements come in pairs of two, where
+     * the first value is the string to be replaced, and the second
+     * value is the replacement, example:
+     * %key1%, value1, %key2%, value2
+     *
+     * @param message String to format
+     * @param replacements Replacements, needs to be a multiple of 2
+     * @return
+     */
     @NotNull public static String format(@NotNull final String message, @NotNull final String... replacements) {
         if (replacements.length % 2 != 0) {
             throw new IllegalArgumentException("Replacement length must be a multiple of two");
@@ -43,6 +56,14 @@ public final class MessageUtil {
         return replacedMessage;
     }
 
+    /**
+     * Send a message to a recipient
+     *
+     * @param recipient Receiver of the message
+     * @param message Mesasge to send
+     * @param replacements Replacements
+     * @see #format(String, String...) for information about string replacements
+     */
     public static void sendMessage(@NotNull final CommandSender recipient,
         @NotNull final Message message, @NotNull final String... replacements) {
         Objects.requireNonNull(recipient);

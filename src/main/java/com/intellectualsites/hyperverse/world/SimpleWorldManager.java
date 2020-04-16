@@ -48,6 +48,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Implementation of {@link WorldManager}
+ * {@inheritDoc}
+ */
 @Singleton
 public class SimpleWorldManager implements WorldManager, Listener {
 

@@ -30,6 +30,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
+/**
+ * Generator utility methods
+ */
 public final class GeneratorUtil {
 
     private static Method generatorGetter;
@@ -39,6 +42,12 @@ public final class GeneratorUtil {
     private GeneratorUtil() {
     }
 
+    /**
+     * Attempt to find the generator for a given world name
+     *
+     * @param world world name
+     * @return Generator, if found
+     */
     @Nullable public static ChunkGenerator getGenerator(@NotNull final String world)
         throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (generatorGetter == null) {
@@ -50,6 +59,12 @@ public final class GeneratorUtil {
             .invoke(Bukkit.getServer(), Objects.requireNonNull(world));
     }
 
+    /**
+     * Attempt to find the generator plugin from a chunk generator instance
+     *
+     * @param generator Generator instance
+     * @return Plugin, if found
+     */
     @Nullable public static JavaPlugin matchGenerator(@NotNull final ChunkGenerator generator)
         throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         Objects.requireNonNull(generator);
@@ -65,6 +80,12 @@ public final class GeneratorUtil {
         return null;
     }
 
+    /**
+     * Check if there is an available generator with the given name
+     *
+     * @param generatorName Generator name
+     * @return True if the generator is available, false if not
+     */
     public static boolean isGeneratorAvailable(@Nullable final String generatorName) {
         if (generatorName == null ||
             generatorName.isEmpty() ||

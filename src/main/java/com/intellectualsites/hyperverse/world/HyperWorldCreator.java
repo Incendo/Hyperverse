@@ -28,6 +28,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * World creator instance used to create a {@link HyperWorld}
+ */
 public final class HyperWorldCreator extends WorldCreator {
 
     private final HyperWorld hyperWorld;
@@ -37,10 +40,11 @@ public final class HyperWorldCreator extends WorldCreator {
         this.hyperWorld = hyperWorld;
     }
 
-    public HyperWorld getHyperWorld() {
-        return this.hyperWorld;
-    }
-
+    /**
+     * Validate the world configuration
+     *
+     * @return Result of the validation
+     */
     @NotNull public ValidationResult validate() {
         final WorldConfiguration worldConfiguration = this.hyperWorld.getConfiguration();
         if (!worldConfiguration.getGenerator().isEmpty() &&
@@ -55,6 +59,9 @@ public final class HyperWorldCreator extends WorldCreator {
         return ValidationResult.SUCCESS;
     }
 
+    /**
+     * Configure the world creator
+     */
     public void configure() {
         final WorldConfiguration worldConfiguration = this.hyperWorld.getConfiguration();
         this.type(WorldType.NORMAL);
@@ -74,6 +81,9 @@ public final class HyperWorldCreator extends WorldCreator {
             this.hyperWorld.getConfiguration().getGeneratorArg());
     }
 
+    /**
+     * Result of configuration validation
+     */
     public enum ValidationResult {
         SUCCESS, UNKNOWN_GENERATOR
     }

@@ -26,6 +26,9 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * World type, mirroring Bukkit's {@link org.bukkit.World.Environment}
+ */
 public enum WorldType {
     OVER_WORLD(World.Environment.NORMAL, Arrays.asList("overworld", "over_world", "normal")),
     NETHER(World.Environment.NETHER, Arrays.asList("the_nether", "nether", "hell")),
@@ -39,14 +42,30 @@ public enum WorldType {
         this.aliases = aliases;
     }
 
+    /**
+     * Get the bukkit equivalent
+     *
+     * @return Bukkit equivalent
+     */
     @NotNull public World.Environment getBukkitType() {
         return this.bukkitType;
     }
 
+    /**
+     * Get all aliases of the type name
+     *
+     * @return Name aliases
+     */
     @NotNull public Collection<String> getAliases() {
         return this.aliases;
     }
 
+    /**
+     * Attempt to map a string to a world type
+     *
+     * @param string String to match
+     * @return Optional containing the type, if found
+     */
     @NotNull public static Optional<WorldType> fromString(@NotNull final String string) {
         final String normalized = Objects.requireNonNull(string.toLowerCase());
         for (final WorldType worldType : values()) {
@@ -57,6 +76,12 @@ public enum WorldType {
         return Optional.empty();
     }
 
+    /**
+     * Get the world type from a bukkit environment
+     *
+     * @param environment Bukkit environment
+     * @return Equivalent Hyperverse world type
+     */
     @NotNull public static WorldType fromBukkit(@NotNull final World.Environment environment) {
         for (final WorldType worldType : values()) {
             if (worldType.getBukkitType() == environment) {

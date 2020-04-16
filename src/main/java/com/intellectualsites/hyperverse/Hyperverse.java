@@ -31,8 +31,10 @@ import com.intellectualsites.hyperverse.world.WorldManager;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
-@Singleton
-public final class Hyperverse extends JavaPlugin {
+/**
+ * Plugin main class
+ */
+@Singleton public final class Hyperverse extends JavaPlugin {
 
     public static final int BSTATS_ID = 7177;
 
@@ -51,9 +53,6 @@ public final class Hyperverse extends JavaPlugin {
         injector.getInstance(HyperCommandManager.class);
         // Initialize bStats metrics tracking
         new Metrics(this, BSTATS_ID);
-    }
-
-    @Override public void onDisable() {
     }
 
 }

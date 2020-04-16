@@ -16,25 +16,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.intellectualsites.hyperverse.util;
-
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
- * Seed utility methods
+ * Guice modules and factory types
  */
-public final class SeedUtil {
-
-    private SeedUtil() {
-    }
-
-    /**
-     * Generate a random seed
-     *
-     * @return Randomly generated seed
-     */
-    public static long randomSeed() {
-        return ThreadLocalRandom.current().nextLong();
-    }
-
-}
+package com.intellectualsites.hyperverse.modules;

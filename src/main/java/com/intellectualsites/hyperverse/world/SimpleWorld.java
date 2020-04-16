@@ -38,6 +38,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,6 +47,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Implementation of {@link HyperWorld}
+ * {@inheritDoc}
+ */
 public class SimpleWorld implements HyperWorld {
 
     private boolean flagsInitialized = false;
@@ -244,10 +249,16 @@ public class SimpleWorld implements HyperWorld {
         if (player.getWorld().equals(this.bukkitWorld)) {
             return;
         }
-        PaperLib.teleportAsync(player, this.getSpawn());
+        final Location spawn = this.getSpawn();
+        if (spawn != null) {
+            PaperLib.teleportAsync(player, spawn);
+        }
     }
 
-    @Override public Location getSpawn() {
+    @Override @Nullable public Location getSpawn() {
+        if (this.bukkitWorld == null) {
+            return null;
+        }
         final Location location = this.bukkitWorld.getSpawnLocation().clone();
         location.add(0.5, 0, 0.5);
         return location;
@@ -272,15 +283,15 @@ public class SimpleWorld implements HyperWorld {
         return "HyperWorld{" + "worldUUID=" + worldUUID + ", configuration=" + configuration + '}';
     }
 
-    @Override public UUID getWorldUUID() {
+    @Override @NotNull public UUID getWorldUUID() {
         return this.worldUUID;
     }
 
-    @Override public World getBukkitWorld() {
+    @Override @Nullable public World getBukkitWorld() {
         return this.bukkitWorld;
     }
 
-    @Override public WorldConfiguration getConfiguration() {
+    @Override @NotNull public WorldConfiguration getConfiguration() {
         return this.configuration;
     }
 

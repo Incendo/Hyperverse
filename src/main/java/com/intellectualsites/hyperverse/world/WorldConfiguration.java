@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Configuration of a {@link HyperWorld}
+ */
 public class WorldConfiguration {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -64,10 +67,22 @@ public class WorldConfiguration {
         this.flags = new HashMap<>();
     }
 
+    /**
+     * Get a new {@link WorldConfigurationBuilder} instance
+     *
+     * @return New builder instance
+     */
     public static WorldConfigurationBuilder builder() {
         return new WorldConfigurationBuilder();
     }
 
+    /**
+     * Create a world configuration from a {@link World} instance. The generator name
+     * will be inferred from the {@link ChunkGenerator} instance
+     *
+     * @param world World instance
+     * @return The constructed configuration instance
+     */
     @NotNull public static WorldConfiguration fromWorld(@NotNull final World world) {
         Objects.requireNonNull(world);
         final WorldConfigurationBuilder worldConfigurationBuilder = builder();
@@ -93,6 +108,12 @@ public class WorldConfiguration {
         return worldConfigurationBuilder.createWorldConfiguration();
     }
 
+    /**
+     * Construct a configuration instance from a given file
+     *
+     * @param path File path
+     * @return Constructed configuration instance
+     */
     @Nullable public static WorldConfiguration fromFile(@NotNull final Path path) {
         if (!Files.exists(path)) {
             return null;
@@ -105,41 +126,89 @@ public class WorldConfiguration {
         return null;
     }
 
-    public String getName() {
+    /**
+     * Get the world name
+     *
+     * @return World name
+     */
+    @NotNull public String getName() {
         return this.name;
     }
 
-    public WorldType getType() {
+    /**
+     * Get the world type
+     *
+     * @return World type
+     */
+    @NotNull public WorldType getType() {
         return this.type;
     }
 
-    public String getSettings() {
+    /**
+     * Get the world setting string
+     * This is primarily used by the flat world generator
+     *
+     * @return Setting string
+     */
+    @NotNull public String getSettings() {
         return this.settings;
     }
 
+    /**
+     * Get the world seed
+     *
+     * @return World seed
+     */
     public long getSeed() {
         return this.seed;
     }
 
+    /**
+     * Check if the world should generate structured
+     *
+     * @return Structure generation status
+     */
     public boolean isGenerateStructures() {
         return this.generateStructures;
     }
 
+    /**
+     * Get the world generator name
+     *
+     * @return World generator name
+     */
     public String getGenerator() {
         return this.generator;
     }
 
+    /**
+     * Get the world generator ID
+     *
+     * @return World generator ID
+     */
     public String getGeneratorArg() {
         return this.generatorArg;
     }
 
-    public Map<String, String> getFlags() {
+    /**
+     * Get an internal map containing all
+     * configured flags
+     *
+     * @return All configured world flags
+     */
+    @NotNull public Map<String, String> getFlags() {
         if (this.flags == null) {
             this.flags = new HashMap<>();
         }
         return this.flags;
     }
 
+    /**
+     * Update a flag value internally
+     *
+     * @param flag Flag name
+     * @param flagValue Flag value
+     */
     public void setFlagValue(@NotNull final String flag, @Nullable final String flagValue) {
         if (flagValue == null) {
             this.flags.remove(flag);
@@ -148,31 +217,46 @@ public class WorldConfiguration {
         }
     }
 
+    /**
+     * Check whether a world is supposed to be loaded
+     *
+     * @return World load status
+     */
     public boolean isLoaded() {
         return this.loaded;
     }
 
+    /**
+     * Set whether a world is supposed to be loaded
+     *
+     * @param loaded World load status
+     */
     public void setLoaded(final boolean loaded) {
         this.loaded = loaded;
     }
 
-    public boolean writeToFile(@NotNull final Path path) {
+    /**
+     * Write this configuration to a file
+     *
+     * @param path File to write to
+     */
+    public void writeToFile(@NotNull final Path path) {
         if (!Files.exists(path)) {
             try {
                 Files.createFile(path);
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
+                return;
             }
         }
         try (final BufferedWriter bufferedWriter = Files
             .newBufferedWriter(Objects.requireNonNull(path))) {
             gson.toJson(this, WorldConfiguration.class, gson.newJsonWriter(bufferedWriter));
-            return true;
+            return;
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return;
     }
 
     @Override public String toString() {

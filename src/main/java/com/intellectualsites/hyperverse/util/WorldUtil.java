@@ -22,6 +22,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
+/**
+ * World utility methods
+ */
 public final class WorldUtil {
 
     private static final Pattern worldNamePattern = Pattern.compile("[A-Za-z\\-_0-9]{1,16}");
@@ -29,6 +32,12 @@ public final class WorldUtil {
     private WorldUtil() {
     }
 
+    /**
+     * Check whether or not a world name is valid
+     *
+     * @param worldName World name
+     * @return True if the world name is valid, false if not
+     */
     public static boolean validateName(@NotNull final String worldName) {
         return worldNamePattern.matcher(worldName).matches();
     }

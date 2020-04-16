@@ -27,6 +27,9 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Manages {@link HyperWorld worlds}
+ */
 public interface WorldManager {
 
     /**
@@ -41,24 +44,98 @@ public interface WorldManager {
     WorldImportResult importWorld(@NotNull World world, boolean vanilla,
         @Nullable String generator);
 
+    /**
+     * Load all pre-configured worlds. This will not create the worlds,
+     * just load them into the system
+     */
     void loadWorlds();
 
+    /**
+     * Trigger the creation of all non-existent, but loaded worlds
+     */
     void createWorlds();
 
+    /**
+     * Add the world to the manager and create the configuration file
+     *
+     * @param hyperWorld World to add
+     */
     void addWorld(@NotNull HyperWorld hyperWorld);
 
+    /**
+     * Register the world internally
+     *
+     * @param hyperWorld World to register
+     */
     void registerWorld(@NotNull HyperWorld hyperWorld);
 
+    /**
+     * Get all registered worlds
+     *
+     * @return Immutable view of all recognized worlds
+     */
     @NotNull Collection<HyperWorld> getWorlds();
 
+    /**
+     * Get a world using its name
+     *
+     * @param name World name
+     * @return World, if it exists
+     */
     @Nullable HyperWorld getWorld(@NotNull String name);
 
+    /**
+     * Get a world using its UUID
+     *
+     * @param uuid World UUID
+     * @return World, if it exists
+     */
     @Nullable HyperWorld getWorld(@NotNull UUID uuid);
 
+    /**
+     * Get a world from a Bukkit world
+     *
+     * @param world Bukkit world
+     * @return World, if it exists
+     */
     @Nullable HyperWorld getWorld(@NotNull final World world);
 
+    /**
+     * Make a world ignored, this means that it won't
+     * be registered by the world manager when
+     * it is initialized
+     *
+     * @param world World to ignore
+     */
     void ignoreWorld(@NotNull final String world);
 
+    /**
+     * Check whether or not a world is ignored
+     *
+     * @param name World name
+     * @return True if the world is ignored
+     * @see #ignoreWorld(String) To ignore a world
+     */
+    boolean shouldIgnore(@NotNull final String name);
+
+    /**
+     * Get the directory containing world configurations
+     *
+     * @return Path to configurations
+     */
+    @NotNull Path getWorldDirectory();
+
+    /**
+     * Remove a world. This will not delete the world,
+     * just remove it from the internal maps
+     *
+     * @param hyperWorld World to remove
+     */
+    void unregisterWorld(@NotNull final HyperWorld hyperWorld);
+
+    /**
+     * Result of attempts to import worlds
+     */
     enum WorldImportResult {
         SUCCESS("Success"), ALREADY_IMPORTED("The world was already imported"),
         GENERATOR_NOT_FOUND("The specified generator could not be found");
@@ -69,15 +146,15 @@ public interface WorldManager {
             this.description = Objects.requireNonNull(description);
         }
 
+        /**
+         * Get a human readable description explaining
+         * the result
+         *
+         * @return Result description
+         */
         @NotNull public String getDescription() {
             return this.description;
         }
     }
-
-    boolean shouldIgnore(@NotNull final String name);
-
-    @NotNull Path getWorldDirectory();
-
-    void unregisterWorld(@NotNull final HyperWorld hyperWorld);
 
 }

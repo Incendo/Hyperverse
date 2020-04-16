@@ -20,6 +20,9 @@ package com.intellectualsites.hyperverse.world;
 
 import com.intellectualsites.hyperverse.util.SeedUtil;
 
+/**
+ * Builder for {@link WorldConfiguration}
+ */
 public class WorldConfigurationBuilder {
 
     private String name;
