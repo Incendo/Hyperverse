@@ -23,6 +23,7 @@ import com.intellectualsites.hyperverse.flags.implementation.GamemodeFlag;
 import com.intellectualsites.hyperverse.flags.implementation.LocalRespawnFlag;
 import com.intellectualsites.hyperverse.flags.implementation.PveFlag;
 import com.intellectualsites.hyperverse.flags.implementation.PvpFlag;
+import com.intellectualsites.hyperverse.flags.implementation.WorldPermissionFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -46,6 +47,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(ForceSpawn.FORCE_SPAWN_FALSE);
         this.addFlag(PvpFlag.PVP_FLAG_TRUE);
         this.addFlag(PveFlag.PVE_FLAG_TRUE);
+        this.addFlag(WorldPermissionFlag.WORLD_PERMISSION_FLAG_DEFAULT);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {
