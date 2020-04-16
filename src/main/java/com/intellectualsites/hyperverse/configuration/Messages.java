@@ -98,6 +98,8 @@ public class Messages {
         "&cThe world could not be removed. Reason: %reason%");
     public static final Message messageWorldRemoved = createMessage("world.removed",
         "&7The world was removed successfully");
+    public static final Message messageNotPermittedEntry = createMessage("world.not_permitted",
+        "&cYou are not allowed to enter that world");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
@@ -111,6 +113,8 @@ public class Messages {
         "Whether or not player vs. player combat is enabled");
     public static final Message flagDescriptionPve = createMessage("flags.pve",
         "Whether or not player vs. entity combat is enabled");
+    public static final Message flagWorldPermission = createMessage("flags.world-permission",
+        "Permission node required to visit the world");
 
     public static Message createMessage(@NotNull final String key,
         @NotNull final String defaultValue) {

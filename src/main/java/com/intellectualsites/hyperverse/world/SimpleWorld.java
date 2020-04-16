@@ -30,6 +30,7 @@ import com.intellectualsites.hyperverse.flags.FlagContainer;
 import com.intellectualsites.hyperverse.flags.FlagParseException;
 import com.intellectualsites.hyperverse.flags.GlobalWorldFlagContainer;
 import com.intellectualsites.hyperverse.flags.WorldFlag;
+import com.intellectualsites.hyperverse.flags.implementation.WorldPermissionFlag;
 import com.intellectualsites.hyperverse.modules.FlagContainerFactory;
 import com.intellectualsites.hyperverse.modules.HyperWorldCreatorFactory;
 import com.intellectualsites.hyperverse.util.MessageUtil;
@@ -256,8 +257,17 @@ public class SimpleWorld implements HyperWorld {
             throw new IllegalStateException(
                 "Cannot teleport a player to a world before it has been generated");
         }
+
         if (player.getWorld().equals(this.bukkitWorld)) {
             return;
+        }
+
+        if (!this.getFlag(WorldPermissionFlag.class).isEmpty()) {
+            final String permission = getFlag(WorldPermissionFlag.class);
+            if (!player.hasPermission(permission)) {
+                MessageUtil.sendMessage(player, Messages.messageNotPermittedEntry);
+                return;
+            }
         }
 
         final Location location;
