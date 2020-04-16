@@ -29,3 +29,5 @@ Planned Features:
 
 ### Documentation
 - [Commands](https://github.com/Sauilitired/Hyperverse/wiki/Commands)
+- [Configuration](https://github.com/Sauilitired/Hyperverse/wiki/Configuration)
+- [Flags and Game Rules](https://github.com/Sauilitired/Hyperverse/wiki/Flags-and-Game-Rules)
