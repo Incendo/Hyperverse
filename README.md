@@ -11,14 +11,14 @@ Current Features:
 - World importing (will automatically import worlds)
 - World loading/unloading
 - World teleportation
-- World flags (gamemode, local-spawn)
+- World flags (gamemode, local-spawn, force-spawn)
 - World game rules
 - Tab completed commands
+- Persistent world locations
 
 Planned Features:
 - More flags: pvp, pve, etc...
 - Per world inventories
-- Persistent world locations
 - Per world beds
 - Portals, sign teleportation
 

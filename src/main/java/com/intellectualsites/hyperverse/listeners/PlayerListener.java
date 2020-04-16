@@ -77,8 +77,8 @@ public class PlayerListener implements Listener {
             // The player moved between two different worlds, so we
             // need to update
             final UUID uuid = event.getPlayer().getUniqueId();
-            this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, from), true);
-            this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, to), true);
+            this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, from), true, false);
+            this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, to), true, false);
         }
     }
 
@@ -88,7 +88,7 @@ public class PlayerListener implements Listener {
             // Persist the locations when the player quits
             final UUID uuid = event.getPlayer().getUniqueId();
             this.hyperDatabase.storeLocation(
-                PersistentLocation.fromLocation(uuid, event.getPlayer().getLocation()), false);
+                PersistentLocation.fromLocation(uuid, event.getPlayer().getLocation()), false, true);
             this.hyperDatabase.clearLocations(uuid);
         }
     }

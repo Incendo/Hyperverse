@@ -23,14 +23,20 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.intellectualsites.hyperverse.Hyperverse;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -45,11 +51,13 @@ import java.util.concurrent.Future;
     private Dao<PersistentLocation, String> locationDao;
     private ConnectionSource connectionSource;
     private TaskChainFactory taskChainFactory;
+    private final Hyperverse hyperverse;
     private final Table<UUID, String, PersistentLocation> locations
         = HashBasedTable.create();
 
-    @Inject public HyperDatabase(final TaskChainFactory taskChainFactory) {
+    @Inject public HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
         this.taskChainFactory = taskChainFactory;
+        this.hyperverse = hyperverse;
     }
 
     /**
@@ -60,9 +68,14 @@ import java.util.concurrent.Future;
     public boolean attemptConnect() {
         try {
             Class.forName("org.sqlite.JDBC");
+            final Path file = this.hyperverse.getDataFolder().toPath().resolve("storage.db");
+            if (!Files.exists(file)) {
+                Files.createFile(this.hyperverse.getDataFolder().toPath().resolve("storage.db"));
+            }
             this.connectionSource = new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
             // Setup DAOs
             this.locationDao = DaoManager.createDao(connectionSource, PersistentLocation.class);
+            TableUtils.createTableIfNotExists(connectionSource, PersistentLocation.class);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -87,16 +100,28 @@ import java.util.concurrent.Future;
      * @param updateTable Whether or not the internal table should be updated
      */
     public void storeLocation(@NotNull final PersistentLocation persistentLocation,
-        final boolean updateTable) {
+        final boolean updateTable, final boolean clear) {
+
+        final PersistentLocation storedLocation = this.locations.get(UUID.fromString(persistentLocation.getUuid()),
+            persistentLocation.getWorld());
+        if (storedLocation != null) {
+            persistentLocation.setId(storedLocation.getId());
+        }
+
         if (updateTable) {
             this.locations.put(UUID.fromString(persistentLocation.getUuid()),
                 persistentLocation.getWorld(), persistentLocation);
         }
+
         taskChainFactory.newChain().async(() -> {
             try {
                 this.locationDao.createOrUpdate(persistentLocation);
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+        }).syncLast(in -> {
+            if (clear) {
+                clearLocations(UUID.fromString(persistentLocation.getUuid()));
             }
         }).execute();
     }
@@ -107,7 +132,7 @@ import java.util.concurrent.Future;
      * @param uuid Player UUID
      */
     public void clearLocations(@NotNull final UUID uuid) {
-        final Collection<String> keys = this.locations.columnKeySet();
+        final Collection<String> keys = new HashSet<>(this.locations.columnKeySet());
         for (final String key : keys) {
             this.locations.remove(uuid, key);
         }
@@ -123,7 +148,8 @@ import java.util.concurrent.Future;
         final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
         taskChainFactory.newChain().async(() -> {
             try {
-                final Collection<PersistentLocation> locations = this.locationDao.queryForEq("uuid", uuid.toString());
+                final Collection<PersistentLocation> locations = this.locationDao.queryForEq("uuid",
+                    Objects.requireNonNull(uuid).toString());
                 for (final PersistentLocation persistentLocation : locations) {
                     this.locations.put(uuid, persistentLocation.getWorld(), persistentLocation);
                 }

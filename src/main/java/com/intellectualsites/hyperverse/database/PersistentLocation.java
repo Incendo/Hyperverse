@@ -81,6 +81,14 @@ public final class PersistentLocation {
         return this.z;
     }
 
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
     @NotNull public Location toLocation() {
         return new Location(Bukkit.getWorld(world), x, y, z);
     }
