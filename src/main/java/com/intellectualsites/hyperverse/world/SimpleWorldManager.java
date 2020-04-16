@@ -253,4 +253,9 @@ public class SimpleWorldManager implements WorldManager, Listener {
         return this.worldDirectory;
     }
 
+    @Override public void unregisterWorld(@NotNull final HyperWorld hyperWorld) {
+        this.worldMap.remove(hyperWorld.getWorldUUID());
+        this.uuidMap.remove(hyperWorld.getConfiguration().getName());
+    }
+
 }

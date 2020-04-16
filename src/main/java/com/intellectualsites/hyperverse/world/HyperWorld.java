@@ -49,6 +49,8 @@ public interface HyperWorld {
 
     boolean isLoaded();
 
+    @NotNull WorldUnloadResult deleteWorld();
+
     @NotNull WorldUnloadResult unloadWorld();
 
     @NotNull <T> T getFlag(@NotNull final Class<? extends WorldFlag<T, ?>> flagClass);

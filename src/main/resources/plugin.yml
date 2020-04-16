@@ -35,3 +35,7 @@ permissions:
     default: op
   hyperverse.gamerule.set:
     description: Allow players to world gamerules
+    default: op
+  hyperverse.delete:
+    description: Allow players to delete worlds
+    default: op

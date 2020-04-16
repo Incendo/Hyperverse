@@ -78,4 +78,6 @@ public interface WorldManager {
 
     @NotNull Path getWorldDirectory();
 
+    void unregisterWorld(@NotNull final HyperWorld hyperWorld);
+
 }

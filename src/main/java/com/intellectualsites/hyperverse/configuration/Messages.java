@@ -94,6 +94,10 @@ public class Messages {
         "&7The game rule was updated");
     public static final Message messageGameRuleRemoved = createMessage("gamerule.removed",
         "&7The game rule was removed");
+    public static final Message messageWorldNotRemoved = createMessage("world.not_remoted",
+        "&cThe world could not be removed. Reason: %reason%");
+    public static final Message messageWorldRemoved = createMessage("world.removed",
+        "&7The world was removed successfully");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",

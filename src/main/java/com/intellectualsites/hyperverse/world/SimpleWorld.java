@@ -39,6 +39,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -107,6 +109,32 @@ public class SimpleWorld implements HyperWorld {
 
     @Override public boolean isLoaded() {
         return this.bukkitWorld != null;
+    }
+
+    @Override @NotNull public WorldUnloadResult deleteWorld() {
+        if (this.bukkitWorld != null) {
+            if (Bukkit.getWorlds().get(0).equals(this.bukkitWorld)) {
+                return WorldUnloadResult.FAILURE_ONLY_WORLD;
+            }
+            if (!this.bukkitWorld.getPlayers().isEmpty()) {
+                return WorldUnloadResult.FAILURE_HAS_PLAYERS;
+            }
+            if (!Bukkit.unloadWorld(this.bukkitWorld, true)) {
+                return WorldUnloadResult.FAILURE_OTHER;
+            }
+            // We unload the world, then we remove the world file,
+            // but we don't delete the actual world folder
+            Bukkit.unloadWorld(this.bukkitWorld, true);
+        }
+        taskChainFactory.newChain().async(() -> {
+            try {
+                Files.delete(this.worldManager.getWorldDirectory().
+                    resolve(String.format("%s.json", this.getConfiguration().getName())));
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        }).sync(() -> this.worldManager.unregisterWorld(this)).execute();
+        return WorldUnloadResult.SUCCESS;
     }
 
     @Override @NotNull public WorldUnloadResult unloadWorld() {

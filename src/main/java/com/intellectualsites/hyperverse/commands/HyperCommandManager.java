@@ -395,4 +395,20 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageGameRuleRemoved);
     }
 
+    @Subcommand("delete") @CommandPermission("hyperverse.delete")
+    @CommandCompletion("@hyperworlds") @Description("Delete a world")
+    public void doDelete(final CommandSender sender, final HyperWorld hyperWorld) {
+        if (hyperWorld == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+            return;
+        }
+        final HyperWorld.WorldUnloadResult worldUnloadResult = hyperWorld.deleteWorld();
+        if (worldUnloadResult != HyperWorld.WorldUnloadResult.SUCCESS) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%"
+                , worldUnloadResult.getDescription());
+            return;
+        }
+        MessageUtil.sendMessage(sender, Messages.messageWorldRemoved);
+    }
+
 }
