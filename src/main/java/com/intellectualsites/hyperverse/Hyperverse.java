@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.commands.HyperCommandManager;
+import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.listeners.PlayerListener;
 import com.intellectualsites.hyperverse.listeners.WorldListener;
 import com.intellectualsites.hyperverse.modules.HyperverseModule;
@@ -40,9 +41,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
     private WorldManager worldManager;
     private Injector injector;
+    private HyperDatabase hyperDatabase;
 
     @Override public void onEnable() {
         this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
+        this.hyperDatabase = injector.getInstance(HyperDatabase.class);
+        if (!this.hyperDatabase.attemptConnect()) {
+            getLogger().severe("Failed to connect to database...");
+        }
         this.worldManager = injector.getInstance(WorldManager.class);
         this.worldManager.loadWorlds();
         this.getServer().getPluginManager()
@@ -53,6 +59,10 @@ import org.bukkit.plugin.java.JavaPlugin;
         injector.getInstance(HyperCommandManager.class);
         // Initialize bStats metrics tracking
         new Metrics(this, BSTATS_ID);
+    }
+
+    @Override public void onDisable() {
+        this.hyperDatabase.attemptClose();
     }
 
 }

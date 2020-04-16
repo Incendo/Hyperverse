@@ -16,12 +16,22 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.intellectualsites.hyperverse.configuration;
+package com.intellectualsites.hyperverse.flags.implementation;
 
-public interface HyperConfiguration {
+import com.intellectualsites.hyperverse.configuration.Messages;
+import org.jetbrains.annotations.NotNull;
 
-    boolean shouldImportAutomatically();
+public class ForceSpawn extends BooleanFlag<ForceSpawn> {
 
-    boolean shouldPersistLocations();
+    public static final ForceSpawn FORCE_SPAWN_TRUE  = new ForceSpawn(true);
+    public static final ForceSpawn FORCE_SPAWN_FALSE = new ForceSpawn(false);
+
+    private ForceSpawn(final boolean value) {
+        super(value, Messages.flagDescriptionForceSpawn);
+    }
+
+    @Override protected ForceSpawn flagOf(@NotNull final Boolean value) {
+        return value ? FORCE_SPAWN_TRUE : FORCE_SPAWN_FALSE;
+    }
 
 }

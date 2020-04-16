@@ -28,15 +28,20 @@ import org.jetbrains.annotations.NotNull;
 public class PluginFileHyperConfiguration implements HyperConfiguration {
 
     private final boolean importAutomatically;
+    private final boolean persistLocations;
 
     @Inject public PluginFileHyperConfiguration(@NotNull final Hyperverse hyperverse) {
         hyperverse.saveDefaultConfig();
         final FileConfiguration config = hyperverse.getConfig();
         this.importAutomatically = config.getBoolean("worlds.import-automatically", true);
+        this.persistLocations = config.getBoolean("worlds.persist-locations", true);
     }
 
     @Override public boolean shouldImportAutomatically() {
         return this.importAutomatically;
     }
 
+    @Override public boolean shouldPersistLocations() {
+        return this.persistLocations;
+    }
 }

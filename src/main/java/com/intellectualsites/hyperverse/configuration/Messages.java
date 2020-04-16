@@ -105,6 +105,8 @@ public class Messages {
     public static final Message flagDescriptionLocalRespawn = createMessage("flags.local-respawn",
         "Whether or not players should respawn at their beds/global spawn, or respawn in this world"
             + " if they die inside it");
+    public static final Message flagDescriptionForceSpawn = createMessage("flags.force-spawn",
+        "Whether or not players should be teleported to the world spawn each time they enter the world");
 
 
     public static Message createMessage(@NotNull final String key,

@@ -2,3 +2,7 @@ worlds:
   # Whether or not worlds should be automatically imported
   # into Hyperverse on load
   import-automatically: true
+  # Whether or not player locations should be saved
+  # to the database, and be used when a player
+  # teleports between worlds
+  persist-locations: true

@@ -18,6 +18,7 @@
 
 package com.intellectualsites.hyperverse.flags;
 
+import com.intellectualsites.hyperverse.flags.implementation.ForceSpawn;
 import com.intellectualsites.hyperverse.flags.implementation.GamemodeFlag;
 import com.intellectualsites.hyperverse.flags.implementation.LocalRespawnFlag;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         // Register all default flags here
         this.addFlag(GamemodeFlag.GAMEMODE_SURVIVAL);
         this.addFlag(LocalRespawnFlag.RESPAWN_FALSE);
+        this.addFlag(ForceSpawn.FORCE_SPAWN_FALSE);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {

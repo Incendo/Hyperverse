@@ -21,7 +21,10 @@ package com.intellectualsites.hyperverse.world;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.configuration.Messages;
+import com.intellectualsites.hyperverse.database.HyperDatabase;
+import com.intellectualsites.hyperverse.database.PersistentLocation;
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import com.intellectualsites.hyperverse.flags.FlagContainer;
 import com.intellectualsites.hyperverse.flags.FlagParseException;
@@ -60,18 +63,23 @@ public class SimpleWorld implements HyperWorld {
     private final WorldManager worldManager;
     private final TaskChainFactory taskChainFactory;
     private final FlagContainer flagContainer;
+    private final HyperDatabase hyperDatabase;
+    private final HyperConfiguration hyperConfiguration;
     private World bukkitWorld;
 
     @Inject public SimpleWorld(@Assisted final UUID worldUUID,
         @Assisted final WorldConfiguration configuration,
         final HyperWorldCreatorFactory hyperWorldCreatorFactory, final WorldManager worldManager,
         final TaskChainFactory taskChainFactory, final GlobalWorldFlagContainer globalFlagContainer,
-        final FlagContainerFactory flagContainerFactory) {
+        final FlagContainerFactory flagContainerFactory, final HyperDatabase hyperDatabase,
+        final HyperConfiguration hyperConfiguration) {
         this.worldUUID = Objects.requireNonNull(worldUUID);
         this.configuration = Objects.requireNonNull(configuration);
         this.hyperWorldCreatorFactory = Objects.requireNonNull(hyperWorldCreatorFactory);
         this.worldManager = Objects.requireNonNull(worldManager);
         this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
+        this.hyperDatabase = Objects.requireNonNull(hyperDatabase);
+        this.hyperConfiguration = Objects.requireNonNull(hyperConfiguration);
         this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag, type) -> {
             if (flagsInitialized) {
                 if (type == FlagContainer.WorldFlagUpdateType.FLAG_REMOVED) {
@@ -249,10 +257,17 @@ public class SimpleWorld implements HyperWorld {
         if (player.getWorld().equals(this.bukkitWorld)) {
             return;
         }
-        final Location spawn = this.getSpawn();
-        if (spawn != null) {
-            PaperLib.teleportAsync(player, spawn);
+
+        final Location location;
+        if (this.hyperConfiguration.shouldPersistLocations()) {
+            location = this.hyperDatabase.getLocation(player.getUniqueId(),
+                this.getConfiguration().getName()).map(PersistentLocation::toLocation)
+                .orElse(Objects.requireNonNull(this.getSpawn()));
+        } else {
+            location = this.getSpawn();
         }
+
+        PaperLib.teleportAsync(player, Objects.requireNonNull(location));
     }
 
     @Override @Nullable public Location getSpawn() {
