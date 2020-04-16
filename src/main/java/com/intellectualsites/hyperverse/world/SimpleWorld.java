@@ -147,6 +147,8 @@ public class SimpleWorld implements HyperWorld {
                 e.printStackTrace();
             }
         }).sync(() -> this.worldManager.unregisterWorld(this)).execute();
+        // Delete world in the database
+        this.hyperDatabase.clearWorld(this.configuration.getName());
         return WorldUnloadResult.SUCCESS;
     }
 

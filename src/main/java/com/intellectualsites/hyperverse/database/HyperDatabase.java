@@ -27,6 +27,7 @@ import com.intellectualsites.hyperverse.Hyperverse;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,7 @@ import java.util.concurrent.Future;
  */
 @Singleton public class HyperDatabase {
 
-    private Dao<PersistentLocation, String> locationDao;
+    private Dao<PersistentLocation, Integer> locationDao;
     private ConnectionSource connectionSource;
     private TaskChainFactory taskChainFactory;
     private final Hyperverse hyperverse;
@@ -165,6 +166,19 @@ import java.util.concurrent.Future;
     @NotNull public Optional<PersistentLocation> getLocation(@NotNull final UUID uuid,
         @NotNull final String world) {
         return Optional.ofNullable(this.locations.get(uuid, world));
+    }
+
+    public void clearWorld(@NotNull final String worldName) {
+        taskChainFactory.newChain().async(() -> {
+            try {
+                final DeleteBuilder<PersistentLocation, Integer> deleteBuilder =
+                    this.locationDao.deleteBuilder();
+                deleteBuilder.where().eq("world", worldName);
+                deleteBuilder.delete();
+            } catch (final SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }).execute();
     }
 
 }
