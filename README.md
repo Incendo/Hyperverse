@@ -1,5 +1,9 @@
 # Hyperverse
 
+<p align="center">
+    <img height="256px" width="246px" src="https://plotsquared.com/assets/img/LogoMoonv2.png">
+</p>
+
 **Hyperverse is W.I.P!**
 
 A Minecraft world management plugin for Bukkit 1.13+.
