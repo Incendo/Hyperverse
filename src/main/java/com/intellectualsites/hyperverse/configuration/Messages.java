@@ -86,6 +86,14 @@ public class Messages {
         "&7The flag was updated");
     public static final Message messageFlagRemoved = createMessage("flag.removed",
         "&7The flag was removed");
+    public static final Message messageGameRuleParseError = createMessage("gamerule.parse_error",
+        "&cThat is not a valid value for the game rule");
+    public static final Message messageGameRuleUnknown = createMessage("gamerule.unknown",
+        "&cThere is no game rule with that name");
+    public static final Message messageGameRuleSet = createMessage("gamerule.set",
+        "&7The game rule was updated");
+    public static final Message messageGameRuleRemoved = createMessage("gamerule.removed",
+        "&7The game rule was removed");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",

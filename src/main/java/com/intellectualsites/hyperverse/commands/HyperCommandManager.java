@@ -44,6 +44,7 @@ import com.intellectualsites.hyperverse.world.WorldConfiguration;
 import com.intellectualsites.hyperverse.world.WorldManager;
 import com.intellectualsites.hyperverse.world.WorldType;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -100,10 +101,21 @@ public class HyperCommandManager extends BaseCommand {
         bukkitCommandManager.getCommandCompletions().registerCompletion("flags", context ->
             globalFlagContainer.getFlagMap().values().stream().map(WorldFlag::getName).collect(
                 Collectors.toList()));
+        bukkitCommandManager.getCommandCompletions().registerCompletion("gamerules", context ->
+            Arrays.stream(GameRule.values()).map(GameRule::getName).collect(Collectors.toList()));
         bukkitCommandManager.getCommandCompletions().registerCompletion("flag", context -> {
             final WorldFlag<?, ?> flag = context.getContextValue(WorldFlag.class);
             if (flag != null) {
                 return flag.getTabCompletions();
+            }
+            return Collections.emptyList();
+        });
+        bukkitCommandManager.getCommandCompletions().registerCompletion("gamerule", context -> {
+            final GameRule<?> gameRule = context.getContextValue(GameRule.class);
+            if (gameRule != null) {
+                if (gameRule.getType() == Boolean.class) {
+                    return Arrays.asList("true", "false");
+                }
             }
             return Collections.emptyList();
         });
@@ -118,6 +130,8 @@ public class HyperCommandManager extends BaseCommand {
             }
             return hyperWorld;
         });
+        bukkitCommandManager.getCommandContexts().registerContext(GameRule.class, context ->
+            GameRule.getByName(context.popFirstArg()));
         bukkitCommandManager.getCommandContexts().registerContext(WorldFlag.class, context ->
             this.globalFlagContainer.getFlagFromString(context.popFirstArg().toLowerCase()));
         //noinspection deprecation
@@ -326,6 +340,59 @@ public class HyperCommandManager extends BaseCommand {
         }
         hyperWorld.removeFlag(flag);
         MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
+    }
+
+    @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")
+    @CommandCompletion("@hyperworlds @gamerules @gamerule") @Description("Set a world gamerule")
+    public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,
+        final GameRule gameRule, final String value) {
+        if (gameRule == null) {
+            MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
+            return;
+        }
+        if (!hyperWorld.isLoaded()) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
+            return;
+        }
+
+        final Object object;
+        if (gameRule.getType() == Boolean.class) {
+            try {
+                object = Boolean.parseBoolean(value);
+            } catch (final Exception e) {
+                MessageUtil.sendMessage(sender, Messages.messageGameRuleParseError);
+                return;
+            }
+        } else if (gameRule.getType() == Integer.class) {
+            try {
+                object = Integer.parseInt(value);
+            } catch (final Exception e) {
+                MessageUtil.sendMessage(sender, Messages.messageGameRuleParseError);
+                return;
+            }
+        } else {
+            // ??
+            return;
+        }
+
+        hyperWorld.getBukkitWorld().setGameRule(gameRule, object);
+        MessageUtil.sendMessage(sender, Messages.messageGameRuleSet);
+    }
+
+    @Subcommand("gamerule remove") @CommandPermission("hyperverse.gamerule.set")
+    @CommandCompletion("@hyperworlds @gamerules") @Description("Remove a world game rule")
+    public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final GameRule gameRule) {
+        if (gameRule == null) {
+            MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
+            return;
+        }
+        if (!hyperWorld.isLoaded()) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
+            return;
+        }
+        hyperWorld.getBukkitWorld().setGameRule(gameRule,
+            hyperWorld.getBukkitWorld().getGameRuleDefault(gameRule));
+        MessageUtil.sendMessage(sender, Messages.messageGameRuleRemoved);
     }
 
 }

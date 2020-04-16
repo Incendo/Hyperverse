@@ -33,3 +33,5 @@ permissions:
   hyperverse.flag.set:
     description: Allows players to set world flags
     default: op
+  hyperverse.gamerule.set:
+    description: Allow players to world gamerules

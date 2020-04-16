@@ -32,6 +32,7 @@ import com.intellectualsites.hyperverse.modules.HyperWorldCreatorFactory;
 import com.intellectualsites.hyperverse.util.MessageUtil;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -64,7 +65,7 @@ public class SimpleWorld implements HyperWorld {
         this.hyperWorldCreatorFactory = Objects.requireNonNull(hyperWorldCreatorFactory);
         this.worldManager = Objects.requireNonNull(worldManager);
         this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
-        this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag,type) -> {
+        this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag, type) -> {
             if (flagsInitialized) {
                 if (type == FlagContainer.WorldFlagUpdateType.FLAG_REMOVED) {
                     this.configuration.setFlagValue(flag.getName(), null);
@@ -81,8 +82,10 @@ public class SimpleWorld implements HyperWorld {
                 try {
                     this.flagContainer.addFlag(flag.parse(entry.getValue()));
                 } catch (final FlagParseException e) {
-                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageFlagParseError,
-                        "%flag%", e.getFlag().getName(), "%value%", e.getValue(), "%reason%", e.getErrorMessage());
+                    MessageUtil
+                        .sendMessage(Bukkit.getConsoleSender(), Messages.messageFlagParseError,
+                            "%flag%", e.getFlag().getName(), "%value%", e.getValue(), "%reason%",
+                            e.getErrorMessage());
                 }
             }
         }
@@ -97,10 +100,9 @@ public class SimpleWorld implements HyperWorld {
     }
 
     @Override public void saveConfiguration() {
-        this.taskChainFactory.newChain().async(() ->
-            getConfiguration().writeToFile(this.worldManager.getWorldDirectory().
-            resolve(String.format("%s.json", this.getConfiguration().getName()))))
-            .execute();
+        this.taskChainFactory.newChain()
+            .async(() -> getConfiguration().writeToFile(this.worldManager.getWorldDirectory().
+                resolve(String.format("%s.json", this.getConfiguration().getName())))).execute();
     }
 
     @Override public boolean isLoaded() {
@@ -130,33 +132,56 @@ public class SimpleWorld implements HyperWorld {
     }
 
     @Override public void sendWorldInfo(@NotNull CommandSender sender) {
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "name", "%value%", configuration.getName());
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "type", "%value%", configuration.getType().name());
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "seed", "%value%", Long.toString(configuration.getSeed()));
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "structures", "%value%", Boolean.toString(configuration.isGenerateStructures()));
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "settings", "%value%", configuration.getSettings());
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "generator", "%value%", configuration.getGenerator());
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "generator arg", "%value%", configuration.getGeneratorArg());
+        MessageUtil
+            .sendMessage(sender, Messages.messageWorldProperty, "%property%", "name", "%value%",
+                configuration.getName());
+        MessageUtil
+            .sendMessage(sender, Messages.messageWorldProperty, "%property%", "type", "%value%",
+                configuration.getType().name());
+        MessageUtil
+            .sendMessage(sender, Messages.messageWorldProperty, "%property%", "seed", "%value%",
+                Long.toString(configuration.getSeed()));
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "structures",
+            "%value%", Boolean.toString(configuration.isGenerateStructures()));
+        MessageUtil
+            .sendMessage(sender, Messages.messageWorldProperty, "%property%", "settings", "%value%",
+                configuration.getSettings());
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "generator",
+            "%value%", configuration.getGenerator());
+        MessageUtil
+            .sendMessage(sender, Messages.messageWorldProperty, "%property%", "generator arg",
+                "%value%", configuration.getGeneratorArg());
         // Flags
-        final StringBuilder stringBuilder = new StringBuilder();
-        final Iterator<Map.Entry<String, String>> flagIterator = this.configuration.getFlags()
-            .entrySet().iterator();
+        final StringBuilder flagStringBuilder = new StringBuilder();
+        final Iterator<Map.Entry<String, String>> flagIterator =
+            this.configuration.getFlags().entrySet().iterator();
         while (flagIterator.hasNext()) {
             final Map.Entry<String, String> entry = flagIterator.next();
-            stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+            flagStringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
             if (flagIterator.hasNext()) {
-                stringBuilder.append(", ");
+                flagStringBuilder.append(", ");
             }
         }
-        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
-            "%property%", "flags", "%value%", stringBuilder.toString());
+        MessageUtil
+            .sendMessage(sender, Messages.messageWorldProperty, "%property%", "flags", "%value%",
+                flagStringBuilder.toString());
+
+        if (this.isLoaded()) {
+            final StringBuilder gameRuleStringBuilder = new StringBuilder();
+
+            final GameRule[] gameRules = GameRule.values();
+            for (int i = 0; i < gameRules.length; i++) {
+                final Object value = this.bukkitWorld.getGameRuleValue(gameRules[i]);
+                if (value == this.bukkitWorld.getGameRuleDefault(gameRules[i])) {
+                    continue;
+                }
+                gameRuleStringBuilder.append(gameRules[i].getName()).append("=")
+                    .append(value.toString()).append(" ");
+            }
+
+            MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "game rules",
+                "%value%", gameRuleStringBuilder.toString());
+        }
     }
 
     @Override public void createBukkitWorld() throws HyperWorldValidationException {
@@ -231,8 +256,8 @@ public class SimpleWorld implements HyperWorld {
         return this.configuration;
     }
 
-    @Override public <T> void setFlag(@NotNull final WorldFlag<T, ?> flag,
-        @NotNull final String value)
+    @Override
+    public <T> void setFlag(@NotNull final WorldFlag<T, ?> flag, @NotNull final String value)
         throws FlagParseException {
         this.flagContainer.addFlag(flag.parse(value));
     }
@@ -241,7 +266,8 @@ public class SimpleWorld implements HyperWorld {
         this.flagContainer.removeFlag(flagInstance);
     }
 
-    @Override @NotNull public <T> T getFlag(@NotNull final Class<? extends WorldFlag<T, ?>> flagClass) {
+    @Override @NotNull
+    public <T> T getFlag(@NotNull final Class<? extends WorldFlag<T, ?>> flagClass) {
         return this.flagContainer.getFlag(flagClass).getValue();
     }
 
