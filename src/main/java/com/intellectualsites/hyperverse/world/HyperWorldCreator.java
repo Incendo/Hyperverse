@@ -68,7 +68,6 @@ public final class HyperWorldCreator extends WorldCreator {
         this.environment(worldConfiguration.getType().getBukkitType());
         this.generatorSettings(worldConfiguration.getSettings());
         this.seed(worldConfiguration.getSeed());
-        this.hardcore(false);
         this.generateStructures(worldConfiguration.isGenerateStructures());
         this.generator(getJoinedName(), NullRouteCommandSender.getInstance());
     }
