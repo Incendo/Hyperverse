@@ -245,6 +245,10 @@ public class SimpleWorldManager implements WorldManager, Listener {
         return this.worldMap.get(Objects.requireNonNull(uuid));
     }
 
+    @Override @Nullable public HyperWorld getWorld(@NotNull World world) {
+        return this.getWorld(world.getName());
+    }
+
     @NotNull @Override public Path getWorldDirectory() {
         return this.worldDirectory;
     }

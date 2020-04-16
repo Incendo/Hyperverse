@@ -32,6 +32,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class WorldConfiguration {
@@ -48,6 +50,7 @@ public class WorldConfiguration {
     private String generatorArg;
     // Mutable properties
     private boolean loaded = true;
+    private Map<String, String> flags;
 
     WorldConfiguration(final String name, final WorldType type, final String settings, final long seed,
         final boolean generateStructures, final String generator, final String generatorArg) {
@@ -58,6 +61,7 @@ public class WorldConfiguration {
         this.generateStructures = generateStructures;
         this.generator = generator;
         this.generatorArg = generatorArg;
+        this.flags = new HashMap<>();
     }
 
     public static WorldConfigurationBuilder builder() {
@@ -127,6 +131,21 @@ public class WorldConfiguration {
 
     public String getGeneratorArg() {
         return this.generatorArg;
+    }
+
+    public Map<String, String> getFlags() {
+        if (this.flags == null) {
+            this.flags = new HashMap<>();
+        }
+        return this.flags;
+    }
+
+    public void setFlagValue(@NotNull final String flag, @Nullable final String flagValue) {
+        if (flagValue == null) {
+            this.flags.remove(flag);
+        } else {
+            this.flags.put(flag, flagValue);
+        }
     }
 
     public boolean isLoaded() {

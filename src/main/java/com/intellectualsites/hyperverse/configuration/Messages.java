@@ -78,6 +78,22 @@ public class Messages {
         "&cThat world is already loaded");
     public static final Message messageWorldLoadedSuccessfully = createMessage("world.load_success",
         "&7The world has been loaded");
+    public static final Message messageFlagParseError = createMessage("flag.parse_error",
+        "&cError when parsing flag '%flag%', value '%value%'. Reason: %reason%");
+    public static final Message messageFlagUnknown = createMessage("flag.unknown",
+        "&cThere is no flag with that name");
+    public static final Message messageFlagSet = createMessage("flag.set",
+        "&7The flag was updated");
+    public static final Message messageFlagRemoved = createMessage("flag.removed",
+        "&7The flag was removed");
+
+    // Flag descriptions
+    public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
+        "World gamemode. Available values: survival, creative, adventure, spectator");
+    public static final Message flagDescriptionLocalRespawn = createMessage("flags.local-respawn",
+        "Whether or not players should respawn at their beds/global spawn, or respawn in this world"
+            + " if they die inside it");
+
 
     public static Message createMessage(@NotNull final String key,
         @NotNull final String defaultValue) {

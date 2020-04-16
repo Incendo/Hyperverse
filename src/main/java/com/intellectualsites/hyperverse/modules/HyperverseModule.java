@@ -24,6 +24,9 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.intellectualsites.hyperverse.Hyperverse;
 import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.configuration.PluginFileHyperConfiguration;
+import com.intellectualsites.hyperverse.flags.FlagContainer;
+import com.intellectualsites.hyperverse.flags.GlobalWorldFlagContainer;
+import com.intellectualsites.hyperverse.flags.WorldFlagContainer;
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.HyperWorldCreator;
 import com.intellectualsites.hyperverse.world.SimpleWorld;
@@ -37,10 +40,13 @@ public class HyperverseModule extends AbstractModule {
         bind(Hyperverse.class).toInstance(Hyperverse.getPlugin(Hyperverse.class));
         bind(HyperConfiguration.class).to(PluginFileHyperConfiguration.class).in(Singleton.class);
         bind(WorldManager.class).to(SimpleWorldManager.class).in(Singleton.class);
+        bind(GlobalWorldFlagContainer.class).toInstance(new GlobalWorldFlagContainer());
         install(new FactoryModuleBuilder().implement(WorldCreator.class, HyperWorldCreator.class)
             .build(HyperWorldCreatorFactory.class));
         install(new FactoryModuleBuilder().implement(HyperWorld.class, SimpleWorld.class)
             .build(HyperWorldFactory.class));
+        install(new FactoryModuleBuilder().implement(FlagContainer.class, WorldFlagContainer.class)
+            .build(FlagContainerFactory.class));
     }
 
 }

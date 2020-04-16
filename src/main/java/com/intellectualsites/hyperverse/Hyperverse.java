@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.commands.HyperCommandManager;
+import com.intellectualsites.hyperverse.listeners.PlayerListener;
 import com.intellectualsites.hyperverse.listeners.WorldListener;
 import com.intellectualsites.hyperverse.modules.HyperverseModule;
 import com.intellectualsites.hyperverse.modules.TaskChainModule;
@@ -44,6 +45,8 @@ public final class Hyperverse extends JavaPlugin {
         this.worldManager.loadWorlds();
         this.getServer().getPluginManager()
             .registerEvents(injector.getInstance(WorldListener.class), this);
+        this.getServer().getPluginManager()
+            .registerEvents(injector.getInstance(PlayerListener.class), this);
         // Create the command manager instance
         injector.getInstance(HyperCommandManager.class);
         // Initialize bStats metrics tracking

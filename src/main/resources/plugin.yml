@@ -27,3 +27,9 @@ permissions:
   hyperverse.load:
     description: Allows players to load worlds
     default: op
+  hyperverse.flag.list:
+    description: Allows player to list available flags
+    default: op
+  hyperverse.flag.set:
+    description: Allows players to set world flags
+    default: op

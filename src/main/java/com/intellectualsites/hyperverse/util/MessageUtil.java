@@ -32,16 +32,21 @@ public final class MessageUtil {
     private MessageUtil() {
     }
 
-    public static void sendMessage(@NotNull final CommandSender recipient,
-        @NotNull final Message message, @NotNull final String... replacements) {
-        Objects.requireNonNull(recipient);
+    @NotNull public static String format(@NotNull final String message, @NotNull final String... replacements) {
         if (replacements.length % 2 != 0) {
             throw new IllegalArgumentException("Replacement length must be a multiple of two");
         }
-        String replacedMessage = Objects.requireNonNull(message).toString();
+        String replacedMessage = Objects.requireNonNull(message);
         for (int i = 0; i < replacements.length; i += 2) {
             replacedMessage = replacedMessage.replace(replacements[i], replacements[i + 1]);
         }
+        return replacedMessage;
+    }
+
+    public static void sendMessage(@NotNull final CommandSender recipient,
+        @NotNull final Message message, @NotNull final String... replacements) {
+        Objects.requireNonNull(recipient);
+        final String replacedMessage = format(message.toString(), replacements);
         final String prefixedMessage = ChatColor.translateAlternateColorCodes('&',
             Messages.messagePrefix.toString() + replacedMessage);
         if (prefixedMessage.contains("<") && prefixedMessage.contains(">")) {

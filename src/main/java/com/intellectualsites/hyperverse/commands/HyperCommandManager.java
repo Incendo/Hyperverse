@@ -33,6 +33,9 @@ import com.google.inject.Inject;
 import com.intellectualsites.hyperverse.Hyperverse;
 import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
+import com.intellectualsites.hyperverse.flags.FlagParseException;
+import com.intellectualsites.hyperverse.flags.GlobalWorldFlagContainer;
+import com.intellectualsites.hyperverse.flags.WorldFlag;
 import com.intellectualsites.hyperverse.modules.HyperWorldFactory;
 import com.intellectualsites.hyperverse.util.MessageUtil;
 import com.intellectualsites.hyperverse.util.WorldUtil;
@@ -60,11 +63,13 @@ public class HyperCommandManager extends BaseCommand {
 
     private final WorldManager worldManager;
     private final HyperWorldFactory hyperWorldFactory;
+    private final GlobalWorldFlagContainer globalFlagContainer;
 
     @Inject public HyperCommandManager(final Hyperverse hyperverse, final WorldManager worldManager,
-        final HyperWorldFactory hyperWorldFactory) {
+        final HyperWorldFactory hyperWorldFactory, final GlobalWorldFlagContainer globalFlagContainer) {
         this.worldManager = Objects.requireNonNull(worldManager);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
+        this.globalFlagContainer = Objects.requireNonNull(globalFlagContainer);
         // Create the command manager
         final BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(hyperverse);
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
@@ -92,6 +97,16 @@ public class HyperCommandManager extends BaseCommand {
                 }
                 return generators;
             });
+        bukkitCommandManager.getCommandCompletions().registerCompletion("flags", context ->
+            globalFlagContainer.getFlagMap().values().stream().map(WorldFlag::getName).collect(
+                Collectors.toList()));
+        bukkitCommandManager.getCommandCompletions().registerCompletion("flag", context -> {
+            final WorldFlag<?, ?> flag = context.getContextValue(WorldFlag.class);
+            if (flag != null) {
+                return flag.getTabCompletions();
+            }
+            return Collections.emptyList();
+        });
         bukkitCommandManager.getCommandContexts().registerContext(WorldType.class, context -> {
             final String arg = context.popFirstArg();
             return WorldType.fromString(arg).orElse(null);
@@ -103,6 +118,8 @@ public class HyperCommandManager extends BaseCommand {
             }
             return hyperWorld;
         });
+        bukkitCommandManager.getCommandContexts().registerContext(WorldFlag.class, context ->
+            this.globalFlagContainer.getFlagFromString(context.popFirstArg().toLowerCase()));
         //noinspection deprecation
         bukkitCommandManager.enableUnstableAPI("help");
         bukkitCommandManager.registerCommand(this);
@@ -280,6 +297,35 @@ public class HyperCommandManager extends BaseCommand {
         world.saveConfiguration();
 
         MessageUtil.sendMessage(sender, Messages.messageWorldLoadedSuccessfully);
+    }
+
+    @Subcommand("flag set") @CommandPermission("hyperverse.flag.set")
+    @CommandCompletion("@hyperworlds @flags @flag") @Description("Set a world flag")
+    public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,
+        final WorldFlag<?, ?> flag, final String value) {
+        if (flag == null) {
+            MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
+            return;
+        }
+        try {
+            hyperWorld.setFlag(flag, value);
+        } catch (final FlagParseException e) {
+            MessageUtil.sendMessage(sender, Messages.messageFlagParseError,
+                "%flag%", e.getFlag().getName(), "%value%", e.getValue(), "%reason%", e.getErrorMessage());
+            return;
+        }
+        MessageUtil.sendMessage(sender, Messages.messageFlagSet);
+    }
+
+    @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
+    @CommandCompletion("@hyperworlds @flags") @Description("Remove a world flag")
+    public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
+        if (flag == null) {
+            MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
+            return;
+        }
+        hyperWorld.removeFlag(flag);
+        MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
     }
 
 }

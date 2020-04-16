@@ -19,6 +19,9 @@
 package com.intellectualsites.hyperverse.world;
 
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
+import com.intellectualsites.hyperverse.flags.FlagParseException;
+import com.intellectualsites.hyperverse.flags.WorldFlag;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,6 +32,8 @@ public interface HyperWorld {
     void createBukkitWorld() throws HyperWorldValidationException;
 
     void teleportPlayer(@NotNull Player player);
+
+    Location getSpawn();
 
     java.util.UUID getWorldUUID();
 
@@ -45,6 +50,13 @@ public interface HyperWorld {
     boolean isLoaded();
 
     @NotNull WorldUnloadResult unloadWorld();
+
+    @NotNull <T> T getFlag(@NotNull final Class<? extends WorldFlag<T, ?>> flagClass);
+
+    <T> void removeFlag(@NotNull final WorldFlag<T, ?> flag);
+
+    <T> void setFlag(@NotNull final WorldFlag<T, ?> flag, @NotNull final String value) throws
+        FlagParseException;
 
     enum WorldUnloadResult {
         SUCCESS(""),

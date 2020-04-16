@@ -23,36 +23,70 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
+import com.intellectualsites.hyperverse.flags.FlagContainer;
+import com.intellectualsites.hyperverse.flags.FlagParseException;
+import com.intellectualsites.hyperverse.flags.GlobalWorldFlagContainer;
+import com.intellectualsites.hyperverse.flags.WorldFlag;
+import com.intellectualsites.hyperverse.modules.FlagContainerFactory;
 import com.intellectualsites.hyperverse.modules.HyperWorldCreatorFactory;
 import com.intellectualsites.hyperverse.util.MessageUtil;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 public class SimpleWorld implements HyperWorld {
 
+    private boolean flagsInitialized = false;
     private final UUID worldUUID;
     private final WorldConfiguration configuration;
     private final HyperWorldCreatorFactory hyperWorldCreatorFactory;
     private final WorldManager worldManager;
     private final TaskChainFactory taskChainFactory;
+    private final FlagContainer flagContainer;
     private World bukkitWorld;
 
     @Inject public SimpleWorld(@Assisted final UUID worldUUID,
         @Assisted final WorldConfiguration configuration,
         final HyperWorldCreatorFactory hyperWorldCreatorFactory, final WorldManager worldManager,
-        final TaskChainFactory taskChainFactory) {
+        final TaskChainFactory taskChainFactory, final GlobalWorldFlagContainer globalFlagContainer,
+        final FlagContainerFactory flagContainerFactory) {
         this.worldUUID = Objects.requireNonNull(worldUUID);
         this.configuration = Objects.requireNonNull(configuration);
         this.hyperWorldCreatorFactory = Objects.requireNonNull(hyperWorldCreatorFactory);
         this.worldManager = Objects.requireNonNull(worldManager);
         this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
+        this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag,type) -> {
+            if (flagsInitialized) {
+                if (type == FlagContainer.WorldFlagUpdateType.FLAG_REMOVED) {
+                    this.configuration.setFlagValue(flag.getName(), null);
+                } else {
+                    this.configuration.setFlagValue(flag.getName(), flag.toString());
+                }
+                this.saveConfiguration();
+            }
+        });
+        // Load flag values
+        for (final Map.Entry<String, String> entry : this.configuration.getFlags().entrySet()) {
+            final WorldFlag<?, ?> flag = globalFlagContainer.getFlagFromString(entry.getKey());
+            if (flag != null) {
+                try {
+                    this.flagContainer.addFlag(flag.parse(entry.getValue()));
+                } catch (final FlagParseException e) {
+                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageFlagParseError,
+                        "%flag%", e.getFlag().getName(), "%value%", e.getValue(), "%reason%", e.getErrorMessage());
+                }
+            }
+        }
+        this.flagsInitialized = true;
     }
 
     @Override public void setBukkitWorld(@NotNull final World world) {
@@ -110,6 +144,19 @@ public class SimpleWorld implements HyperWorld {
             "%property%", "generator", "%value%", configuration.getGenerator());
         MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
             "%property%", "generator arg", "%value%", configuration.getGeneratorArg());
+        // Flags
+        final StringBuilder stringBuilder = new StringBuilder();
+        final Iterator<Map.Entry<String, String>> flagIterator = this.configuration.getFlags()
+            .entrySet().iterator();
+        while (flagIterator.hasNext()) {
+            final Map.Entry<String, String> entry = flagIterator.next();
+            stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+            if (flagIterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
+        }
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty,
+            "%property%", "flags", "%value%", stringBuilder.toString());
     }
 
     @Override public void createBukkitWorld() throws HyperWorldValidationException {
@@ -144,7 +191,13 @@ public class SimpleWorld implements HyperWorld {
         if (player.getWorld().equals(this.bukkitWorld)) {
             return;
         }
-        PaperLib.teleportAsync(player, this.bukkitWorld.getSpawnLocation());
+        PaperLib.teleportAsync(player, this.getSpawn());
+    }
+
+    @Override public Location getSpawn() {
+        final Location location = this.bukkitWorld.getSpawnLocation().clone();
+        location.add(0.5, 0, 0.5);
+        return location;
     }
 
     @Override public boolean equals(Object o) {
@@ -177,4 +230,19 @@ public class SimpleWorld implements HyperWorld {
     @Override public WorldConfiguration getConfiguration() {
         return this.configuration;
     }
+
+    @Override public <T> void setFlag(@NotNull final WorldFlag<T, ?> flag,
+        @NotNull final String value)
+        throws FlagParseException {
+        this.flagContainer.addFlag(flag.parse(value));
+    }
+
+    @Override public <T> void removeFlag(@NotNull final WorldFlag<T, ?> flagInstance) {
+        this.flagContainer.removeFlag(flagInstance);
+    }
+
+    @Override @NotNull public <T> T getFlag(@NotNull final Class<? extends WorldFlag<T, ?>> flagClass) {
+        return this.flagContainer.getFlag(flagClass).getValue();
+    }
+
 }
