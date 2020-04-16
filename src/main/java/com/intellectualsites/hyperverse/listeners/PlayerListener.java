@@ -23,12 +23,17 @@ import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.database.PersistentLocation;
 import com.intellectualsites.hyperverse.flags.implementation.GamemodeFlag;
 import com.intellectualsites.hyperverse.flags.implementation.LocalRespawnFlag;
+import com.intellectualsites.hyperverse.flags.implementation.PveFlag;
+import com.intellectualsites.hyperverse.flags.implementation.PvpFlag;
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.WorldManager;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -112,6 +117,27 @@ public class PlayerListener implements Listener {
         }
         if (hyperWorld.getFlag(LocalRespawnFlag.class)) {
             event.setRespawnLocation(Objects.requireNonNull(hyperWorld.getSpawn()));
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageEvent(final EntityDamageByEntityEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getEntity().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        final Entity first = event.getEntity();
+        final Entity second = event.getDamager();
+        if (first.getType() == EntityType.PLAYER || second.getType() == EntityType.PLAYER) {
+            if (first.getType() == second.getType()) {
+                if (!hyperWorld.getFlag(PvpFlag.class)) {
+                    event.setCancelled(true);
+                }
+            } else {
+                if (!hyperWorld.getFlag(PveFlag.class)) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 

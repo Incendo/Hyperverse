@@ -107,7 +107,10 @@ public class Messages {
             + " if they die inside it");
     public static final Message flagDescriptionForceSpawn = createMessage("flags.force-spawn",
         "Whether or not players should be teleported to the world spawn each time they enter the world");
-
+    public static final Message flagDescriptionPvp = createMessage("flags.pvp",
+        "Whether or not player vs. player combat is enabled");
+    public static final Message flagDescriptionPve = createMessage("flags.pve",
+        "Whether or not player vs. entity combat is enabled");
 
     public static Message createMessage(@NotNull final String key,
         @NotNull final String defaultValue) {
