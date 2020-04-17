@@ -27,9 +27,11 @@ Planned Features:
 ## Links
 
 ### Downloads
+- [Spigot](https://www.spigotmc.org/resources/hyperverse-w-i-p.77550/)
 - [Development Builds](https://ci.athion.net/job/Hyperverse/)
 
 ### Documentation
+- [Installation](https://github.com/Sauilitired/Hyperverse/wiki/Installation)
 - [Commands](https://github.com/Sauilitired/Hyperverse/wiki/Commands)
 - [Configuration](https://github.com/Sauilitired/Hyperverse/wiki/Configuration)
 - [Flags and Game Rules](https://github.com/Sauilitired/Hyperverse/wiki/Flags-and-Game-Rules)
