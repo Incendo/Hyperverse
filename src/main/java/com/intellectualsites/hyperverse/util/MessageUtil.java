@@ -68,6 +68,9 @@ public final class MessageUtil {
         @NotNull final Message message, @NotNull final String... replacements) {
         Objects.requireNonNull(recipient);
         final String replacedMessage = format(message.toString(), replacements);
+        if (replacedMessage.isEmpty()) {
+            return;
+        }
         final String prefixedMessage = ChatColor.translateAlternateColorCodes('&',
             Messages.messagePrefix.toString() + replacedMessage);
         if (prefixedMessage.contains("<") && prefixedMessage.contains(">")) {

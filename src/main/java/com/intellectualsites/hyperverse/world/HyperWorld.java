@@ -21,6 +21,7 @@ package com.intellectualsites.hyperverse.world;
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import com.intellectualsites.hyperverse.flags.FlagParseException;
 import com.intellectualsites.hyperverse.flags.WorldFlag;
+import com.intellectualsites.hyperverse.teleportation.TeleportationManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -144,6 +145,13 @@ public interface HyperWorld {
      */
     <T> void setFlag(@NotNull final WorldFlag<T, ?> flag, @NotNull final String value) throws
         FlagParseException;
+
+    /**
+     * Get the teleportation manager belonging to this world
+     *
+     * @return The worlds' teleportation manager
+     */
+    TeleportationManager getTeleportationManager();
 
     /**
      * Result of unloading or deleting a world

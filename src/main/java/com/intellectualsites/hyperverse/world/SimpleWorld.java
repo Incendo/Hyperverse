@@ -30,11 +30,11 @@ import com.intellectualsites.hyperverse.flags.FlagContainer;
 import com.intellectualsites.hyperverse.flags.FlagParseException;
 import com.intellectualsites.hyperverse.flags.GlobalWorldFlagContainer;
 import com.intellectualsites.hyperverse.flags.WorldFlag;
-import com.intellectualsites.hyperverse.flags.implementation.WorldPermissionFlag;
 import com.intellectualsites.hyperverse.modules.FlagContainerFactory;
 import com.intellectualsites.hyperverse.modules.HyperWorldCreatorFactory;
+import com.intellectualsites.hyperverse.modules.TeleportationManagerFactory;
+import com.intellectualsites.hyperverse.teleportation.TeleportationManager;
 import com.intellectualsites.hyperverse.util.MessageUtil;
-import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -66,6 +66,7 @@ public class SimpleWorld implements HyperWorld {
     private final FlagContainer flagContainer;
     private final HyperDatabase hyperDatabase;
     private final HyperConfiguration hyperConfiguration;
+    private final TeleportationManager teleportationManager;
     private World bukkitWorld;
 
     @Inject public SimpleWorld(@Assisted final UUID worldUUID,
@@ -73,7 +74,7 @@ public class SimpleWorld implements HyperWorld {
         final HyperWorldCreatorFactory hyperWorldCreatorFactory, final WorldManager worldManager,
         final TaskChainFactory taskChainFactory, final GlobalWorldFlagContainer globalFlagContainer,
         final FlagContainerFactory flagContainerFactory, final HyperDatabase hyperDatabase,
-        final HyperConfiguration hyperConfiguration) {
+        final HyperConfiguration hyperConfiguration, final TeleportationManagerFactory teleportationManagerFactory) {
         this.worldUUID = Objects.requireNonNull(worldUUID);
         this.configuration = Objects.requireNonNull(configuration);
         this.hyperWorldCreatorFactory = Objects.requireNonNull(hyperWorldCreatorFactory);
@@ -81,6 +82,7 @@ public class SimpleWorld implements HyperWorld {
         this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
         this.hyperDatabase = Objects.requireNonNull(hyperDatabase);
         this.hyperConfiguration = Objects.requireNonNull(hyperConfiguration);
+        this.teleportationManager = Objects.requireNonNull(teleportationManagerFactory).create(this);
         this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag, type) -> {
             if (flagsInitialized) {
                 if (type == FlagContainer.WorldFlagUpdateType.FLAG_REMOVED) {
@@ -262,14 +264,6 @@ public class SimpleWorld implements HyperWorld {
             return;
         }
 
-        if (!this.getFlag(WorldPermissionFlag.class).isEmpty()) {
-            final String permission = getFlag(WorldPermissionFlag.class);
-            if (!player.hasPermission(permission)) {
-                MessageUtil.sendMessage(player, Messages.messageNotPermittedEntry);
-                return;
-            }
-        }
-
         final Location location;
         if (this.hyperConfiguration.shouldPersistLocations()) {
             location = this.hyperDatabase.getLocation(player.getUniqueId(),
@@ -279,7 +273,22 @@ public class SimpleWorld implements HyperWorld {
             location = this.getSpawn();
         }
 
-        PaperLib.teleportAsync(player, Objects.requireNonNull(location));
+        assert location != null;
+        this.teleportationManager.allowedTeleport(player, location).thenAccept(value -> {
+           if (!value) {
+               MessageUtil.sendMessage(player, Messages.messageNotPermittedEntry);
+           } else {
+               this.teleportationManager.canTeleport(player, location).thenAccept(safe -> {
+                   if (!safe) {
+                       MessageUtil.sendMessage(player, Messages.messageTeleportNotSafe);
+                       this.teleportationManager.findSafe(location).thenAccept(safeLocation ->
+                           this.teleportationManager.teleportPlayer(player, safeLocation));
+                   } else {
+                       this.teleportationManager.teleportPlayer(player, location);
+                   }
+               });
+           }
+        });
     }
 
     @Override @Nullable public Location getSpawn() {
@@ -335,6 +344,10 @@ public class SimpleWorld implements HyperWorld {
     @Override @NotNull
     public <T> T getFlag(@NotNull final Class<? extends WorldFlag<T, ?>> flagClass) {
         return this.flagContainer.getFlag(flagClass).getValue();
+    }
+
+    @Override @NotNull public TeleportationManager getTeleportationManager() {
+        return this.teleportationManager;
     }
 
 }

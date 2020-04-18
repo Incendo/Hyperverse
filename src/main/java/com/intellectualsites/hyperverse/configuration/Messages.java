@@ -104,6 +104,8 @@ public class Messages {
         "&7The world was removed successfully");
     public static final Message messageNotPermittedEntry = createMessage("world.not_permitted",
         "&cYou are not allowed to enter that world");
+    public static final Message messageTeleportNotSafe = createMessage("world.not_safe",
+        "&cTeleportation to that location is not safe. An attempt to find a safe destination will be made.");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
