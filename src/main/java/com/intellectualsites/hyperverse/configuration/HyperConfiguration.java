@@ -18,10 +18,26 @@
 
 package com.intellectualsites.hyperverse.configuration;
 
+/**
+ * Hyperverse configuration options
+ */
 public interface HyperConfiguration {
 
+    /**
+     * Whether or not Hyperverse should
+     * import detected worlds automatically
+     *
+     * @return True if worlds should be imported
+     *         automatically
+     */
     boolean shouldImportAutomatically();
 
+    /**
+     * Whether or not Hyperverse's location
+     * persistence system should be enabled
+     *
+     * @return True if locations should persist
+     */
     boolean shouldPersistLocations();
 
 }

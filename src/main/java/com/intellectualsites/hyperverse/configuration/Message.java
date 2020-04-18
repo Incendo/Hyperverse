@@ -22,20 +22,39 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * Configurable messages
+ */
 public final class Message {
 
     private final String key;
     private final String defaultValue;
 
+    /**
+     * Construct a new message
+     *
+     * @param key The message key, used as a path in the configuration file
+     * @param defaultValue The default message
+     */
     public Message(@NotNull final String key, @NotNull final String defaultValue) {
         this.key = Objects.requireNonNull(key);
         this.defaultValue = Objects.requireNonNull(defaultValue);
     }
 
+    /**
+     * Get the configuration key
+     *
+     * @return Configuration key
+     */
     @NotNull public String getKey() {
         return this.key;
     }
 
+    /**
+     * Get the default message
+     *
+     * @return Default message
+     */
     @NotNull public String getDefaultValue() {
         return this.defaultValue;
     }

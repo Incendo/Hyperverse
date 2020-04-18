@@ -18,11 +18,15 @@
 
 package com.intellectualsites.hyperverse.configuration;
 
+import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class Messages {
+
+    private static final Map<String, String> configuredMessages = Maps.newHashMap();
 
     public static final Message messagePrefix =
         createMessage("other.prefix", "&8[&6Hyperverse&8] ");
@@ -116,14 +120,18 @@ public class Messages {
     public static final Message flagWorldPermission = createMessage("flags.world-permission",
         "Permission node required to visit the world");
 
+    @NotNull public static Map<String, String> getConfiguredMessages() {
+        return configuredMessages;
+    }
+
     public static Message createMessage(@NotNull final String key,
         @NotNull final String defaultValue) {
+        configuredMessages.put(key, defaultValue);
         return new Message(Objects.requireNonNull(key), Objects.requireNonNull(defaultValue));
     }
 
     public static String getConfigured(@NotNull final Message message) {
-        // TODO: Actually load custom values
-        return message.getDefaultValue();
+        return configuredMessages.getOrDefault(message.getKey(), message.getDefaultValue());
     }
 
 }

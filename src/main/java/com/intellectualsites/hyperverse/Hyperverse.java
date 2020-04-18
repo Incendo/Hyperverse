@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.commands.HyperCommandManager;
+import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.listeners.PlayerListener;
 import com.intellectualsites.hyperverse.listeners.WorldListener;
@@ -30,7 +31,16 @@ import com.intellectualsites.hyperverse.modules.HyperverseModule;
 import com.intellectualsites.hyperverse.modules.TaskChainModule;
 import com.intellectualsites.hyperverse.world.WorldManager;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Plugin main class
@@ -45,18 +55,51 @@ import org.bukkit.plugin.java.JavaPlugin;
 
     @Override public void onEnable() {
         this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
+
+        // Message configuration
+        final Path messagePath = this.getDataFolder().toPath().resolve("messages.yml");
+        if (!Files.exists(messagePath)) {
+            try {
+                Files.createFile(messagePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        final FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(messagePath.toFile());
+        final Map<String, String> messages = Messages.getConfiguredMessages();
+        final Collection<String> messageKeys = new ArrayList<>(messages.keySet());
+        for (final String key : messageKeys) {
+            if (fileConfiguration.contains(key)) {
+                messages.put(key, fileConfiguration.getString(key));
+            } else {
+                fileConfiguration.set(key, messages.get(key));
+            }
+        }
+        try {
+            fileConfiguration.save(messagePath.toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Load the database
         this.hyperDatabase = injector.getInstance(HyperDatabase.class);
         if (!this.hyperDatabase.attemptConnect()) {
             getLogger().severe("Failed to connect to database...");
         }
+
+        // Load the world manager
         this.worldManager = injector.getInstance(WorldManager.class);
         this.worldManager.loadWorlds();
+
+        // Register events
         this.getServer().getPluginManager()
             .registerEvents(injector.getInstance(WorldListener.class), this);
         this.getServer().getPluginManager()
             .registerEvents(injector.getInstance(PlayerListener.class), this);
+
         // Create the command manager instance
         injector.getInstance(HyperCommandManager.class);
+
         // Initialize bStats metrics tracking
         new Metrics(this, BSTATS_ID);
     }
