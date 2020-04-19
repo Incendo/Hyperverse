@@ -13,10 +13,11 @@ Current Features:
 - World importing (will automatically import worlds)
 - World loading/unloading
 - World teleportation
-- World flags (gamemode, local-spawn, force-spawn, pve, pvp)
+- World flags (gamemode, local-spawn, force-spawn, pve, pvp, world-permission, nether)
 - World game rules
 - Tab completed commands
 - Persistent world locations
+- Nether & end portal linking
 
 Planned Features:
 - More flags

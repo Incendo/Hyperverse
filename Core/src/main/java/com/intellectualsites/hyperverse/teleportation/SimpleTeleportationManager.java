@@ -20,8 +20,10 @@ package com.intellectualsites.hyperverse.teleportation;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.intellectualsites.hyperverse.flags.implementation.EndFlag;
 import com.intellectualsites.hyperverse.flags.implementation.NetherFlag;
 import com.intellectualsites.hyperverse.flags.implementation.WorldPermissionFlag;
+import com.intellectualsites.hyperverse.util.NMS;
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.WorldManager;
 import com.intellectualsites.hyperverse.world.WorldType;
@@ -44,11 +46,13 @@ public final class SimpleTeleportationManager implements TeleportationManager {
 
     private final HyperWorld hyperWorld;
     private final WorldManager worldManager;
+    private final NMS nms;
 
     @Inject public SimpleTeleportationManager(@Assisted HyperWorld hyperWorld,
-        final WorldManager worldManager) {
+        final WorldManager worldManager, final NMS nms) {
         this.hyperWorld = hyperWorld;
         this.worldManager = worldManager;
+        this.nms = nms;
     }
 
     @Override public CompletableFuture<Boolean> allowedTeleport(@NotNull final Player player,
@@ -112,6 +116,18 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         }
 
         return new Location(destination.getBukkitWorld(), x, y, z);
+    }
+
+    @Override @Nullable public Location endDestination(@NotNull final Entity entity) {
+        final String endLinkedWorld = this.hyperWorld.getFlag(EndFlag.class);
+        if (endLinkedWorld.isEmpty()) {
+            return null;
+        }
+        final HyperWorld destination = this.worldManager.getWorld(endLinkedWorld);
+        if (destination == null || !destination.isLoaded()) {
+            return null;
+        }
+        return nms.getDimensionSpawn(Objects.requireNonNull(destination.getSpawn()));
     }
 
 }

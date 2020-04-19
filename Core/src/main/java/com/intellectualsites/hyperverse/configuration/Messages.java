@@ -123,6 +123,8 @@ public class Messages {
         "Permission node required to visit the world");
     public static final Message flagDescriptionNether = createMessage("flags.nether",
         "Name of the dimension linked to this world's nether portals");
+    public static final Message flagDescriptionEnd = createMessage("flags.end",
+        "Name of the dimension linked to this world's end portals");
 
     @NotNull public static Map<String, String> getConfiguredMessages() {
         return configuredMessages;

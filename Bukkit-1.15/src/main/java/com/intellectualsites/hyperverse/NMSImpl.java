@@ -73,4 +73,13 @@ public class NMSImpl implements NMS {
             portalShape.position.getZ() + 1);
     }
 
+    @Override @Nullable public Location getDimensionSpawn(@NotNull final Location origin) {
+        final WorldServer worldServer = ((CraftWorld) origin.getWorld()).getHandle();
+        final BlockPosition dimensionSpawn = worldServer.getDimensionSpawn();
+        if (dimensionSpawn != null) {
+            return new Location(origin.getWorld(), dimensionSpawn.getX(), dimensionSpawn.getY(), dimensionSpawn.getZ());
+        }
+        return origin.getWorld().getSpawnLocation();
+    }
+
 }

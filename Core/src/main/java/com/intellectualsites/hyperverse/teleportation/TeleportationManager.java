@@ -76,4 +76,11 @@ public interface TeleportationManager {
     @Nullable Location netherDestination(@NotNull final Entity entity,
         @NotNull final Location location);
 
+    /**
+     * Handle end portal teleportation
+     *
+     * @param entity   Entity to teleport
+     */
+    @Nullable Location endDestination(@NotNull final Entity entity);
+
 }

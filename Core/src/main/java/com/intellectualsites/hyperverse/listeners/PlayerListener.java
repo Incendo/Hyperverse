@@ -23,6 +23,7 @@ import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.database.PersistentLocation;
+import com.intellectualsites.hyperverse.flags.implementation.EndFlag;
 import com.intellectualsites.hyperverse.flags.implementation.GamemodeFlag;
 import com.intellectualsites.hyperverse.flags.implementation.LocalRespawnFlag;
 import com.intellectualsites.hyperverse.flags.implementation.NetherFlag;
@@ -32,6 +33,7 @@ import com.intellectualsites.hyperverse.util.MessageUtil;
 import com.intellectualsites.hyperverse.util.NMS;
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.WorldManager;
+import com.intellectualsites.hyperverse.world.WorldType;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -132,7 +134,20 @@ public class PlayerListener implements Listener {
         if (hyperWorld == null) {
             return;
         }
-        if (hyperWorld.getFlag(LocalRespawnFlag.class)) {
+        if (hyperWorld.getConfiguration().getType() == WorldType.END &&
+            event.getPlayer().getLocation().getBlock().getType() == Material.END_PORTAL) {
+            final Location destination = hyperWorld.getTeleportationManager()
+                .endDestination(event.getPlayer());
+            if (destination != null) {
+                final boolean allowedEntry = hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
+                    .getNow(false);
+                if (!allowedEntry) {
+                    MessageUtil.sendMessage(event.getPlayer(), Messages.messageNotPermittedEntry);
+                } else {
+                    event.setRespawnLocation(destination);
+                }
+            }
+        } else if (hyperWorld.getFlag(LocalRespawnFlag.class)) {
             event.setRespawnLocation(Objects.requireNonNull(hyperWorld.getSpawn()));
         }
     }
@@ -167,6 +182,18 @@ public class PlayerListener implements Listener {
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
             final Location destination = hyperWorld.getTeleportationManager()
                 .netherDestination(event.getPlayer(), event.getFrom());
+            if (destination != null) {
+                final boolean allowedEntry = hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
+                    .getNow(false);
+                if (!allowedEntry) {
+                    MessageUtil.sendMessage(event.getPlayer(), Messages.messageNotPermittedEntry);
+                } else {
+                    event.setTo(destination);
+                }
+            }
+        } else if (event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
+            final Location destination = hyperWorld.getTeleportationManager()
+                .endDestination(event.getPlayer());
             if (destination != null) {
                 final boolean allowedEntry = hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
                     .getNow(false);
@@ -213,6 +240,12 @@ public class PlayerListener implements Listener {
                         location.toString()));
                 }
             }
+        } else if (event.getLocation().getBlock().getType() == Material.END_PORTAL &&
+                   !hyperWorld.getFlag(EndFlag.class).isEmpty()) {
+            final Location destination = hyperWorld.getTeleportationManager().endDestination(event.getEntity());
+            if (destination != null) {
+                PaperLib.teleportAsync(event.getEntity(), destination, PlayerTeleportEvent.TeleportCause.COMMAND);
+            }
         }
     }
 
@@ -225,6 +258,9 @@ public class PlayerListener implements Listener {
         }
         if (event.getFrom().getBlock().getType() == Material.NETHER_PORTAL &&
             !hyperWorld.getFlag(NetherFlag.class).isEmpty()) {
+            event.setCancelled(true);
+        } else if (event.getFrom().getBlock().getType() == Material.END_PORTAL &&
+                !hyperWorld.getFlag(EndFlag.class).isEmpty()) {
             event.setCancelled(true);
         }
     }

@@ -18,6 +18,7 @@
 
 package com.intellectualsites.hyperverse.flags;
 
+import com.intellectualsites.hyperverse.flags.implementation.EndFlag;
 import com.intellectualsites.hyperverse.flags.implementation.ForceSpawn;
 import com.intellectualsites.hyperverse.flags.implementation.GamemodeFlag;
 import com.intellectualsites.hyperverse.flags.implementation.LocalRespawnFlag;
@@ -50,6 +51,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(PveFlag.PVE_FLAG_TRUE);
         this.addFlag(WorldPermissionFlag.WORLD_PERMISSION_FLAG_DEFAULT);
         this.addFlag(NetherFlag.NETHER_FLAG_DEFAULT);
+        this.addFlag(EndFlag.END_FLAG_DEFAULT);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {

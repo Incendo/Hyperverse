@@ -31,4 +31,6 @@ public interface NMS {
     @Nullable Location getOrCreateNetherPortal(@NotNull final Entity entity,
         @NotNull final Location origin);
 
+    @Nullable Location getDimensionSpawn(@NotNull final Location origin);
+
 }
