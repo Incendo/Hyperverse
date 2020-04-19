@@ -43,4 +43,4 @@ Planned Features:
 ## Contributing
 
 Contributions are very welcome. So general contribution
-guidelines can be found in [CONTRIBUTION.md](https://github.com/Sauilitired/Hyperverse/blob/master/CONTRIBUTION.md)
+guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hyperverse/blob/master/CONTRIBUTING.md)
