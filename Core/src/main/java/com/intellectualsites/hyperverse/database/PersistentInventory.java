@@ -36,7 +36,7 @@ public final class PersistentInventory {
 
     public PersistentInventory(@NotNull final String worldUID, @NotNull final PlayerInventory playerInventory) {
         this.worldName = worldUID;
-        this.b64data = serialise(playerInventory);
+        this.b64data = serialize(playerInventory);
         this.ownerUUID = Objects.requireNonNull(playerInventory.getHolder()).getUniqueId().toString();
         this.heldSlot = playerInventory.getHeldItemSlot();
     }
@@ -51,7 +51,7 @@ public final class PersistentInventory {
      * @return Returns a Bas64 Encoded string which represents the state of this inventory's
      *         {@link Inventory#getStorageContents()} and {@link PlayerInventory#getArmorContents()}
      */
-    @NotNull private static String serialise(@NotNull final PlayerInventory inventory) {
+    @NotNull private static String serialize(@NotNull final PlayerInventory inventory) {
         YamlConfiguration configuration = new YamlConfiguration();
         int index = 0;
         for (final ItemStack itemStack : inventory.getStorageContents()) {

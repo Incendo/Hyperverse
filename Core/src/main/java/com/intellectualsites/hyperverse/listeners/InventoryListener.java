@@ -4,8 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.database.PersistentInventory;
-import com.intellectualsites.hyperverse.world.HyperWorld;
-import com.intellectualsites.hyperverse.world.WorldManager;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
