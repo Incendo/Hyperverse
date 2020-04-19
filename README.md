@@ -4,7 +4,8 @@
 
 **Hyperverse is W.I.P!**
 
-A Minecraft world management plugin for Bukkit 1.13+.
+A Minecraft world management plugin for Bukkit 1.15.
+More versions may come to be supported in the future.
 
 ## Features
 

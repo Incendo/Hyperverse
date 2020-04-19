@@ -46,8 +46,8 @@
     </distributionManagement>
 
     <modules>
-        <module>Bukkit-1.15</module>
         <module>Core</module>
+        <module>Bukkit-1.15</module>
     </modules>
 
     <build>
