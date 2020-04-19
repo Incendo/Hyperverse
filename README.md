@@ -42,5 +42,5 @@ Planned Features:
 
 ## Contributing
 
-Contributions are very welcome. So general contribution
+Contributions are very welcome. Some general contribution
 guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hyperverse/blob/master/CONTRIBUTING.md)
