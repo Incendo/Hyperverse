@@ -87,21 +87,17 @@ public final class PersistentInventory {
     }
 
     /**
-     * Derserialize this object back into an {@link PlayerInventory}
+     * Derserializes this object and sets it a given player.
+     * This method will mutate the inventory from
+     * {@link Player#getInventory()}
      *
-     * @return Returns a nullable PlayerInventory object based on the saved data.
-     *         Returns null if the player is not online.
      */
-    @Nullable public PlayerInventory toInventory() {
+    public void setToPlayer(@NotNull final Player player) {
         YamlConfiguration configuration = new YamlConfiguration();
         try {
             configuration.loadFromString(new String(Base64.getDecoder().decode(b64data.getBytes())));
         } catch (InvalidConfigurationException ex) {
             throw new IllegalStateException("Error Deserializing inventory", ex);
-        }
-        final Player player = Bukkit.getPlayer(UUID.fromString(ownerUUID));
-        if (player == null) {
-           return null;
         }
         PlayerInventory inventory = player.getInventory();
         for (String key : configuration.getKeys(false)) {
@@ -117,19 +113,5 @@ public final class PersistentInventory {
             }
         }
         //inventory.setHeldItemSlot(heldSlot); //Set to the held slot when saved
-        return inventory;
-    }
-
-    /**
-     * Set the player's current inventory to this inventory.
-     * @param player The player object to set this inventory to.
-     */
-    public void setToPlayer(@NotNull final Player player) {
-        final PlayerInventory playerInventory = toInventory();
-        assert playerInventory != null;
-        PlayerInventory current = player.getInventory();
-        current.setStorageContents(playerInventory.getStorageContents());
-        //current.setHeldItemSlot(playerInventory.getHeldItemSlot());
-        current.setArmorContents(playerInventory.getArmorContents());
     }
 }
