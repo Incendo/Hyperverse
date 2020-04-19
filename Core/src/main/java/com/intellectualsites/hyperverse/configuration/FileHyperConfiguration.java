@@ -43,6 +43,7 @@ public class FileHyperConfiguration implements HyperConfiguration {
     private final boolean importAutomatically;
     private final boolean persistLocations;
     private final boolean keepSpawnLoaded;
+    private final boolean perWorldInventories;
 
     @Inject public FileHyperConfiguration(@NotNull final Hyperverse hyperverse) {
         final File configFile = new File(hyperverse.getDataFolder(), "hyperverse.conf");
@@ -79,6 +80,7 @@ public class FileHyperConfiguration implements HyperConfiguration {
         this.importAutomatically = configObject.isImportAutomatically();
         this.keepSpawnLoaded = configObject.isKeepSpawnLoaded();
         this.persistLocations = configObject.isPersistLocations();
+        this.perWorldInventories = configObject.isEnablePerWorldInventories();
     }
 
     @Override public boolean shouldImportAutomatically() {
@@ -93,4 +95,8 @@ public class FileHyperConfiguration implements HyperConfiguration {
         return this.keepSpawnLoaded;
     }
 
+    @Override
+    public boolean shouldEnablePerWorldInventories() {
+        return perWorldInventories;
+    }
 }

@@ -24,7 +24,6 @@ import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.commands.HyperCommandManager;
 import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.configuration.Messages;
-import com.intellectualsites.hyperverse.configuration.PluginFileHyperConfiguration;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.listeners.InventoryListener;
 import com.intellectualsites.hyperverse.listeners.PlayerListener;
@@ -68,6 +67,7 @@ import java.util.Map;
         this.getLogger().info("§8- §7use persistent locations? " + hyperConfiguration.shouldPersistLocations());
         this.getLogger().info("§8- §7keep spawns loaded? " + hyperConfiguration.shouldKeepSpawnLoaded());
         this.getLogger().info("§8- §7should detect worlds?  " + hyperConfiguration.shouldImportAutomatically());
+        this.getLogger().info("§8- §7per-world inventories?  " + hyperConfiguration.shouldEnablePerWorldInventories());
 
         // Message configuration
         final Path messagePath = this.getDataFolder().toPath().resolve("messages.conf");
@@ -127,7 +127,6 @@ import java.util.Map;
         this.getServer().getPluginManager()
             .registerEvents(injector.getInstance(PlayerListener.class), this);
 
-        HyperConfiguration hyperConfiguration = injector.getInstance(PluginFileHyperConfiguration.class);
         if (hyperConfiguration.shouldEnablePerWorldInventories()) {
             this.getServer().getPluginManager()
                     .registerEvents(injector.getInstance(InventoryListener.class), this);

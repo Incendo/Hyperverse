@@ -37,6 +37,8 @@ public class FileConfigurationObject {
     @Setting(value = "keep-loaded", comment = "Whether or not world spawn chunks"
         + " should be kept in memory")
     private boolean keepSpawnLoaded = true;
+    @Setting(value = "per-world-inventories", comment = "Whether or not per-world inventories should be enabled.")
+    private boolean enablePerWorldInventories = false;
 
     public boolean isImportAutomatically() {
         return this.importAutomatically;
@@ -48,5 +50,9 @@ public class FileConfigurationObject {
 
     public boolean isKeepSpawnLoaded() {
         return this.keepSpawnLoaded;
+    }
+
+    public boolean isEnablePerWorldInventories() {
+        return this.enablePerWorldInventories;
     }
 }
