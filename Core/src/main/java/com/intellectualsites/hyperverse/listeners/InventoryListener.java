@@ -47,9 +47,10 @@ public class InventoryListener implements Listener {
         final World current = event.getPlayer().getWorld();
         //Store old inventory.
         this.hyperDatabase.storeInventory(
-                        new PersistentInventory(world.getName(),
-                event.getPlayer().getInventory()), true, false);
-        final Optional<PersistentInventory> optional = this.hyperDatabase.getInventory(event.getPlayer().getUniqueId(),current.getName());
+            new PersistentInventory(world.getName(), event.getPlayer().getInventory()), true,
+            false);
+        final Optional<PersistentInventory> optional =
+            this.hyperDatabase.getInventory(event.getPlayer().getUniqueId(), current.getName());
         event.getPlayer().getInventory().clear(); //Fresh inventory.
         //Set inventory to the new one.
         optional.ifPresent(PersistentInventory::toInventory);
@@ -57,12 +58,13 @@ public class InventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        this.hyperDatabase.getInventories(event.getPlayer().getUniqueId()); //Load inventories into memory.
+        this.hyperDatabase.loadInventories(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerQuit(final PlayerQuitEvent event) {
-       this.hyperDatabase.storeInventory(PersistentInventory.fromPlayer(event.getPlayer()), false, true); //Store inventory data from the last world.
+        this.hyperDatabase.storeInventory(PersistentInventory.fromPlayer(event.getPlayer()),
+            false, true); //Store inventory data from the last world.
         this.hyperDatabase.clearInventories(event.getPlayer().getUniqueId());
     }
 

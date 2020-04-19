@@ -268,10 +268,8 @@ public class HyperDatabase {
      * Query for inventories for a given UUID
      *
      * @param uuid Player UUID
-     * @return Future that will complete with the locations
      */
-    public Future<Collection<PersistentInventory>> getInventories(@NotNull final UUID uuid) {
-        final CompletableFuture<Collection<PersistentInventory>> future = new CompletableFuture<>();
+    public void loadInventories(@NotNull final UUID uuid) {
         this.taskChainFactory.newChain().async(() -> {
             try {
                 final Collection<PersistentInventory> inventories = this.inventoryDao.queryForEq("ownerUUID",
@@ -279,12 +277,9 @@ public class HyperDatabase {
                 for (final PersistentInventory persistentInventory : inventories) {
                     this.inventories.put(uuid, persistentInventory.getWorldName(), persistentInventory);
                 }
-                future.complete(inventories);
             } catch (SQLException e) {
-                e.printStackTrace(); // In case the caller swallows it
-                future.completeExceptionally(e);
+                e.printStackTrace();
             }
         }).execute();
-        return future;
     }
 }
