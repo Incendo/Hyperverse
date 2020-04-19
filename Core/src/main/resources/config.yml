@@ -6,3 +6,6 @@ worlds:
   # to the database, and be used when a player
   # teleports between worlds
   persist-locations: true
+  # Whether or not world spawn chunks should be
+  # kept in memory
+  keep-loaded: true

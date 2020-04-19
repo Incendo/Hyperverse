@@ -39,4 +39,13 @@ public interface HyperConfiguration {
      */
     boolean shouldPersistLocations();
 
+    /**
+     * Whether or not Hyperverse should keep
+     * spawn chunks loaded
+     *
+     * @return True if spawn chunks should be kept
+     *         loaded
+     */
+    boolean shouldKeepSpawnLoaded();
+
 }
