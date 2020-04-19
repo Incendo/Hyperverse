@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.commands.HyperCommandManager;
+import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.listeners.PlayerListener;
@@ -29,9 +30,14 @@ import com.intellectualsites.hyperverse.listeners.WorldListener;
 import com.intellectualsites.hyperverse.modules.HyperverseModule;
 import com.intellectualsites.hyperverse.modules.TaskChainModule;
 import com.intellectualsites.hyperverse.world.WorldManager;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigRenderOptions;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.ConfigurationOptions;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -55,8 +61,30 @@ import java.util.Map;
     @Override public void onEnable() {
         this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
 
+        final HyperConfiguration hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
+        this.getLogger().info("§6Hyperverse Options");
+        this.getLogger().info("§8- §7use persistent locations? " + hyperConfiguration.shouldPersistLocations());
+        this.getLogger().info("§8- §7keep spawns loaded? " + hyperConfiguration.shouldKeepSpawnLoaded());
+        this.getLogger().info("§8- §7should detect worlds?  " + hyperConfiguration.shouldImportAutomatically());
+
         // Message configuration
-        final Path messagePath = this.getDataFolder().toPath().resolve("messages.yml");
+        final Path messagePath = this.getDataFolder().toPath().resolve("messages.conf");
+        final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
+            .builder()
+            .setParseOptions(ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
+            .setRenderOptions(ConfigRenderOptions.defaults()
+                .setComments(true)
+                .setFormatted(true)
+                .setOriginComments(false)
+                .setJson(false))
+            .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
+        ConfigurationNode translationNode;
+        try {
+            translationNode = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            translationNode = loader.createEmptyNode();
+        }
         if (!Files.exists(messagePath)) {
             try {
                 Files.createFile(messagePath);
@@ -64,18 +92,19 @@ import java.util.Map;
                 e.printStackTrace();
             }
         }
-        final FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(messagePath.toFile());
+
         final Map<String, String> messages = Messages.getConfiguredMessages();
         final Collection<String> messageKeys = new ArrayList<>(messages.keySet());
         for (final String key : messageKeys) {
-            if (fileConfiguration.contains(key)) {
-                messages.put(key, fileConfiguration.getString(key));
+            final ConfigurationNode messageNode = translationNode.getNode(key);
+            if (messageNode.isVirtual()) {
+                messageNode.setValue(messages.get(key));
             } else {
-                fileConfiguration.set(key, messages.get(key));
+                messages.put(key, messageNode.getString());
             }
         }
         try {
-            fileConfiguration.save(messagePath.toFile());
+            loader.save(translationNode);
         } catch (IOException e) {
             e.printStackTrace();
         }
