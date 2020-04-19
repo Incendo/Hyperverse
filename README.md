@@ -39,3 +39,8 @@ Planned Features:
 - [Flags and Game Rules](https://github.com/Sauilitired/Hyperverse/wiki/Flags-and-Game-Rules)
 - [Linking Portals](https://github.com/Sauilitired/Hyperverse/wiki/Linking-Portals)
 - [JavaDoc](https://plotsquared.com/docs/hyperverse/)
+
+## Contributing
+
+Contributions are very welcome. So general contribution
+guidelines can be found in [CONTRIBUTION.md](https://github.com/Sauilitired/Hyperverse/blob/master/CONTRIBUTION.md)
