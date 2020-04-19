@@ -1,18 +1,35 @@
+//
+// Hyperverse - A Minecraft world management plugin
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+
 package com.intellectualsites.hyperverse.database;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Base64;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -25,20 +42,16 @@ public final class PersistentInventory {
     private String worldName;
     @DatabaseField(uniqueCombo = true)
     private String ownerUUID;
-    @DatabaseField
-    private String b64data;
-    @DatabaseField
-    private int heldSlot;
+    @DatabaseField(dataType = DataType.BYTE_ARRAY)
+    private byte[] content;
 
     public PersistentInventory() {
-
     }
 
     public PersistentInventory(@NotNull final String worldUID, @NotNull final PlayerInventory playerInventory) {
         this.worldName = worldUID;
-        this.b64data = serialize(playerInventory);
+        this.content = serialize(playerInventory);
         this.ownerUUID = Objects.requireNonNull(playerInventory.getHolder()).getUniqueId().toString();
-        this.heldSlot = playerInventory.getHeldItemSlot();
     }
 
     @NotNull public static PersistentInventory fromPlayer(Player player) {
@@ -46,32 +59,27 @@ public final class PersistentInventory {
     }
 
     /**
-     * Serialize a {@link PlayerInventory} contents into a {@link Base64} string.
+     * Serialize a {@link PlayerInventory} contents into a base64 encoded byte array
+     *
      * @param inventory The Inventory object to serialize.
-     * @return Returns a Bas64 Encoded string which represents the state of this inventory's
-     *         {@link Inventory#getStorageContents()} and {@link PlayerInventory#getArmorContents()}
+     * @return Returns encoded serialized inventory contents
      */
-    @NotNull private static String serialize(@NotNull final PlayerInventory inventory) {
-        YamlConfiguration configuration = new YamlConfiguration();
-        int index = 0;
-        for (final ItemStack itemStack : inventory.getStorageContents()) {
-            configuration.set(String.valueOf(index++), itemStack);
+    @NotNull private static byte[] serialize(@NotNull final PlayerInventory inventory) {
+        try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            try (final BukkitObjectOutputStream bukkitObjectOutputStream = new BukkitObjectOutputStream(byteArrayOutputStream)) {
+                bukkitObjectOutputStream.writeInt(inventory.getSize());
+                for (final ItemStack stack : inventory) {
+                    bukkitObjectOutputStream.writeObject(stack);
+                }
+            }
+            return byteArrayOutputStream.toByteArray();
+        } catch (final Exception e) {
+             throw new RuntimeException(e);
         }
-        //Set the special slots in a player inventory.
-        configuration.set("offhand", inventory.getItemInOffHand());
-        configuration.set("helmet", inventory.getHelmet());
-        configuration.set("chestplate", inventory.getChestplate());
-        configuration.set("leggings", inventory.getLeggings());
-        configuration.set("boots", inventory.getBoots());
-        return Base64.getEncoder().encodeToString(configuration.saveToString().getBytes()); //Convert to Base64
     }
 
     @NotNull public String getOwnerUUID() {
         return ownerUUID;
-    }
-
-    public int getHeldSlot() {
-        return heldSlot;
     }
 
     @NotNull public String getWorldName() {
@@ -87,31 +95,29 @@ public final class PersistentInventory {
     }
 
     /**
-     * Derserializes this object and sets it a given player.
-     * This method will mutate the inventory from
-     * {@link Player#getInventory()}
-     *
+     * Deserialize this object back into an {@link PlayerInventory} and applies it
+     * to the player
      */
-    public void setToPlayer(@NotNull final Player player) {
-        YamlConfiguration configuration = new YamlConfiguration();
-        try {
-            configuration.loadFromString(new String(Base64.getDecoder().decode(b64data.getBytes())));
-        } catch (InvalidConfigurationException ex) {
-            throw new IllegalStateException("Error Deserializing inventory", ex);
+    public void toInventory() {
+        if (this.content.length == 0) {
+            return;
         }
-        PlayerInventory inventory = player.getInventory();
-        for (String key : configuration.getKeys(false)) {
-            ItemStack is = configuration.getItemStack(key);
-            switch (key.toLowerCase()) {
-                case "helmet": inventory.setHelmet(is); break;
-                case "chestplate": inventory.setChestplate(is); break;
-                case "leggings": inventory.setLeggings(is); break;
-                case "boots": inventory.setBoots(is); break;
-                case "offhand": inventory.setItemInOffHand(is); break;
-                default:
-                    inventory.setItem(Integer.parseInt(key), is);
+        final Player player = Bukkit.getPlayer(UUID.fromString(ownerUUID));
+        if (player == null) {
+            return;
+        }
+        final PlayerInventory inventory = player.getInventory();
+        try (final ByteArrayInputStream byteArrayInputStream =
+            new ByteArrayInputStream(this.content)) {
+            try (final BukkitObjectInputStream bukkitObjectInputStream = new BukkitObjectInputStream(byteArrayInputStream)) {
+                final int size = bukkitObjectInputStream.readInt();
+                for (int i = 0; i < size; i++) {
+                    inventory.setItem(i, (ItemStack) bukkitObjectInputStream.readObject());
+                }
             }
+        } catch (final Exception e) {
+            e.printStackTrace();
         }
-        //inventory.setHeldItemSlot(heldSlot); //Set to the held slot when saved
+
     }
 }
