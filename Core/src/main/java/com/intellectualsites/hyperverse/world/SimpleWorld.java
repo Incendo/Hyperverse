@@ -251,6 +251,9 @@ public class SimpleWorld implements HyperWorld {
             throw new IllegalStateException("Failed to create the world");
         }
         this.bukkitWorld = world;
+        if (hyperConfiguration.shouldKeepSpawnLoaded()) {
+            this.bukkitWorld.setKeepSpawnInMemory(true);
+        }
     }
 
     @Override public void teleportPlayer(@NotNull final Player player) {
