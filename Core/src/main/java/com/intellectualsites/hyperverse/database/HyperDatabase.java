@@ -50,10 +50,12 @@ import java.util.concurrent.Future;
 public class HyperDatabase {
 
     private Dao<PersistentLocation, Integer> locationDao;
+    private Dao<PersistentInventory, Integer> inventoryDao;
     private ConnectionSource connectionSource;
     private TaskChainFactory taskChainFactory;
     private final Hyperverse hyperverse;
     private final Table<UUID, String, PersistentLocation> locations = HashBasedTable.create();
+    private final Table<UUID, String, PersistentInventory> inventories = HashBasedTable.create();
 
     @Inject
     public HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
@@ -77,7 +79,9 @@ public class HyperDatabase {
                 new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
             // Setup DAOs
             this.locationDao = DaoManager.createDao(connectionSource, PersistentLocation.class);
+            this.inventoryDao = DaoManager.createDao(connectionSource, PersistentInventory.class);
             TableUtils.createTableIfNotExists(connectionSource, PersistentLocation.class);
+            TableUtils.createTableIfNotExists(connectionSource, PersistentInventory.class);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -190,10 +194,100 @@ public class HyperDatabase {
                     this.locationDao.deleteBuilder();
                 deleteBuilder.where().eq("world", worldName);
                 deleteBuilder.delete();
+                //Delete inventories
+                final DeleteBuilder<PersistentInventory, Integer> invDeleteBuilder =
+                        this.inventoryDao.deleteBuilder();
+                invDeleteBuilder.where().eq("world", worldName);
+                invDeleteBuilder.delete();
             } catch (final SQLException throwables) {
                 throwables.printStackTrace();
             }
         }).execute();
     }
+
+    /**
+     * Store the inventory in the database
+     *
+     * @param persistentInventory Inventory to store
+     * @param updateTable        Whether or not the internal table should be updated
+     */
+    public void storeInventory(@NotNull final PersistentInventory persistentInventory,
+                               final boolean updateTable, final boolean clear) {
+        final PersistentInventory storedInventory = this.inventories
+                .get(UUID.fromString(persistentInventory.getOwnerUUID()), persistentInventory.getWorldUID());
+        if (storedInventory != null) {
+            persistentInventory.setId(storedInventory.getId());
+        }
+
+        if (updateTable) {
+            this.inventories
+                    .put(UUID.fromString(persistentInventory.getOwnerUUID()), persistentInventory.getWorldUID(),
+                            persistentInventory);
+        }
+
+        taskChainFactory.newChain().async(() -> {
+            try {
+                this.inventoryDao.createOrUpdate(persistentInventory);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }).syncLast(in -> {
+            if (clear) {
+                clearLocations(UUID.fromString(persistentInventory.getOwnerUUID()));
+            }
+        }).execute();
+
+    }
+
+    /**
+     * Remove all stored inventories for a specific UUID
+     *
+     * @param uuid Player UUID
+     */
+    public void clearInventories(@NotNull final UUID uuid) {
+        final Collection<String> keys = new HashSet<>(this.inventories.columnKeySet());
+        for (final String key : keys) {
+            this.inventories.remove(uuid, key);
+        }
+    }
+
+    /**
+     * Get a stored persistent inventory for a given UUID
+     * and world
+     *
+     * @param uuid  Player UUID
+     * @param world World
+     * @return Optional containing the location, if it was stored
+     */
+    @NotNull public Optional<PersistentInventory> getInventory(@NotNull final UUID uuid,
+                                                             @NotNull final String world) {
+        return Optional.ofNullable(this.inventories.get(uuid, world));
+    }
+
+    /**
+     * Query for inventories for a given UUID
+     *
+     * @param uuid Player UUID
+     * @return Future that will complete with the locations
+     */
+    public Future<Collection<PersistentInventory>> getInventories(@NotNull final UUID uuid) {
+        final CompletableFuture<Collection<PersistentInventory>> future = new CompletableFuture<>();
+        taskChainFactory.newChain().async(() -> {
+            try {
+                final Collection<PersistentInventory> inventories =
+                        this.inventoryDao.queryForEq("uuid", Objects.requireNonNull(uuid).toString());
+                for (final PersistentInventory persistentInventory : inventories) {
+                    this.inventories.put(uuid, persistentInventory.getWorldUID(), persistentInventory);
+                }
+                future.complete(inventories);
+            } catch (SQLException e) {
+                e.printStackTrace(); // In case the caller swallows it
+                future.completeExceptionally(e);
+            }
+        }).execute();
+        return future;
+    }
+
+
 
 }

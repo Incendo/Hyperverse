@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Base64;
+import java.util.Objects;
 import java.util.UUID;
 
 @DatabaseTable(tableName = "inventory")
@@ -22,7 +23,7 @@ public final class PersistentInventory {
     @DatabaseField(generatedId = true)
     private int id;
     @DatabaseField(uniqueCombo = true)
-    private String world;
+    private String worldUID;
     @DatabaseField(uniqueCombo = true)
     private String ownerUUID;
     @DatabaseField
@@ -34,10 +35,10 @@ public final class PersistentInventory {
 
     }
 
-    public PersistentInventory(@NotNull final String world, @NotNull final PlayerInventory playerInventory) {
-        this.world = world;
+    public PersistentInventory(@NotNull final String worldUID, @NotNull final PlayerInventory playerInventory) {
+        this.worldUID = worldUID;
         this.b64data = serialise(playerInventory);
-        this.ownerUUID = playerInventory.getHolder() == null ? "null" : playerInventory.getHolder().getUniqueId().toString();
+        this.ownerUUID = Objects.requireNonNull(playerInventory.getHolder()).getUniqueId().toString();
         this.heldSlot = playerInventory.getHeldItemSlot();
     }
 
@@ -66,7 +67,7 @@ public final class PersistentInventory {
         return Base64.getEncoder().encodeToString(configuration.saveToString().getBytes()); //Convert to Base64
     }
 
-    @Nullable public String getOwnerUUID() {
+    @NotNull public String getOwnerUUID() {
         return ownerUUID;
     }
 
@@ -74,8 +75,8 @@ public final class PersistentInventory {
         return heldSlot;
     }
 
-    @NotNull public String getWorld() {
-        return world;
+    @NotNull public String getWorldUID() {
+        return worldUID;
     }
 
     public int getId() {
@@ -113,5 +114,13 @@ public final class PersistentInventory {
         }
         //inventory.setHeldItemSlot(heldSlot); //Set to the held slot when saved
         return inventory;
+    }
+
+    public void setToPlayer(@NotNull Player player) {
+        PlayerInventory playerInventory = toInventory();
+        PlayerInventory current = player.getInventory();
+        current.setStorageContents(playerInventory.getStorageContents());
+        //current.setHeldItemSlot(playerInventory.getHeldItemSlot());
+        current.setArmorContents(playerInventory.getArmorContents());
     }
 }
