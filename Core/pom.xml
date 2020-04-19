@@ -119,6 +119,23 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.30.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-hocon</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-core</artifactId>
+            <version>3.6.1</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-core</artifactId>
+            <version>3.6.1</version>
+            <classifier>javadoc</classifier>
+        </dependency>
     </dependencies>
 
     <build>

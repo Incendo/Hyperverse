@@ -39,3 +39,17 @@ can be found in the HEADER file.
 
 By contributing to the project you guarantee that your
 code follows the GPLv3 License requirements.
+
+## Configuration Options
+
+Whenever Hyperverse introduces behaviour that deviates from
+the vanilla experience, it needs to be configurable.
+
+All configuration options needs to be added to the `HyperConfig`
+interface as getters. These should be implemented in 
+`FileHyperConfiguration`. This implementation class delegates
+the getters to `FileConfigurationObject`, which is read by 
+[configurate](https://github.com/SpongePowered/Configurate). 
+All configuration options should be commented and given default
+values in `FileConfigurationObject`.
+
