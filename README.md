@@ -37,4 +37,5 @@ Planned Features:
 - [Commands](https://github.com/Sauilitired/Hyperverse/wiki/Commands)
 - [Configuration](https://github.com/Sauilitired/Hyperverse/wiki/Configuration)
 - [Flags and Game Rules](https://github.com/Sauilitired/Hyperverse/wiki/Flags-and-Game-Rules)
+- [Linking Portals](https://github.com/Sauilitired/Hyperverse/wiki/Linking-Portals)
 - [JavaDoc](https://plotsquared.com/docs/hyperverse/)
