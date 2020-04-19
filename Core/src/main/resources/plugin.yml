@@ -39,3 +39,6 @@ permissions:
   hyperverse.delete:
     description: Allow players to delete worlds
     default: op
+  hyperverse.debugpaste:
+    description: Allows players to create debug pastes
+    default: op

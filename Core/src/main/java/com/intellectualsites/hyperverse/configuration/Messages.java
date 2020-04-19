@@ -105,6 +105,12 @@ public class Messages {
         "&cYou are not allowed to enter that world");
     public static final Message messageTeleportNotSafe = createMessage("world.not_safe",
         "&cTeleportation to that location is not safe. An attempt to find a safe destination will be made.");
+    public static final Message messageLogTooBig = createMessage("paste.log_too_big",
+        "&clatest.log is too big to be pasted, will ignore");
+    public static final Message messagePasteUpload = createMessage("paste.uploaded",
+        "&7The paste file has been uploaded to: %paste%");
+    public static final Message messagePasteFailed = createMessage("paste.failed",
+        "&cFailed to create the debug paste. Reason: %reason%");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
