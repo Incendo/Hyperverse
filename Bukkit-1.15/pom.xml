@@ -61,6 +61,18 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>com.intellectualsites.hyperverse.bstats</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>com.intellectualsites.hyperverse.acf</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.minidigger.minimessage</pattern>
+                            <shadedPattern>com.intellectualsites.hyperverse.messages</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.taskchain</pattern>
+                            <shadedPattern>com.intellectualsites.hyperverse.taskchain</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
             </plugin>
