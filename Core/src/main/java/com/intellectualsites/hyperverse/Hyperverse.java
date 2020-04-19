@@ -22,8 +22,11 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.intellectualsites.hyperverse.commands.HyperCommandManager;
+import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.configuration.Messages;
+import com.intellectualsites.hyperverse.configuration.PluginFileHyperConfiguration;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
+import com.intellectualsites.hyperverse.listeners.InventoryListener;
 import com.intellectualsites.hyperverse.listeners.PlayerListener;
 import com.intellectualsites.hyperverse.listeners.WorldListener;
 import com.intellectualsites.hyperverse.modules.HyperverseModule;
@@ -95,6 +98,12 @@ import java.util.Map;
             .registerEvents(injector.getInstance(WorldListener.class), this);
         this.getServer().getPluginManager()
             .registerEvents(injector.getInstance(PlayerListener.class), this);
+
+        HyperConfiguration hyperConfiguration = injector.getInstance(PluginFileHyperConfiguration.class);
+        if (hyperConfiguration.shouldEnablePerWorldInventories()) {
+            this.getServer().getPluginManager()
+                    .registerEvents(injector.getInstance(InventoryListener.class), this);
+        }
 
         // Create the command manager instance
         injector.getInstance(HyperCommandManager.class);

@@ -2,11 +2,11 @@ package com.intellectualsites.hyperverse.listeners;
 
 import com.google.inject.Inject;
 import com.intellectualsites.hyperverse.Hyperverse;
+import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.database.PersistentInventory;
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.WorldManager;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class InventoryListener implements Listener {
@@ -23,12 +22,10 @@ public class InventoryListener implements Listener {
     private final HyperDatabase hyperDatabase;
     private final WorldManager worldManager;
 
-    @Inject public InventoryListener(@NotNull Hyperverse hyperverse,
-                                     @NotNull final WorldManager worldManager,
+    @Inject public InventoryListener(@NotNull final WorldManager worldManager,
                                      @NotNull HyperDatabase hyperDatabase) {
         this.hyperDatabase = hyperDatabase;
         this.worldManager = worldManager;
-        Bukkit.getPluginManager().registerEvents(this, Objects.requireNonNull(hyperverse));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

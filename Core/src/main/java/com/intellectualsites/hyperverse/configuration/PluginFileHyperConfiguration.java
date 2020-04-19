@@ -32,6 +32,7 @@ public class PluginFileHyperConfiguration implements HyperConfiguration {
     private final boolean importAutomatically;
     private final boolean persistLocations;
     private final boolean keepSpawnLoaded;
+    private final boolean perWorldInventories;
 
     @Inject public PluginFileHyperConfiguration(@NotNull final Hyperverse hyperverse) {
         hyperverse.saveDefaultConfig();
@@ -48,6 +49,10 @@ public class PluginFileHyperConfiguration implements HyperConfiguration {
             config.set("worlds.keep-loaded", true);
         }
         this.keepSpawnLoaded = config.getBoolean("worlds.keep-loaded", true);
+        if (!config.contains("inventories.per-world.inventories")) {
+            config.set("inventories.per-world.inventories", false);
+        }
+        this.perWorldInventories = config.getBoolean("inventories.per-world-inventories", false);
         hyperverse.saveConfig();
     }
 
@@ -63,4 +68,8 @@ public class PluginFileHyperConfiguration implements HyperConfiguration {
         return this.keepSpawnLoaded;
     }
 
+    @Override
+    public boolean shouldEnablePerWorldInventories() {
+        return this.perWorldInventories;
+    }
 }

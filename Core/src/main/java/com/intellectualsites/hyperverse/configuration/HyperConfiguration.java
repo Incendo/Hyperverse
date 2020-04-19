@@ -48,4 +48,14 @@ public interface HyperConfiguration {
      */
     boolean shouldKeepSpawnLoaded();
 
+
+    /**
+     * Whether or not Hyperverse should enable
+     * per-world inventory functionality.
+     *
+     * @return True if per-world inventories should
+     *         be enabled.
+     */
+    boolean shouldEnablePerWorldInventories();
+
 }
