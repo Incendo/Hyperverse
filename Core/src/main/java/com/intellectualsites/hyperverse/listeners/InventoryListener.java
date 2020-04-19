@@ -1,8 +1,7 @@
 package com.intellectualsites.hyperverse.listeners;
 
 import com.google.inject.Inject;
-import com.intellectualsites.hyperverse.Hyperverse;
-import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
+import com.google.inject.Singleton;
 import com.intellectualsites.hyperverse.database.HyperDatabase;
 import com.intellectualsites.hyperverse.database.PersistentInventory;
 import com.intellectualsites.hyperverse.world.HyperWorld;
@@ -17,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+@Singleton
 public class InventoryListener implements Listener {
 
     private final HyperDatabase hyperDatabase;
@@ -40,11 +40,9 @@ public class InventoryListener implements Listener {
                 event.getPlayer().getInventory()), true, false);
         Optional<PersistentInventory> optional =
                 this.hyperDatabase.getInventory(event.getPlayer().getUniqueId(), currentHyperWorld == null ? current.getUID().toString() : currentHyperWorld.getWorldUUID().toString());
+        event.getPlayer().getInventory().clear(); //Fresh inventory.
         //Set inventory to the new one.
         optional.ifPresent(persistentInventory -> persistentInventory.setToPlayer(event.getPlayer()));
-        if (!optional.isPresent()) {
-            event.getPlayer().getInventory().clear(); //Fresh inventory.
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

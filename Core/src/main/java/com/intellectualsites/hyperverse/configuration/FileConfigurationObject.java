@@ -38,7 +38,7 @@ public class FileConfigurationObject {
         + " should be kept in memory")
     private boolean keepSpawnLoaded = true;
     @Setting(value = "per-world-inventories", comment = "Whether or not per-world inventories should be enabled.")
-    private boolean enablePerWorldInventories = false;
+    private boolean enablePerWorldInventories = true;
 
     public boolean isImportAutomatically() {
         return this.importAutomatically;

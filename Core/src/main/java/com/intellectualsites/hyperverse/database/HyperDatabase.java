@@ -233,7 +233,7 @@ public class HyperDatabase {
             }
         }).syncLast(in -> {
             if (clear) {
-                clearLocations(UUID.fromString(persistentInventory.getOwnerUUID()));
+                clearInventories(UUID.fromString(persistentInventory.getOwnerUUID()));
             }
         }).execute();
 

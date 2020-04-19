@@ -95,8 +95,7 @@ public class FileHyperConfiguration implements HyperConfiguration {
         return this.keepSpawnLoaded;
     }
 
-    @Override
-    public boolean shouldEnablePerWorldInventories() {
+    @Override public boolean shouldEnablePerWorldInventories() {
         return perWorldInventories;
     }
 }

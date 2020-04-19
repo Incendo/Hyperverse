@@ -3,6 +3,7 @@ package com.intellectualsites.hyperverse.database;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -90,16 +91,21 @@ public final class PersistentInventory {
     /**
      * Derserialize this object back into an {@link PlayerInventory}
      *
-     * @return Returns a never-null PlayerInventory object based on the saved data.
+     * @return Returns a nullable PlayerInventory object based on the saved data.
+     *         Returns null if the player is not online.
      */
-    @NotNull public PlayerInventory toInventory() {
+    @Nullable public PlayerInventory toInventory() {
         YamlConfiguration configuration = new YamlConfiguration();
         try {
             configuration.loadFromString(new String(Base64.getDecoder().decode(b64data.getBytes())));
         } catch (InvalidConfigurationException ex) {
             throw new IllegalStateException("Error Deserializing inventory", ex);
         }
-        PlayerInventory inventory = (PlayerInventory) Bukkit.createInventory(ownerUUID == null ? null : Bukkit.getPlayer(UUID.fromString(ownerUUID)), InventoryType.PLAYER);
+        Player player = Bukkit.getPlayer(UUID.fromString(ownerUUID));
+        if (player == null) {
+           return null;
+        }
+        PlayerInventory inventory = player.getInventory();
         for (String key : configuration.getKeys(false)) {
             ItemStack is = configuration.getItemStack(key);
             switch (key.toLowerCase()) {
@@ -116,8 +122,13 @@ public final class PersistentInventory {
         return inventory;
     }
 
+    /**
+     * Set the player's current inventory to this inventory.
+     * @param player The player object to set this inventory to.
+     */
     public void setToPlayer(@NotNull Player player) {
         PlayerInventory playerInventory = toInventory();
+        assert playerInventory != null;
         PlayerInventory current = player.getInventory();
         current.setStorageContents(playerInventory.getStorageContents());
         //current.setHeldItemSlot(playerInventory.getHeldItemSlot());

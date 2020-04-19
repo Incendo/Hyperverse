@@ -128,6 +128,7 @@ import java.util.Map;
             .registerEvents(injector.getInstance(PlayerListener.class), this);
 
         if (hyperConfiguration.shouldEnablePerWorldInventories()) {
+            System.out.println("Enabling listener");
             this.getServer().getPluginManager()
                     .registerEvents(injector.getInstance(InventoryListener.class), this);
         }
