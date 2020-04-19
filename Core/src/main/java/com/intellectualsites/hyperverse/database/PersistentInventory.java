@@ -3,11 +3,9 @@ package com.intellectualsites.hyperverse.database;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -24,7 +22,7 @@ public final class PersistentInventory {
     @DatabaseField(generatedId = true)
     private int id;
     @DatabaseField(uniqueCombo = true)
-    private String worldUID;
+    private String worldName;
     @DatabaseField(uniqueCombo = true)
     private String ownerUUID;
     @DatabaseField
@@ -37,7 +35,7 @@ public final class PersistentInventory {
     }
 
     public PersistentInventory(@NotNull final String worldUID, @NotNull final PlayerInventory playerInventory) {
-        this.worldUID = worldUID;
+        this.worldName = worldUID;
         this.b64data = serialise(playerInventory);
         this.ownerUUID = Objects.requireNonNull(playerInventory.getHolder()).getUniqueId().toString();
         this.heldSlot = playerInventory.getHeldItemSlot();
@@ -76,8 +74,8 @@ public final class PersistentInventory {
         return heldSlot;
     }
 
-    @NotNull public String getWorldUID() {
-        return worldUID;
+    @NotNull public String getWorldName() {
+        return worldName;
     }
 
     public int getId() {
@@ -101,7 +99,7 @@ public final class PersistentInventory {
         } catch (InvalidConfigurationException ex) {
             throw new IllegalStateException("Error Deserializing inventory", ex);
         }
-        Player player = Bukkit.getPlayer(UUID.fromString(ownerUUID));
+        final Player player = Bukkit.getPlayer(UUID.fromString(ownerUUID));
         if (player == null) {
            return null;
         }
@@ -126,8 +124,8 @@ public final class PersistentInventory {
      * Set the player's current inventory to this inventory.
      * @param player The player object to set this inventory to.
      */
-    public void setToPlayer(@NotNull Player player) {
-        PlayerInventory playerInventory = toInventory();
+    public void setToPlayer(@NotNull final Player player) {
+        final PlayerInventory playerInventory = toInventory();
         assert playerInventory != null;
         PlayerInventory current = player.getInventory();
         current.setStorageContents(playerInventory.getStorageContents());

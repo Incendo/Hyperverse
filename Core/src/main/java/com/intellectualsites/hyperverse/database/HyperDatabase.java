@@ -214,14 +214,14 @@ public class HyperDatabase {
     public void storeInventory(@NotNull final PersistentInventory persistentInventory,
                                final boolean updateTable, final boolean clear) {
         final PersistentInventory storedInventory = this.inventories
-                .get(UUID.fromString(persistentInventory.getOwnerUUID()), persistentInventory.getWorldUID());
+                .get(UUID.fromString(persistentInventory.getOwnerUUID()), persistentInventory.getWorldName());
         if (storedInventory != null) {
             persistentInventory.setId(storedInventory.getId());
         }
 
         if (updateTable) {
             this.inventories
-                    .put(UUID.fromString(persistentInventory.getOwnerUUID()), persistentInventory.getWorldUID(),
+                    .put(UUID.fromString(persistentInventory.getOwnerUUID()), persistentInventory.getWorldName(),
                             persistentInventory);
         }
 
@@ -272,12 +272,12 @@ public class HyperDatabase {
      */
     public Future<Collection<PersistentInventory>> getInventories(@NotNull final UUID uuid) {
         final CompletableFuture<Collection<PersistentInventory>> future = new CompletableFuture<>();
-        taskChainFactory.newChain().async(() -> {
+        this.taskChainFactory.newChain().async(() -> {
             try {
                 final Collection<PersistentInventory> inventories =
-                        this.inventoryDao.queryForEq("uuid", Objects.requireNonNull(uuid).toString());
+                        this.inventoryDao.queryForEq("ownerUUID", Objects.requireNonNull(uuid).toString());
                 for (final PersistentInventory persistentInventory : inventories) {
-                    this.inventories.put(uuid, persistentInventory.getWorldUID(), persistentInventory);
+                    this.inventories.put(uuid, persistentInventory.getWorldName(), persistentInventory);
                 }
                 future.complete(inventories);
             } catch (SQLException e) {
