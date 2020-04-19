@@ -274,8 +274,8 @@ public class HyperDatabase {
         final CompletableFuture<Collection<PersistentInventory>> future = new CompletableFuture<>();
         this.taskChainFactory.newChain().async(() -> {
             try {
-                final Collection<PersistentInventory> inventories =
-                        this.inventoryDao.queryForEq("ownerUUID", Objects.requireNonNull(uuid).toString());
+                final Collection<PersistentInventory> inventories = this.inventoryDao.queryForEq("ownerUUID",
+                    Objects.requireNonNull(uuid, "uuid").toString());
                 for (final PersistentInventory persistentInventory : inventories) {
                     this.inventories.put(uuid, persistentInventory.getWorldName(), persistentInventory);
                 }
