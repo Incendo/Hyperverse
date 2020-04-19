@@ -49,8 +49,8 @@ public class PluginFileHyperConfiguration implements HyperConfiguration {
             config.set("worlds.keep-loaded", true);
         }
         this.keepSpawnLoaded = config.getBoolean("worlds.keep-loaded", true);
-        if (!config.contains("inventories.per-world.inventories")) {
-            config.set("inventories.per-world.inventories", false);
+        if (!config.contains("inventories.per-world-inventories")) {
+            config.set("inventories.per-world-inventories", false);
         }
         this.perWorldInventories = config.getBoolean("inventories.per-world-inventories", false);
         hyperverse.saveConfig();
