@@ -1,5 +1,5 @@
 //
-// Hyperverse Bukkit 1.15 - A minecraft world management plugin
+// Hyperverse - A minecraft world management plugin
 // Copyright © 2020 Alexander Söderberg (sauilitired@gmail.com)
 //
 // This program is free software: you can redistribute it and/or modify
