@@ -43,7 +43,7 @@ public final class MessageUtil {
      *
      * @param message String to format
      * @param replacements Replacements, needs to be a multiple of 2
-     * @return
+     * @return The formatted string
      */
     @NotNull public static String format(@NotNull final String message, @NotNull final String... replacements) {
         if (replacements.length % 2 != 0) {
@@ -60,7 +60,7 @@ public final class MessageUtil {
      * Send a message to a recipient
      *
      * @param recipient Receiver of the message
-     * @param message Mesasge to send
+     * @param message Message to send
      * @param replacements Replacements
      * @see #format(String, String...) for information about string replacements
      */

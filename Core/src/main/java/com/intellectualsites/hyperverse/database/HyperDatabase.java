@@ -47,16 +47,17 @@ import java.util.concurrent.Future;
  * Class containing the database connection that
  * is used throughout the plugin
  */
-@Singleton public class HyperDatabase {
+@Singleton
+public class HyperDatabase {
 
     private Dao<PersistentLocation, Integer> locationDao;
     private ConnectionSource connectionSource;
     private TaskChainFactory taskChainFactory;
     private final Hyperverse hyperverse;
-    private final Table<UUID, String, PersistentLocation> locations
-        = HashBasedTable.create();
+    private final Table<UUID, String, PersistentLocation> locations = HashBasedTable.create();
 
-    @Inject public HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
+    @Inject
+    public HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
         this.taskChainFactory = taskChainFactory;
         this.hyperverse = hyperverse;
     }
@@ -73,7 +74,8 @@ import java.util.concurrent.Future;
             if (!Files.exists(file)) {
                 Files.createFile(this.hyperverse.getDataFolder().toPath().resolve("storage.db"));
             }
-            this.connectionSource = new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
+            this.connectionSource =
+                new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
             // Setup DAOs
             this.locationDao = DaoManager.createDao(connectionSource, PersistentLocation.class);
             TableUtils.createTableIfNotExists(connectionSource, PersistentLocation.class);
@@ -98,20 +100,21 @@ import java.util.concurrent.Future;
      * Store the location in the database
      *
      * @param persistentLocation Location to store
-     * @param updateTable Whether or not the internal table should be updated
+     * @param updateTable        Whether or not the internal table should be updated
      */
     public void storeLocation(@NotNull final PersistentLocation persistentLocation,
         final boolean updateTable, final boolean clear) {
 
-        final PersistentLocation storedLocation = this.locations.get(UUID.fromString(persistentLocation.getUuid()),
-            persistentLocation.getWorld());
+        final PersistentLocation storedLocation = this.locations
+            .get(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld());
         if (storedLocation != null) {
             persistentLocation.setId(storedLocation.getId());
         }
 
         if (updateTable) {
-            this.locations.put(UUID.fromString(persistentLocation.getUuid()),
-                persistentLocation.getWorld(), persistentLocation);
+            this.locations
+                .put(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld(),
+                    persistentLocation);
         }
 
         taskChainFactory.newChain().async(() -> {
@@ -149,8 +152,8 @@ import java.util.concurrent.Future;
         final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
         taskChainFactory.newChain().async(() -> {
             try {
-                final Collection<PersistentLocation> locations = this.locationDao.queryForEq("uuid",
-                    Objects.requireNonNull(uuid).toString());
+                final Collection<PersistentLocation> locations =
+                    this.locationDao.queryForEq("uuid", Objects.requireNonNull(uuid).toString());
                 for (final PersistentLocation persistentLocation : locations) {
                     this.locations.put(uuid, persistentLocation.getWorld(), persistentLocation);
                 }
@@ -163,11 +166,24 @@ import java.util.concurrent.Future;
         return future;
     }
 
+    /**
+     * Get a stored persistent location for a given UUID
+     * and world
+     *
+     * @param uuid  Player UUID
+     * @param world World
+     * @return Optional containing the location, if it was stored
+     */
     @NotNull public Optional<PersistentLocation> getLocation(@NotNull final UUID uuid,
         @NotNull final String world) {
         return Optional.ofNullable(this.locations.get(uuid, world));
     }
 
+    /**
+     * Clear all references to a world from the database
+     *
+     * @param worldName World to remove
+     */
     public void clearWorld(@NotNull final String worldName) {
         taskChainFactory.newChain().async(() -> {
             try {

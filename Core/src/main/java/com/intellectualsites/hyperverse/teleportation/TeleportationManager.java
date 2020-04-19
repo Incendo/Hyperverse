@@ -26,6 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Manager responsible for teleportation related actions
+ */
 public interface TeleportationManager {
 
     /**
