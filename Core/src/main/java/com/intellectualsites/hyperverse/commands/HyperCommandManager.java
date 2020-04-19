@@ -464,7 +464,7 @@ public class HyperCommandManager extends BaseCommand {
                 b.append("OS Arch: ").append(System.getProperty("os.arch")).append('\n');
                 b.append("# Okay :D Great. You are now ready to create your bug report!");
                 b.append(
-                    "\n# You can do so at https://github.com/IntellectualSites/PlotSquared/issues");
+                    "\n# You can do so at https://github.com/Sauilitired/Hyperverse/issues");
                 b.append("\n# or via our Discord at https://discord.gg/KxkjDVg");
 
                 // We use the PlotSquared profile
