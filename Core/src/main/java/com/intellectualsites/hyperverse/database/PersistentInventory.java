@@ -78,12 +78,20 @@ public final class PersistentInventory {
         return world;
     }
 
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     /**
      * Derserialize this object back into an {@link PlayerInventory}
      *
      * @return Returns a never-null PlayerInventory object based on the saved data.
      */
-    @NotNull public PlayerInventory deserialize() {
+    @NotNull public PlayerInventory toInventory() {
         YamlConfiguration configuration = new YamlConfiguration();
         try {
             configuration.loadFromString(new String(Base64.getDecoder().decode(b64data.getBytes())));
