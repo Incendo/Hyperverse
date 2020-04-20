@@ -42,9 +42,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {
@@ -133,19 +136,43 @@ public class NMSImpl implements NMS {
             if (compound == null) {
                 return;
             }
+            // Health and hunger don't update properly, so we
+            // give them a little help
+            final float health = compound.getFloat("Health");
+            final int foodLevel = compound.getInt("foodLevel");
             final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
             // We re-write the extra Bukkit data as to not
             // mess up the profile
             ((CraftPlayer) player).setExtraData(compound);
-            entityPlayer.effects.clear();
+            // We start by doing a total reset
+            entityPlayer.reset();
             entityPlayer.f(compound);
             // entityPlayer.updateEffects = true;
             // entityPlayer.updateAbilities();
             player.teleport(originLocation);
             final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
             final DimensionManager dimensionManager = worldServer.worldProvider.getDimensionManager();
+            // Prevent annoying message
+            entityPlayer.decouple();
+            worldServer.removePlayer(entityPlayer);
+            // worldServer.removePlayer above should remove the player from the
+            // map, but that doesn't always happen. This is a last effort
+            // attempt to prevent the annoying "Force re-added" message
+            // from appearing
+            try {
+                final Field field = worldServer.getClass().getDeclaredField("entitiesByUUID");
+                field.setAccessible(true);
+                final Map<UUID, Entity> map = (Map<UUID, Entity>) field.get(worldServer);
+                map.remove(entityPlayer.getUniqueID());
+            } catch (final NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
             entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, dimensionManager,
                 true, originLocation, true);
+            // Apply health and foodLevel
+            player.setHealth(health);
+            player.setFoodLevel(foodLevel);
+            player.setPortalCooldown(40);
         }).execute(whenDone);
     }
 
