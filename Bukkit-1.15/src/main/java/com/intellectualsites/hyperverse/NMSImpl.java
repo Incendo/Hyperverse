@@ -17,10 +17,16 @@
 
 package com.intellectualsites.hyperverse;
 
+import co.aikar.taskchain.TaskChainFactory;
+import com.google.inject.Inject;
 import com.intellectualsites.hyperverse.util.NMS;
 import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.DimensionManager;
 import net.minecraft.server.v1_15_R1.EntityHuman;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.EnumDirection;
+import net.minecraft.server.v1_15_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.PortalTravelAgent;
 import net.minecraft.server.v1_15_R1.ShapeDetector;
 import net.minecraft.server.v1_15_R1.Vec3D;
@@ -28,14 +34,26 @@ import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {
+
+    private final TaskChainFactory taskChainFactory;
+
+    @Inject public NMSImpl(final TaskChainFactory taskChainFactory) {
+        this.taskChainFactory = taskChainFactory;
+    }
 
     @Override public @Nullable Location getOrCreateNetherPortal(@NotNull final Entity entity,
         @NotNull final Location origin) {
@@ -79,6 +97,45 @@ public class NMSImpl implements NMS {
             return new Location(origin.getWorld(), dimensionSpawn.getX(), dimensionSpawn.getY(), dimensionSpawn.getZ());
         }
         return origin.getWorld().getSpawnLocation();
+    }
+
+    @Override public void writePlayerData(@NotNull final Player player, @NotNull final Path file) {
+        final NBTTagCompound playerTag = new NBTTagCompound();
+        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        entityPlayer.save(playerTag);
+        taskChainFactory.newChain().async(() -> {
+            try (final OutputStream outputStream = Files.newOutputStream(file)) {
+                NBTCompressedStreamTools.a(playerTag, outputStream);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).execute();
+    }
+
+    @Override public void readPlayerData(@NotNull final Player player, @NotNull final Path file, @NotNull final Runnable whenDone) {
+        final Location originLocation = player.getLocation().clone();
+        taskChainFactory.newChain().asyncFirst(() -> {
+            try (final InputStream inputStream = Files.newInputStream(file)) {
+                return NBTCompressedStreamTools.a(inputStream);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).syncLast(compound -> {
+            if (compound == null) {
+                return;
+            }
+            final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+            entityPlayer.effects.clear();
+            entityPlayer.f(compound);
+            // entityPlayer.updateEffects = true;
+            // entityPlayer.updateAbilities();
+            player.teleport(originLocation);
+            final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
+            final DimensionManager dimensionManager = worldServer.worldProvider.getDimensionManager();
+            entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, dimensionManager,
+                true, originLocation, true);
+        }).execute(whenDone);
     }
 
 }

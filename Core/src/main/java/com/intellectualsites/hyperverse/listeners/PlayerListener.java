@@ -26,6 +26,7 @@ import com.intellectualsites.hyperverse.flags.implementation.EndFlag;
 import com.intellectualsites.hyperverse.flags.implementation.GamemodeFlag;
 import com.intellectualsites.hyperverse.flags.implementation.LocalRespawnFlag;
 import com.intellectualsites.hyperverse.flags.implementation.NetherFlag;
+import com.intellectualsites.hyperverse.flags.implementation.ProfileGroupFlag;
 import com.intellectualsites.hyperverse.flags.implementation.PveFlag;
 import com.intellectualsites.hyperverse.flags.implementation.PvpFlag;
 import com.intellectualsites.hyperverse.util.MessageUtil;
@@ -34,8 +35,13 @@ import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.WorldManager;
 import com.intellectualsites.hyperverse.world.WorldType;
 import io.papermc.lib.PaperLib;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -52,8 +58,13 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -102,6 +113,23 @@ public class PlayerListener implements Listener {
             final UUID uuid = event.getPlayer().getUniqueId();
             this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, from), true, false);
             this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, to), true, false);
+
+            if (hyperConfiguration.shouldGroupProfiles()) {
+                final HyperWorld hyperWorld = this.worldManager.getWorld(from.getWorld());
+                if (hyperWorld != null) {
+                    final Path oldWorldDirectory =
+                        hyperverse.getDataFolder().toPath().resolve("profiles").resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
+                    if (!Files.exists(oldWorldDirectory)) {
+                        try {
+                            Files.createDirectories(oldWorldDirectory);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    nms.writePlayerData(event.getPlayer(), oldWorldDirectory.resolve(
+                        String.format("%s.nbt", event.getPlayer().getUniqueId().toString())));
+                }
+            }
         }
     }
 
@@ -123,7 +151,59 @@ public class PlayerListener implements Listener {
         if (hyperWorld == null) {
             return;
         }
-        player.setGameMode(hyperWorld.getFlag(GamemodeFlag.class));
+        if (hyperConfiguration.shouldGroupProfiles()) {
+            final HyperWorld from = this.worldManager.getWorld(event.getFrom());
+            // Only load player data if the worlds belong to different groups
+            if (from == null || !from.getFlag(ProfileGroupFlag.class).equals(hyperWorld.getFlag(ProfileGroupFlag.class))) {
+                final Path newWorldDirectory =
+                    hyperverse.getDataFolder().toPath().resolve("profiles").resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
+                if (!Files.exists(newWorldDirectory)) {
+                    try {
+                        Files.createDirectories(newWorldDirectory);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                final Path playerData = newWorldDirectory.resolve(String.format("%s.nbt", player.getUniqueId().toString()));
+                if (Files.exists(playerData)) {
+                    nms.readPlayerData(event.getPlayer(), playerData,
+                        () -> Bukkit.getScheduler().runTaskLater(hyperverse, () -> {
+                            // We need to trick bukkit into updating the gamemode
+                            final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
+                            if (worldGameMode != GameMode.ADVENTURE) {
+                                player.setGameMode(GameMode.ADVENTURE);
+                            } else {
+                                player.setGameMode(GameMode.SURVIVAL);
+                            }
+                            player.setGameMode(worldGameMode);
+                            // Apply any other flags here
+                        }, 1L));
+                } else {
+                    // The player has no stored data. Reset everything
+                    player.getInventory().clear();
+                    player.getEnderChest().clear();
+                    player.setTotalExperience(0);
+                    for (final PotionEffectType potionEffectType : PotionEffectType.values()) {
+                        player.removePotionEffect(potionEffectType);
+                    }
+                    player.setVelocity(new Vector(0, 0, 0));
+                    player.setTicksLived(1);
+                    player.setFireTicks(1);
+                    player.getInventory().setHeldItemSlot(0);
+                    for (final Attribute attribute : Attribute.values()) {
+                        final AttributeInstance attributeInstance = player.getAttribute(attribute);
+                        if (attributeInstance != null) {
+                            attributeInstance.setBaseValue(attributeInstance.getDefaultValue());
+                            for (final AttributeModifier attributeModifier : attributeInstance.getModifiers()) {
+                                attributeInstance.removeModifier(attributeModifier);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            player.setGameMode(hyperWorld.getFlag(GamemodeFlag.class));
+        }
     }
 
     @EventHandler

@@ -130,6 +130,8 @@ public class Messages {
         "Name of the dimension linked to this world's nether portals");
     public static final Message flagDescriptionEnd = createMessage("flags.end",
         "Name of the dimension linked to this world's end portals");
+    public static final Message flagDescriptionProfileGroup = createMessage("flags.profile-group",
+        "Name of the profile group that the world belongs to");
 
     @NotNull public static Map<String, String> getConfiguredMessages() {
         return configuredMessages;
