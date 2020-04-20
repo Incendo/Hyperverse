@@ -19,6 +19,7 @@ package com.intellectualsites.hyperverse;
 
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
+import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.util.NMS;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.DimensionManager;
@@ -31,6 +32,9 @@ import net.minecraft.server.v1_15_R1.PortalTravelAgent;
 import net.minecraft.server.v1_15_R1.ShapeDetector;
 import net.minecraft.server.v1_15_R1.Vec3D;
 import net.minecraft.server.v1_15_R1.WorldServer;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.filter.RegexFilter;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
@@ -53,9 +57,28 @@ import java.util.UUID;
 public class NMSImpl implements NMS {
 
     private final TaskChainFactory taskChainFactory;
+    private Field entitiesByUUID;
+    private org.apache.logging.log4j.core.Logger worldServerLogger;
 
-    @Inject public NMSImpl(final TaskChainFactory taskChainFactory) {
+    @Inject public NMSImpl(final TaskChainFactory taskChainFactory, final HyperConfiguration hyperConfiguration) {
         this.taskChainFactory = taskChainFactory;
+        if (hyperConfiguration.shouldGroupProfiles()) {
+            try {
+                final Field field = WorldServer.class.getDeclaredField("LOGGER");
+                field.setAccessible(true);
+                this.worldServerLogger = (Logger) field.get(null);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                final RegexFilter regexFilter = RegexFilter
+                    .createFilter("[\\S\\s]*Force-added player with duplicate UUID[\\S\\s]*", null, false,
+                        Filter.Result.DENY, Filter.Result.ACCEPT);
+                this.worldServerLogger.addFilter(regexFilter);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override public @Nullable Location getOrCreateNetherPortal(@NotNull final Entity entity,
@@ -136,6 +159,7 @@ public class NMSImpl implements NMS {
             if (compound == null) {
                 return;
             }
+
             // Health and hunger don't update properly, so we
             // give them a little help
             final float health = compound.getFloat("Health");
@@ -160,9 +184,11 @@ public class NMSImpl implements NMS {
             // attempt to prevent the annoying "Force re-added" message
             // from appearing
             try {
-                final Field field = worldServer.getClass().getDeclaredField("entitiesByUUID");
-                field.setAccessible(true);
-                final Map<UUID, Entity> map = (Map<UUID, Entity>) field.get(worldServer);
+                if (this.entitiesByUUID == null) {
+                    this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
+                    this.entitiesByUUID.setAccessible(true);
+                }
+                final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
                 map.remove(entityPlayer.getUniqueID());
             } catch (final NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
