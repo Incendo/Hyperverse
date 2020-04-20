@@ -267,6 +267,9 @@ public class HyperCommandManager extends BaseCommand {
             MessageUtil.sendMessage(player, Messages.messageWorldNotLoaded);
             return;
         }
+        if (world.getBukkitWorld() == player.getWorld()) {
+            MessageUtil.sendMessage(player, Messages.messageAlreadyInWorld);
+        }
         MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%",
             world.getConfiguration().getName());
         world.teleportPlayer(player);
