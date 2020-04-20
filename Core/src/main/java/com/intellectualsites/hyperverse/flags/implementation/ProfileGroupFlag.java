@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ProfileGroupFlag extends WorldFlag<String, ProfileGroupFlag> {
 
-    public static final ProfileGroupFlag PROFILE_GROUP_FLAG_EMPTY = new ProfileGroupFlag("");
+    public static final ProfileGroupFlag PROFILE_GROUP_FLAG_EMPTY = new ProfileGroupFlag("default");
 
     private ProfileGroupFlag(@NotNull final String group) {
         super(group, Messages.flagDescriptionProfileGroup);
