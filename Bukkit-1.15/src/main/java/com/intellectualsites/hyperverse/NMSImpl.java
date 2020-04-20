@@ -21,6 +21,7 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.util.NMS;
+import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.DimensionManager;
 import net.minecraft.server.v1_15_R1.EntityHuman;
@@ -159,46 +160,47 @@ public class NMSImpl implements NMS {
             if (compound == null) {
                 return;
             }
-
-            // Health and hunger don't update properly, so we
-            // give them a little help
-            final float health = compound.getFloat("Health");
-            final int foodLevel = compound.getInt("foodLevel");
-            final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            // We re-write the extra Bukkit data as to not
-            // mess up the profile
-            ((CraftPlayer) player).setExtraData(compound);
-            // We start by doing a total reset
-            entityPlayer.reset();
-            entityPlayer.f(compound);
-            // entityPlayer.updateEffects = true;
-            // entityPlayer.updateAbilities();
-            player.teleport(originLocation);
-            final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
-            final DimensionManager dimensionManager = worldServer.worldProvider.getDimensionManager();
-            // Prevent annoying message
-            entityPlayer.decouple();
-            worldServer.removePlayer(entityPlayer);
-            // worldServer.removePlayer above should remove the player from the
-            // map, but that doesn't always happen. This is a last effort
-            // attempt to prevent the annoying "Force re-added" message
-            // from appearing
-            try {
-                if (this.entitiesByUUID == null) {
-                    this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
-                    this.entitiesByUUID.setAccessible(true);
+            PaperLib.getChunkAtAsync(originLocation).thenAccept(chunk -> {
+                // Health and hunger don't update properly, so we
+                // give them a little help
+                final float health = compound.getFloat("Health");
+                final int foodLevel = compound.getInt("foodLevel");
+                final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+                // We re-write the extra Bukkit data as to not
+                // mess up the profile
+                ((CraftPlayer) player).setExtraData(compound);
+                // We start by doing a total reset
+                entityPlayer.reset();
+                entityPlayer.f(compound);
+                // entityPlayer.updateEffects = true;
+                // entityPlayer.updateAbilities();
+                player.teleport(originLocation);
+                final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
+                final DimensionManager dimensionManager = worldServer.worldProvider.getDimensionManager();
+                // Prevent annoying message
+                entityPlayer.decouple();
+                worldServer.removePlayer(entityPlayer);
+                // worldServer.removePlayer above should remove the player from the
+                // map, but that doesn't always happen. This is a last effort
+                // attempt to prevent the annoying "Force re-added" message
+                // from appearing
+                try {
+                    if (this.entitiesByUUID == null) {
+                        this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
+                        this.entitiesByUUID.setAccessible(true);
+                    }
+                    final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
+                    map.remove(entityPlayer.getUniqueID());
+                } catch (final NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-                final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
-                map.remove(entityPlayer.getUniqueID());
-            } catch (final NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, dimensionManager,
-                true, originLocation, true);
-            // Apply health and foodLevel
-            player.setHealth(health);
-            player.setFoodLevel(foodLevel);
-            player.setPortalCooldown(40);
+                entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, dimensionManager,
+                    true, originLocation, true);
+                // Apply health and foodLevel
+                player.setHealth(health);
+                player.setFoodLevel(foodLevel);
+                player.setPortalCooldown(40);
+            });
         }).execute(whenDone);
     }
 
