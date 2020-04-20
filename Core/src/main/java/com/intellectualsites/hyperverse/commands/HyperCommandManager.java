@@ -66,7 +66,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@CommandAlias("worlds|world|hyperverse|hv")
+@CommandAlias("hyperverse|hv|worlds|world")
 @CommandPermission("hyperverse.worlds")
 @SuppressWarnings("unused")
 public class HyperCommandManager extends BaseCommand {
