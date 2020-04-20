@@ -103,6 +103,14 @@ public class NMSImpl implements NMS {
         final NBTTagCompound playerTag = new NBTTagCompound();
         final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         entityPlayer.save(playerTag);
+
+        if (!playerTag.hasKey("hyperverse")) {
+            playerTag.set("hyperverse", new NBTTagCompound());
+        }
+        final NBTTagCompound hyperverse = playerTag.getCompound("hyperverse");
+        hyperverse.setLong("writeTime", System.currentTimeMillis());
+        hyperverse.setString("version", Hyperverse.getPlugin(Hyperverse.class).getDescription().getVersion());
+
         taskChainFactory.newChain().async(() -> {
             try (final OutputStream outputStream = Files.newOutputStream(file)) {
                 NBTCompressedStreamTools.a(playerTag, outputStream);
