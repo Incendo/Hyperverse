@@ -74,6 +74,11 @@
                             <shadedPattern>com.intellectualsites.hyperverse.taskchain</shadedPattern>
                         </relocation>
                     </relocations>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>co.aikar:minecraft-timings</exclude>
+                        </excludes>
+                    </artifactSet>
                 </configuration>
             </plugin>
         </plugins>
