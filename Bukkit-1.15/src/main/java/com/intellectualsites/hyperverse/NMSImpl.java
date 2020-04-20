@@ -126,6 +126,9 @@ public class NMSImpl implements NMS {
                 return;
             }
             final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+            // We re-write the extra Bukkit data as to not
+            // mess up the profile
+            ((CraftPlayer) player).setExtraData(compound);
             entityPlayer.effects.clear();
             entityPlayer.f(compound);
             // entityPlayer.updateEffects = true;
