@@ -27,6 +27,8 @@ public class Messages {
 
     private static final Map<String, String> configuredMessages = Maps.newHashMap();
 
+    public static final Message messageAlreadyInWorld =
+        createMessage("world.same-world", "&cYou are already in this world!");
     public static final Message messagePrefix =
         createMessage("other.prefix", "&8[&6Hyperverse&8] ");
     public static final Message messageWorldExists =
