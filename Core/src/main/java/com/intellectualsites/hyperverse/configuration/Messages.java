@@ -26,7 +26,6 @@ import java.util.Objects;
 public class Messages {
 
     private static final Map<String, String> configuredMessages = Maps.newHashMap();
-
     public static final Message messageAlreadyInWorld =
         createMessage("world.same-world", "&cYou are already in this world!");
     public static final Message messagePrefix =
@@ -65,6 +64,8 @@ public class Messages {
     public static final Message messageListEntry = createMessage("list.entry",
         "&8- <hover:show_text:\"<gray>Click to teleport to the world</gray>\"><click:run_command:/hvtp %name%>"
             + "&7%name%</click></hover> &8(&7%generator%&8: &7%type%&8) - %load_status%");
+    public static final Message messageListEntryCurrentWorld = createMessage("list.entry.current-world",
+        "&8- &f%name% &f(%generator%&7: &f%type%) &8- %load_status%");
     public static final Message messageNoSuchWorld = createMessage("world.non_existent",
         "&cThere is no world with that name");
     public static final Message messageTeleporting = createMessage("teleport.teleporting",

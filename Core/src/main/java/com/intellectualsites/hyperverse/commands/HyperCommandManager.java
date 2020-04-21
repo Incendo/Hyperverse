@@ -27,6 +27,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.intellectualsites.hyperverse.Hyperverse;
+import com.intellectualsites.hyperverse.configuration.Message;
 import com.intellectualsites.hyperverse.configuration.Messages;
 import com.intellectualsites.hyperverse.exception.HyperWorldValidationException;
 import com.intellectualsites.hyperverse.flags.FlagParseException;
@@ -44,6 +45,7 @@ import com.intellectualsites.hyperverse.world.WorldType;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -55,6 +57,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CommandAlias("hyperverse|hv|worlds|world")
 @CommandPermission("hyperverse.worlds")
@@ -228,7 +231,12 @@ public class HyperCommandManager extends BaseCommand {
     @Subcommand("list|l|worlds") @CommandPermission("hyperverse.list") @CommandAlias("hvl")
     @Description("List hyperverse worlds") public void doList(final CommandSender sender) {
         MessageUtil.sendMessage(sender, Messages.messageListHeader);
-        for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
+        Stream<HyperWorld> stream = this.worldManager.getWorlds().stream().sorted(Comparator.comparing(world -> world.getConfiguration().getName()));
+        if (sender instanceof Entity) {
+            stream = stream.sorted(Comparator
+                .comparing(world -> !((Entity) sender).getWorld().equals(world.getBukkitWorld())));
+        }
+        stream.forEach(hyperWorld -> {
             final WorldConfiguration configuration = hyperWorld.getConfiguration();
 
             // Format the generator name a little better
@@ -248,9 +256,16 @@ public class HyperCommandManager extends BaseCommand {
                     + configuration.getName() + ">unloaded</click></hover></red>";
             }
 
-            MessageUtil.sendMessage(sender, Messages.messageListEntry, "%name%", configuration.getName(),
+            final Message message;
+            if (sender instanceof Entity && ((Entity) sender).getWorld() == hyperWorld.getBukkitWorld()) {
+                message = Messages.messageListEntryCurrentWorld;
+            } else {
+                message = Messages.messageListEntry;
+            }
+
+            MessageUtil.sendMessage(sender, message, "%name%", configuration.getName(),
                 "%generator%", generator, "%type%", configuration.getType().name(), "%load_status%", loadStatus);
-        }
+        });
     }
 
     @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport")
