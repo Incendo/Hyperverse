@@ -4,6 +4,8 @@
 
 **Hyperverse is W.I.P!**
 
+[![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/hyperverse/badge)](https://www.codefactor.io/repository/github/sauilitired/hyperverse)
+
 A Minecraft world management plugin for Bukkit 1.15.
 More versions may come to be supported in the future.
 
@@ -44,3 +46,8 @@ Planned Features:
 
 Contributions are very welcome. Some general contribution
 guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hyperverse/blob/master/CONTRIBUTING.md)
+
+
+<p align="center">
+![bStats](https://bstats.org/signatures/bukkit/Hyperverse.svg)
+</p>
