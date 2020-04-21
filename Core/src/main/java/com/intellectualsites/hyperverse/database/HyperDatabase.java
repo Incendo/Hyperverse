@@ -31,8 +31,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -69,10 +68,15 @@ public class HyperDatabase {
     public boolean attemptConnect() {
         try {
             Class.forName("org.sqlite.JDBC");
-            final Path file = this.hyperverse.getDataFolder().toPath().resolve("storage.db");
-            if (!Files.exists(file)) {
-                Files.createFile(this.hyperverse.getDataFolder().toPath().resolve("storage.db"));
+
+            final File file = new File(this.hyperverse.getDataFolder(), "storage.db");
+            if (!file.exists()) {
+                if (!file.createNewFile()) {
+                    new RuntimeException("Could not create storage.db").printStackTrace();
+                    return false;
+                }
             }
+
             this.connectionSource =
                 new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
             // Setup DAOs
