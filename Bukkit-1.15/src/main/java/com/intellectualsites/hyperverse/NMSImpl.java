@@ -29,6 +29,8 @@ import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.EnumDirection;
 import net.minecraft.server.v1_15_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.NBTTagDouble;
+import net.minecraft.server.v1_15_R1.NBTTagList;
 import net.minecraft.server.v1_15_R1.PortalTravelAgent;
 import net.minecraft.server.v1_15_R1.ShapeDetector;
 import net.minecraft.server.v1_15_R1.Vec3D;
@@ -169,6 +171,12 @@ public class NMSImpl implements NMS {
                 // We re-write the extra Bukkit data as to not
                 // mess up the profile
                 ((CraftPlayer) player).setExtraData(compound);
+                // Set the position to the player's current position
+                compound.set("Pos", doubleList(entityPlayer.locX(), entityPlayer.locY(), entityPlayer.locZ()));
+                // Set the world to the player's current world
+                compound.setString("world", player.getWorld().getName());
+                // Store persistent values
+                ((CraftPlayer) player).storeBukkitValues(compound);
                 // We start by doing a total reset
                 entityPlayer.reset();
                 entityPlayer.f(compound);
@@ -202,6 +210,14 @@ public class NMSImpl implements NMS {
                 player.setPortalCooldown(40);
             });
         }).execute(whenDone);
+    }
+
+    private static NBTTagList doubleList(final double... values) {
+        final NBTTagList nbttaglist = new NBTTagList();
+        for (final double d : values) {
+            nbttaglist.add(NBTTagDouble.a(d));
+        }
+        return nbttaglist;
     }
 
 }
