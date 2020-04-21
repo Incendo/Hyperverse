@@ -17,7 +17,7 @@
 
 package hyperverse;
 
-import com.intellectualsites.hyperverse.util.NMS;
+import se.hyperver.hyperverse.util.NMS;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.EnumDirection;

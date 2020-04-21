@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>Hyperverse</artifactId>
-        <groupId>com.intellectualsites.hyperverse</groupId>
+        <groupId>se.hyperver.hyperverse</groupId>
         <version>0.1.0</version>
     </parent>
 
@@ -55,11 +55,11 @@
                     <relocations>
                         <relocation>
                             <pattern>io.papermc.lib</pattern>
-                            <shadedPattern>com.intellectualsites.hyperverse.paperlib</shadedPattern> <!-- Replace this -->
+                            <shadedPattern>se.hyperver.hyperverse.paperlib</shadedPattern> <!-- Replace this -->
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>com.intellectualsites.hyperverse.bstats</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -69,7 +69,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.intellectualsites.hyperverse</groupId>
+            <groupId>se.hyperver.hyperverse</groupId>
             <artifactId>Core</artifactId>
             <version>0.1.0</version>
         </dependency>

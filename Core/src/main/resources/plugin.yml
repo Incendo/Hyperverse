@@ -1,6 +1,6 @@
 name: Hyperverse
 version: ${project.version}
-main: com.intellectualsites.hyperverse.Hyperverse
+main: se.hyperver.hyperverse.Hyperverse
 api-version: 1.13
 load: STARTUP
 authors: [Citymonstret]

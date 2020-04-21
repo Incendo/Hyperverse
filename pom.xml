@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.intellectualsites.hyperverse</groupId>
+    <groupId>se.hyperver.hyperverse</groupId>
     <artifactId>Hyperverse</artifactId>
     <!-- Loosely based on https://semver.org/spec/v2.0.0.html -->
     <version>0.1.0</version>
