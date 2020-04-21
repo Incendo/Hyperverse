@@ -38,7 +38,7 @@ public class FileConfigurationObject {
         + " should be kept in memory")
     private boolean keepSpawnLoaded = true;
     @Setting(value = "grouped-inventories", comment = "Whether or player profile groups are enabled")
-    private boolean groupedProfiles = true;
+    private boolean groupedProfiles = false;
 
     public boolean isImportAutomatically() {
         return this.importAutomatically;
