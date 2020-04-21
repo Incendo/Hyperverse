@@ -22,6 +22,7 @@ import com.intellectualsites.hyperverse.flags.implementation.ForceSpawn;
 import com.intellectualsites.hyperverse.flags.implementation.GamemodeFlag;
 import com.intellectualsites.hyperverse.flags.implementation.LocalRespawnFlag;
 import com.intellectualsites.hyperverse.flags.implementation.NetherFlag;
+import com.intellectualsites.hyperverse.flags.implementation.ProfileGroupFlag;
 import com.intellectualsites.hyperverse.flags.implementation.PveFlag;
 import com.intellectualsites.hyperverse.flags.implementation.PvpFlag;
 import com.intellectualsites.hyperverse.flags.implementation.WorldPermissionFlag;
@@ -51,6 +52,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(WorldPermissionFlag.WORLD_PERMISSION_FLAG_DEFAULT);
         this.addFlag(NetherFlag.NETHER_FLAG_DEFAULT);
         this.addFlag(EndFlag.END_FLAG_DEFAULT);
+        this.addFlag(ProfileGroupFlag.PROFILE_GROUP_FLAG_EMPTY);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {

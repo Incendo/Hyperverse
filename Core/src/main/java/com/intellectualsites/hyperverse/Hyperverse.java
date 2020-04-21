@@ -59,13 +59,25 @@ import java.util.Map;
     private HyperDatabase hyperDatabase;
 
     @Override public void onEnable() {
-        this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
+        // Disgusting try-catch mess below, but Guice freaks out completely if it encounters
+        // any errors, and is unable to report them because of the plugin class loader
 
-        final HyperConfiguration hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
-        this.getLogger().info("§6Hyperverse Options");
-        this.getLogger().info("§8- §7use persistent locations? " + hyperConfiguration.shouldPersistLocations());
-        this.getLogger().info("§8- §7keep spawns loaded? " + hyperConfiguration.shouldKeepSpawnLoaded());
-        this.getLogger().info("§8- §7should detect worlds?  " + hyperConfiguration.shouldImportAutomatically());
+        try {
+            this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            final HyperConfiguration hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
+            this.getLogger().info("§6Hyperverse Options");
+            this.getLogger().info("§8- §7use persistent locations? " + hyperConfiguration.shouldPersistLocations());
+            this.getLogger().info("§8- §7keep spawns loaded? " + hyperConfiguration.shouldKeepSpawnLoaded());
+            this.getLogger().info("§8- §7should detect worlds? " + hyperConfiguration.shouldImportAutomatically());
+            this.getLogger().info("§8- §7should separate player profiles? " + hyperConfiguration.shouldGroupProfiles());
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
         // Message configuration
         final Path messagePath = this.getDataFolder().toPath().resolve("messages.conf");
@@ -110,23 +122,37 @@ import java.util.Map;
         }
 
         // Load the database
-        this.hyperDatabase = injector.getInstance(HyperDatabase.class);
-        if (!this.hyperDatabase.attemptConnect()) {
-            getLogger().severe("Failed to connect to database...");
+        try {
+            this.hyperDatabase = injector.getInstance(HyperDatabase.class);
+            if (!this.hyperDatabase.attemptConnect()) {
+                getLogger().severe("Failed to connect to database...");
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
         }
 
         // Load the world manager
-        this.worldManager = injector.getInstance(WorldManager.class);
-        this.worldManager.loadWorlds();
+        try {
+            this.worldManager = injector.getInstance(WorldManager.class);
+            this.worldManager.loadWorlds();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
         // Register events
-        this.getServer().getPluginManager()
-            .registerEvents(injector.getInstance(WorldListener.class), this);
-        this.getServer().getPluginManager()
-            .registerEvents(injector.getInstance(PlayerListener.class), this);
+        try {
+            this.getServer().getPluginManager().registerEvents(injector.getInstance(WorldListener.class), this);
+            this.getServer().getPluginManager().registerEvents(injector.getInstance(PlayerListener.class), this);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
         // Create the command manager instance
-        injector.getInstance(HyperCommandManager.class);
+        try {
+            injector.getInstance(HyperCommandManager.class);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
         // Initialize bStats metrics tracking
         new Metrics(this, BSTATS_ID);
