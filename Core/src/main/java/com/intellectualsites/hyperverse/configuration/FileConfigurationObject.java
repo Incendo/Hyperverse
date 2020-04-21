@@ -37,6 +37,8 @@ public class FileConfigurationObject {
     @Setting(value = "keep-loaded", comment = "Whether or not world spawn chunks"
         + " should be kept in memory")
     private boolean keepSpawnLoaded = true;
+    @Setting(value = "grouped-inventories", comment = "Whether or player profile groups are enabled")
+    private boolean groupedProfiles = false;
 
     public boolean isImportAutomatically() {
         return this.importAutomatically;
@@ -49,4 +51,9 @@ public class FileConfigurationObject {
     public boolean isKeepSpawnLoaded() {
         return this.keepSpawnLoaded;
     }
+
+    public boolean useGroupedProfiles() {
+        return this.groupedProfiles;
+    }
+
 }

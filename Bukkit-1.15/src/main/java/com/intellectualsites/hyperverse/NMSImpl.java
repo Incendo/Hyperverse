@@ -17,25 +17,72 @@
 
 package com.intellectualsites.hyperverse;
 
+import co.aikar.taskchain.TaskChainFactory;
+import com.google.inject.Inject;
+import com.intellectualsites.hyperverse.configuration.HyperConfiguration;
 import com.intellectualsites.hyperverse.util.NMS;
+import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.DimensionManager;
 import net.minecraft.server.v1_15_R1.EntityHuman;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.EnumDirection;
+import net.minecraft.server.v1_15_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.NBTTagDouble;
+import net.minecraft.server.v1_15_R1.NBTTagList;
 import net.minecraft.server.v1_15_R1.PortalTravelAgent;
 import net.minecraft.server.v1_15_R1.ShapeDetector;
 import net.minecraft.server.v1_15_R1.Vec3D;
 import net.minecraft.server.v1_15_R1.WorldServer;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.filter.RegexFilter;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {
+
+    private final TaskChainFactory taskChainFactory;
+    private Field entitiesByUUID;
+    private org.apache.logging.log4j.core.Logger worldServerLogger;
+
+    @Inject public NMSImpl(final TaskChainFactory taskChainFactory, final HyperConfiguration hyperConfiguration) {
+        this.taskChainFactory = taskChainFactory;
+        if (hyperConfiguration.shouldGroupProfiles()) {
+            try {
+                final Field field = WorldServer.class.getDeclaredField("LOGGER");
+                field.setAccessible(true);
+                this.worldServerLogger = (Logger) field.get(null);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                final RegexFilter regexFilter = RegexFilter
+                    .createFilter("[\\S\\s]*Force-added player with duplicate UUID[\\S\\s]*", null, false,
+                        Filter.Result.DENY, Filter.Result.ACCEPT);
+                this.worldServerLogger.addFilter(regexFilter);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override public @Nullable Location getOrCreateNetherPortal(@NotNull final Entity entity,
         @NotNull final Location origin) {
@@ -79,6 +126,98 @@ public class NMSImpl implements NMS {
             return new Location(origin.getWorld(), dimensionSpawn.getX(), dimensionSpawn.getY(), dimensionSpawn.getZ());
         }
         return origin.getWorld().getSpawnLocation();
+    }
+
+    @Override public void writePlayerData(@NotNull final Player player, @NotNull final Path file) {
+        final NBTTagCompound playerTag = new NBTTagCompound();
+        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        entityPlayer.save(playerTag);
+
+        if (!playerTag.hasKey("hyperverse")) {
+            playerTag.set("hyperverse", new NBTTagCompound());
+        }
+        final NBTTagCompound hyperverse = playerTag.getCompound("hyperverse");
+        hyperverse.setLong("writeTime", System.currentTimeMillis());
+        hyperverse.setString("version", Hyperverse.getPlugin(Hyperverse.class).getDescription().getVersion());
+
+        taskChainFactory.newChain().async(() -> {
+            try (final OutputStream outputStream = Files.newOutputStream(file)) {
+                NBTCompressedStreamTools.a(playerTag, outputStream);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).execute();
+    }
+
+    @Override public void readPlayerData(@NotNull final Player player, @NotNull final Path file, @NotNull final Runnable whenDone) {
+        final Location originLocation = player.getLocation().clone();
+        taskChainFactory.newChain().asyncFirst(() -> {
+            try (final InputStream inputStream = Files.newInputStream(file)) {
+                return NBTCompressedStreamTools.a(inputStream);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).syncLast(compound -> {
+            if (compound == null) {
+                return;
+            }
+            PaperLib.getChunkAtAsync(originLocation).thenAccept(chunk -> {
+                // Health and hunger don't update properly, so we
+                // give them a little help
+                final float health = compound.getFloat("Health");
+                final int foodLevel = compound.getInt("foodLevel");
+                final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+                // We re-write the extra Bukkit data as to not
+                // mess up the profile
+                ((CraftPlayer) player).setExtraData(compound);
+                // Set the position to the player's current position
+                compound.set("Pos", doubleList(entityPlayer.locX(), entityPlayer.locY(), entityPlayer.locZ()));
+                // Set the world to the player's current world
+                compound.setString("world", player.getWorld().getName());
+                // Store persistent values
+                ((CraftPlayer) player).storeBukkitValues(compound);
+                // We start by doing a total reset
+                entityPlayer.reset();
+                entityPlayer.f(compound);
+                // entityPlayer.updateEffects = true;
+                // entityPlayer.updateAbilities();
+                player.teleport(originLocation);
+                final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
+                final DimensionManager dimensionManager = worldServer.worldProvider.getDimensionManager();
+                // Prevent annoying message
+                entityPlayer.decouple();
+                worldServer.removePlayer(entityPlayer);
+                // worldServer.removePlayer above should remove the player from the
+                // map, but that doesn't always happen. This is a last effort
+                // attempt to prevent the annoying "Force re-added" message
+                // from appearing
+                try {
+                    if (this.entitiesByUUID == null) {
+                        this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
+                        this.entitiesByUUID.setAccessible(true);
+                    }
+                    final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
+                    map.remove(entityPlayer.getUniqueID());
+                } catch (final NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, dimensionManager,
+                    true, originLocation, true);
+                // Apply health and foodLevel
+                player.setHealth(health);
+                player.setFoodLevel(foodLevel);
+                player.setPortalCooldown(40);
+            });
+        }).execute(whenDone);
+    }
+
+    private static NBTTagList doubleList(final double... values) {
+        final NBTTagList nbttaglist = new NBTTagList();
+        for (final double d : values) {
+            nbttaglist.add(NBTTagDouble.a(d));
+        }
+        return nbttaglist;
     }
 
 }

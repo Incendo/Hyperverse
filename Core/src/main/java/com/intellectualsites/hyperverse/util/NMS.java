@@ -19,8 +19,11 @@ package com.intellectualsites.hyperverse.util;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.file.Path;
 
 /**
  * Version specific NMS utility methods
@@ -31,5 +34,10 @@ public interface NMS {
         @NotNull final Location origin);
 
     @Nullable Location getDimensionSpawn(@NotNull final Location origin);
+
+    void writePlayerData(@NotNull final Player player, @NotNull final Path file);
+
+    void readPlayerData(@NotNull final Player player, @NotNull final Path file,
+        @NotNull final Runnable whenDone);
 
 }
