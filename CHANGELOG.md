@@ -23,7 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Code documentation
 - Option to keep spawn chunks loaded
 - `/hyperverse debugpaste`
+- Added per-world player data
 
 ### Changed
 - Made the module(s) version dependent
 - Use hocon for configuration rather than yaml
+- Made the plugin disable if anything fails to load
