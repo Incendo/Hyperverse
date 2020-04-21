@@ -20,14 +20,8 @@ package com.intellectualsites.hyperverse.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.commands.CommandHelp;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.HelpCommand;
-import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.Optional;
+import co.aikar.commands.annotation.*;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -41,6 +35,7 @@ import com.intellectualsites.hyperverse.flags.WorldFlag;
 import com.intellectualsites.hyperverse.modules.HyperWorldFactory;
 import com.intellectualsites.hyperverse.util.IncendoPaster;
 import com.intellectualsites.hyperverse.util.MessageUtil;
+import com.intellectualsites.hyperverse.util.SeedUtil;
 import com.intellectualsites.hyperverse.util.WorldUtil;
 import com.intellectualsites.hyperverse.world.HyperWorld;
 import com.intellectualsites.hyperverse.world.WorldConfiguration;
@@ -57,12 +52,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -87,7 +77,12 @@ public class HyperCommandManager extends BaseCommand {
         final BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(hyperverse);
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
             context -> worldManager.getWorlds().stream().map(HyperWorld::getConfiguration)
-                .map(WorldConfiguration::getName).collect(Collectors.toList()));
+                .map(WorldConfiguration::getName).filter(worldName -> {
+                    final String selection = context.getConfig("selection", "not_in");
+                    final boolean inWorld =
+                        worldName.equalsIgnoreCase(context.getPlayer().getWorld().getName());
+                    return selection.equalsIgnoreCase("not_in") != inWorld;
+                }).collect(Collectors.toList()));
         bukkitCommandManager.getCommandCompletions().registerCompletion("worldtypes", context -> {
             if (context.getInput().contains(" ")) {
                 return Collections.emptyList();
@@ -161,8 +156,9 @@ public class HyperCommandManager extends BaseCommand {
     @CommandPermission("hyperverse.create") @Description("Create a new world")
     @CommandCompletion("@null @generators @worldtypes @null @null true|false @null")
     public void createWorld(final CommandSender sender, final String world, String generator,
-        @Default("overworld") final WorldType type, @Default("0") final long seed,
+        @Default("overworld") final WorldType type, @Optional final Long specifiedSeed,
         @Default("true") final boolean generateStructures, @Default final String settings) {
+        final long seed = specifiedSeed == null ? SeedUtil.randomSeed() : specifiedSeed;
         // Check if the name already exists
         for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
             if (hyperWorld.getConfiguration().getName().equalsIgnoreCase(world)) {
@@ -258,7 +254,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport")
-    @CommandCompletion("@hyperworlds") @Description("Teleport between hyperverse worlds")
+    @CommandCompletion("@hyperworlds:selection=not_in") @Description("Teleport between hyperverse worlds")
     public void doTeleport(final Player player, final HyperWorld world) {
         if (world == null) {
             return;
