@@ -129,3 +129,12 @@ buildNumber.properties
 .flattened-pom.xml
 
 # End of https://www.gitignore.io/api/java,maven,intellij
+.idea/compiler.xml
+.idea/encodings.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+Bukkit-1.15/Bukkit-1.15.iml
+Core/Core.iml
+Hyperverse.iml
