@@ -360,7 +360,7 @@ public class HyperCommandManager extends BaseCommand {
 
     @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")
     @CommandCompletion("@hyperworlds @gamerules @gamerule") @Description("Set a world gamerule")
-    public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,
+    public void doGameRuleSet(final CommandSender sender, final HyperWorld hyperWorld,
         final GameRule gameRule, final String value) {
         if (gameRule == null) {
             MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
@@ -397,7 +397,7 @@ public class HyperCommandManager extends BaseCommand {
 
     @Subcommand("gamerule remove") @CommandPermission("hyperverse.gamerule.set")
     @CommandCompletion("@hyperworlds @gamerules") @Description("Remove a world game rule")
-    public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final GameRule gameRule) {
+    public void doGameRuleRemove(final CommandSender sender, final HyperWorld hyperWorld, final GameRule gameRule) {
         if (gameRule == null) {
             MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
             return;
