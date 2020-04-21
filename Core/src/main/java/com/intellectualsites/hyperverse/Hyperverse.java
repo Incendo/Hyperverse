@@ -73,75 +73,30 @@ import java.util.Map;
             e.printStackTrace();
         }
 
-        try {
-            final HyperConfiguration hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
-            this.getLogger().info("§6Hyperverse Options");
-            this.getLogger().info("§8- §7use persistent locations? " + hyperConfiguration.shouldPersistLocations());
-            this.getLogger().info("§8- §7keep spawns loaded? " + hyperConfiguration.shouldKeepSpawnLoaded());
-            this.getLogger().info("§8- §7should detect worlds? " + hyperConfiguration.shouldImportAutomatically());
-            this.getLogger().info("§8- §7should separate player profiles? " + hyperConfiguration.shouldGroupProfiles());
-        } catch (final Exception e) {
-            e.printStackTrace();
+        if (!this.loadMessages()) {
+            getLogger().severe("Failed to load messages");
         }
 
-        // Message configuration
-        final Path messagePath = this.getDataFolder().toPath().resolve("messages.conf");
-        final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
-            .builder()
-            .setParseOptions(ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
-            .setRenderOptions(ConfigRenderOptions.defaults()
-                .setComments(true)
-                .setFormatted(true)
-                .setOriginComments(false)
-                .setJson(false))
-            .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
-        ConfigurationNode translationNode;
-        try {
-            translationNode = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-            translationNode = loader.createEmptyNode();
+        if (!this.loadConfiguration()) {
+            getLogger().severe("Failed to load configuration file. Disabling!");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
         }
-        if (!Files.exists(messagePath)) {
+
+        if (!this.loadDatabase()) {
+            getLogger().severe("Failed to connect to the database. Disabling!");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        if (!this.loadWorldManager()) {
+            getLogger().severe("Failed to load world manager. Disabling!");
             try {
-                Files.createFile(messagePath);
-            } catch (IOException e) {
+                this.worldManager = injector.getInstance(WorldManager.class);
+                this.worldManager.loadWorlds();
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
-        }
-
-        final Map<String, String> messages = Messages.getConfiguredMessages();
-        final Collection<String> messageKeys = new ArrayList<>(messages.keySet());
-        for (final String key : messageKeys) {
-            final ConfigurationNode messageNode = translationNode.getNode(key);
-            if (messageNode.isVirtual()) {
-                messageNode.setValue(messages.get(key));
-            } else {
-                messages.put(key, messageNode.getString());
-            }
-        }
-        try {
-            loader.save(translationNode);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Load the database
-        try {
-            this.hyperDatabase = injector.getInstance(HyperDatabase.class);
-            if (!this.hyperDatabase.attemptConnect()) {
-                getLogger().severe("Failed to connect to database...");
-            }
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
-        // Load the world manager
-        try {
-            this.worldManager = injector.getInstance(WorldManager.class);
-            this.worldManager.loadWorlds();
-        } catch (final Exception e) {
-            e.printStackTrace();
         }
 
         // Register events
@@ -165,6 +120,95 @@ import java.util.Map;
 
     @Override public void onDisable() {
         this.hyperDatabase.attemptClose();
+    }
+
+    private boolean loadConfiguration() {
+        try {
+            final HyperConfiguration hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
+            this.getLogger().info("§6Hyperverse Options");
+            this.getLogger().info("§8- §7use persistent locations? " + hyperConfiguration.shouldPersistLocations());
+            this.getLogger().info("§8- §7keep spawns loaded? " + hyperConfiguration.shouldKeepSpawnLoaded());
+            this.getLogger().info("§8- §7should detect worlds? " + hyperConfiguration.shouldImportAutomatically());
+            this.getLogger().info("§8- §7should separate player profiles? " + hyperConfiguration.shouldGroupProfiles());
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean loadWorldManager() {
+        try {
+            this.worldManager = injector.getInstance(WorldManager.class);
+            this.worldManager.loadWorlds();
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean loadDatabase() {
+        try {
+            this.hyperDatabase = injector.getInstance(HyperDatabase.class);
+            if (!this.hyperDatabase.attemptConnect()) {
+                getLogger().severe("Failed to connect to database...");
+                return false;
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean loadMessages() {
+        // Message configuration
+        final Path messagePath = this.getDataFolder().toPath().resolve("messages.conf");
+        final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
+            .builder()
+            .setParseOptions(ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
+            .setRenderOptions(ConfigRenderOptions.defaults()
+                .setComments(true)
+                .setFormatted(true)
+                .setOriginComments(false)
+                .setJson(false))
+            .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
+
+        ConfigurationNode translationNode;
+        try {
+            translationNode = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            translationNode = loader.createEmptyNode();
+        }
+
+        if (!Files.exists(messagePath)) {
+            try {
+                Files.createFile(messagePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        final Map<String, String> messages = Messages.getConfiguredMessages();
+        final Collection<String> messageKeys = new ArrayList<>(messages.keySet());
+        for (final String key : messageKeys) {
+            final ConfigurationNode messageNode = translationNode.getNode(key);
+            if (messageNode.isVirtual()) {
+                messageNode.setValue(messages.get(key));
+            } else {
+                messages.put(key, messageNode.getString());
+            }
+        }
+        try {
+            loader.save(translationNode);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 }
