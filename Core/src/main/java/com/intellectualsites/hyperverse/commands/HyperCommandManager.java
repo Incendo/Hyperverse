@@ -236,7 +236,7 @@ public class HyperCommandManager extends BaseCommand {
             stream = stream.sorted(Comparator
                 .comparing(world -> !((Entity) sender).getWorld().equals(world.getBukkitWorld())));
         }
-        stream.forEach(hyperWorld -> {
+        stream.forEachOrdered(hyperWorld -> {
             final WorldConfiguration configuration = hyperWorld.getConfiguration();
 
             // Format the generator name a little better
