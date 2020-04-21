@@ -21,6 +21,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
+import io.papermc.lib.PaperLib;
 import se.hyperver.hyperverse.commands.HyperCommandManager;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
@@ -125,6 +126,9 @@ import java.util.Map;
 
         // Initialize bStats metrics tracking
         new Metrics(this, BSTATS_ID);
+
+        // Add paper suggestion
+        PaperLib.suggestPaper(this);
     }
 
     @Override public void onDisable() {
