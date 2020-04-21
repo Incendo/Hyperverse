@@ -61,6 +61,11 @@ import java.util.Map;
     @Override public void onEnable() {
         // Disgusting try-catch mess below, but Guice freaks out completely if it encounters
         // any errors, and is unable to report them because of the plugin class loader
+        if (!this.getDataFolder().exists()) {
+            if (!this.getDataFolder().mkdir()) {
+                throw new RuntimeException("Could not create Hyperverse main directory");
+            }
+        }
 
         try {
             this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
