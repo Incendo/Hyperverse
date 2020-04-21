@@ -49,5 +49,5 @@ guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hype
 
 
 <p align="center">
-![bStats](https://bstats.org/signatures/bukkit/Hyperverse.svg)
+<img src="https://bstats.org/signatures/bukkit/Hyperverse.svg" />
 </p>
