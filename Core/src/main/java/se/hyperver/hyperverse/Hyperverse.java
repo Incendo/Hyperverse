@@ -57,6 +57,7 @@ import java.util.Map;
     private WorldManager worldManager;
     private Injector injector;
     private HyperDatabase hyperDatabase;
+    private HyperConfiguration hyperConfiguration;
 
     @Override public void onEnable() {
         // Disgusting try-catch mess below, but Guice freaks out completely if it encounters
@@ -81,6 +82,14 @@ import java.util.Map;
             getLogger().severe("Failed to load configuration file. Disabling!");
             this.getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+
+        if (this.hyperConfiguration.shouldGroupProfiles()) {
+            getLogger().warning("------------------ WARNING ------------------");
+            getLogger().warning("Per-world player data is still very experimental.");
+            getLogger().warning("This may cause your server to freeze, crash, etc.");
+            getLogger().warning("Use at your own risk!");
+            getLogger().warning("------------------ WARNING ------------------");
         }
 
         if (!this.loadDatabase()) {
@@ -124,12 +133,12 @@ import java.util.Map;
 
     private boolean loadConfiguration() {
         try {
-            final HyperConfiguration hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
+            this.hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
             this.getLogger().info("§6Hyperverse Options");
-            this.getLogger().info("§8- §7use persistent locations? " + hyperConfiguration.shouldPersistLocations());
-            this.getLogger().info("§8- §7keep spawns loaded? " + hyperConfiguration.shouldKeepSpawnLoaded());
-            this.getLogger().info("§8- §7should detect worlds? " + hyperConfiguration.shouldImportAutomatically());
-            this.getLogger().info("§8- §7should separate player profiles? " + hyperConfiguration.shouldGroupProfiles());
+            this.getLogger().info("§8- §7use persistent locations? " + this.hyperConfiguration.shouldPersistLocations());
+            this.getLogger().info("§8- §7keep spawns loaded? " + this.hyperConfiguration.shouldKeepSpawnLoaded());
+            this.getLogger().info("§8- §7should detect worlds? " + this.hyperConfiguration.shouldImportAutomatically());
+            this.getLogger().info("§8- §7should separate player profiles? " + this.hyperConfiguration.shouldGroupProfiles());
         } catch (final Exception e) {
             e.printStackTrace();
             return false;
