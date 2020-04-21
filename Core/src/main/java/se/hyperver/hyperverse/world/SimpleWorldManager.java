@@ -171,12 +171,12 @@ public class SimpleWorldManager implements WorldManager, Listener {
             hyperWorld.createBukkitWorld();
         } catch (final HyperWorldValidationException validationException) {
             switch (validationException.getValidationResult()) {
-                case HyperWorldCreator.ValidationResult.UNKNOWN_GENERATOR:
+                case UNKNOWN_GENERATOR:
                     MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorInvalid,
                         "%world%", hyperWorld.getConfiguration().getName(),
                         "%generator%", hyperWorld.getConfiguration().getGenerator());
                     break;
-                case HyperWorldCreator.ValidationResult.SUCCESS:
+                case SUCCESS:
                     break;
                 default:
                     MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageCreationUnknownFailure);

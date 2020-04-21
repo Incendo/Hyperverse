@@ -17,7 +17,6 @@
 
 package hyperverse;
 
-import se.hyperver.hyperverse.util.NMS;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.EnumDirection;
@@ -31,6 +30,7 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import se.hyperver.hyperverse.util.NMS;
 
 import java.util.Objects;
 
