@@ -26,6 +26,13 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
+import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
@@ -38,16 +45,7 @@ import se.hyperver.hyperverse.util.IncendoPaster;
 import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.util.SeedUtil;
 import se.hyperver.hyperverse.util.WorldUtil;
-import se.hyperver.hyperverse.world.HyperWorld;
-import se.hyperver.hyperverse.world.WorldConfiguration;
-import se.hyperver.hyperverse.world.WorldManager;
-import se.hyperver.hyperverse.world.WorldType;
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import se.hyperver.hyperverse.world.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,6 +84,20 @@ public class HyperCommandManager extends BaseCommand {
                         worldName.equalsIgnoreCase(context.getPlayer().getWorld().getName());
                     return selection.equalsIgnoreCase("not_in") != inWorld;
                 }).collect(Collectors.toList()));
+        bukkitCommandManager.getCommandCompletions()
+            .registerAsyncCompletion("import-candidates", context -> {
+                final File baseDirectory = Bukkit.getWorldContainer();
+                try {
+                    return Files.list(baseDirectory.toPath()).filter(path -> {
+                        final File file = path.toFile();
+                        return file.isDirectory() && new File(file, "level.dat").isFile()
+                            && this.worldManager.getWorld(file.getName()) == null;
+                    }).map(path -> path.toFile().getName()).sorted(Comparator.naturalOrder())
+                        .collect(Collectors.toList());
+                } catch (IOException ex) {
+                    return Collections.emptyList();
+                }
+            });
         bukkitCommandManager.getCommandCompletions().registerCompletion("worldtypes", context -> {
             if (context.getInput().contains(" ")) {
                 return Collections.emptyList();
@@ -225,6 +237,40 @@ public class HyperCommandManager extends BaseCommand {
         } catch (final Exception e) {
             MessageUtil.sendMessage(sender, Messages.messageWorldCreationFailed,
                 "%reason%", e.getMessage());
+        }
+    }
+
+    @CommandPermission("hyperverse.import") @CommandAlias("hvimport") @Syntax("<world> <generator>")
+    @CommandCompletion("@import-candidates @generators ") @Description("Load a world as a hyperworld")
+    public void importWorld(final CommandSender sender, String worldName, String generator) {
+        if (worldManager.getWorld(worldName) != null) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldAlreadyImported);
+            return;
+        }
+        if (!WorldUtil.isSuitableImportCandidate(worldName, worldManager)) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+            return;
+        }
+        worldManager.ignoreWorld(worldName); //Make sure we don't auto register on init
+        final HyperWorld hyperWorld = hyperWorldFactory.create(UUID.randomUUID(),
+            new WorldConfigurationBuilder().setName(worldName).setGenerator(generator)
+                .createWorldConfiguration());
+        final World bukkitWorld;
+        try {
+            hyperWorld.createBukkitWorld();
+            bukkitWorld = hyperWorld.getBukkitWorld();
+            assert bukkitWorld != null;
+        } catch (HyperWorldValidationException e) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldImportFailure, "%reason%",
+                e.getMessage());
+            return;
+        }
+        worldManager.addWorld(hyperWorld);
+        MessageUtil.sendMessage(sender, Messages.messageWorldImportFinished);
+        if (sender instanceof Player) {
+            //Schedule teleport 1-tick later so the world has a chance to load.
+            Bukkit.getScheduler().runTaskLater(Hyperverse.getPlugin(Hyperverse.class),
+                () -> doTeleport((Player) sender, worldManager.getWorld(bukkitWorld)), 1L);
         }
     }
 

@@ -46,6 +46,8 @@ public class Messages {
         createMessage("world.creation_finished", "&7The world was created successfully");
     public static final Message messageWorldImportedOnLoad = createMessage("world.load_imported",
         "&7Hyperverse detected that %world% initialized, and successfully imported it (Generator: %generator%)");
+    public static final Message messageWorldImportFinished = createMessage("world.import_finished",
+        "&7World import completed.");
     public static final Message messageWorldLoaded =
         createMessage("world.loaded", "&7Loaded %num% worlds");
     public static final Message messageWorldImportFailure = createMessage("world.load_failure",
@@ -82,6 +84,8 @@ public class Messages {
         "&cThat world is not loaded");
     public static final Message messageWorldAlreadyLoaded = createMessage("world.already_loaded",
         "&cThat world is already loaded");
+    public static final Message messageWorldAlreadyImported = createMessage("world.already_imported",
+        "&cThatt world has already been imported");
     public static final Message messageWorldLoadedSuccessfully = createMessage("world.load_success",
         "&7The world has been loaded");
     public static final Message messageFlagParseError = createMessage("flag.parse_error",
