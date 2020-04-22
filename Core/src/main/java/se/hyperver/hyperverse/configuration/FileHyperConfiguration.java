@@ -20,7 +20,6 @@ package se.hyperver.hyperverse.configuration;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import se.hyperver.hyperverse.Hyperverse;
 import com.typesafe.config.ConfigParseOptions;
 import com.typesafe.config.ConfigRenderOptions;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -30,6 +29,7 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.jetbrains.annotations.NotNull;
+import se.hyperver.hyperverse.Hyperverse;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,14 +40,18 @@ import java.io.IOException;
 @Singleton
 public class FileHyperConfiguration implements HyperConfiguration {
 
-    private final boolean importAutomatically;
-    private final boolean persistLocations;
-    private final boolean keepSpawnLoaded;
-    private final boolean groupProfiles;
+    private FileConfigurationObject fileConfigurationObject;
+    private final Hyperverse hyperverse;
 
     @Inject public FileHyperConfiguration(@NotNull final Hyperverse hyperverse) {
+        this.hyperverse = hyperverse;
+        this.loadConfiguration();
+    }
+
+    public void loadConfiguration() {
         final File configFile = new File(hyperverse.getDataFolder(), "hyperverse.conf");
-        final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
+        final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
+            .builder()
             .setParseOptions(ConfigParseOptions.defaults().setClassLoader(hyperverse.getClass().getClassLoader()))
             .setRenderOptions(ConfigRenderOptions.defaults().setComments(true).setFormatted(true).setOriginComments(false).setJson(false))
             .setDefaultOptions(ConfigurationOptions.defaults()).setFile(configFile).build();
@@ -77,26 +81,23 @@ public class FileHyperConfiguration implements HyperConfiguration {
                 e.printStackTrace();
             }
         }
-        this.importAutomatically = configObject.isImportAutomatically();
-        this.keepSpawnLoaded = configObject.isKeepSpawnLoaded();
-        this.persistLocations = configObject.isPersistLocations();
-        this.groupProfiles = configObject.useGroupedProfiles();
+        this.fileConfigurationObject = configObject;
     }
 
     @Override public boolean shouldImportAutomatically() {
-        return this.importAutomatically;
+        return this.fileConfigurationObject.isImportAutomatically();
     }
 
     @Override public boolean shouldPersistLocations() {
-        return this.persistLocations;
+        return this.fileConfigurationObject.isPersistLocations();
     }
 
     @Override public boolean shouldKeepSpawnLoaded() {
-        return this.keepSpawnLoaded;
+        return this.fileConfigurationObject.isKeepSpawnLoaded();
     }
 
     @Override public boolean shouldGroupProfiles() {
-        return this.groupProfiles;
+        return this.fileConfigurationObject.useGroupedProfiles();
     }
 
 }
