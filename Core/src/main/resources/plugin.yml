@@ -3,7 +3,7 @@ version: ${project.version}
 main: se.hyperver.hyperverse.Hyperverse
 api-version: 1.13
 load: STARTUP
-authors: [Citymonstret]
+authors: [Citymonstret, andrewandy]
 description: A minecraft world management plugin
 permissions:
   hyperverse.worlds:
@@ -47,4 +47,7 @@ permissions:
     default: op
   hyperverse.debugpaste:
     description: Allows players to create debug pastes
+    default: op
+  hyperverse.who:
+    description: Allows players to list players
     default: op

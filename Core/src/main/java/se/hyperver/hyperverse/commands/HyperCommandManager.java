@@ -388,7 +388,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageWorldLoadedSuccessfully);
     }
 
-    @Subcommand("find") @CommandPermission("hyperverse.find") @CommandAlias("hvf|hvfind")
+    @Subcommand("find|where") @CommandPermission("hyperverse.find") @CommandAlias("hvf|hvfind")
     @CommandCompletion("@players") @Description("Find the current world for a player")
     //public void findPlayer(final CommandSender sender, final String... players) {
     public void findPlayer(final CommandSender sender, final String player) {
@@ -402,10 +402,9 @@ public class HyperCommandManager extends BaseCommand {
             final DecimalFormat format = Messages.miscCoordinateDecimalFormat;
         MessageUtil
             .sendMessage(sender, Messages.messagePlayerCurrentWorld, "%player%", player, "%world%",
-                bukkitPlayer.getWorld().getName(), "%location%", MessageUtil
-                    .format(Messages.miscCoordinates.getDefaultValue(), "%x%",
+                bukkitPlayer.getWorld().getName(), "%x%",
                         format.format(location.getX()), "%y%", format.format(location.getY()),
-                        "%z%", format.format(location.getZ())));
+                        "%z%", format.format(location.getZ()));
         //}
     }
 
@@ -423,16 +422,17 @@ public class HyperCommandManager extends BaseCommand {
                 MessageUtil.sendMessage(sender, Messages.messageNoPlayersInWorld, "%world%", world);
                 return;
             }
+            final StringBuilder players = new StringBuilder();
             for (final Player player : bukkitWorld.getPlayers()) {
                 final Location location = player.getLocation();
-                MessageUtil
-                    .sendMessage(sender, Messages.messageListEntryCurrentPlayerWorld, "%player%",
-                        player.getDisplayName(), "%world%", world, "%location%", MessageUtil
-                            .format(Messages.miscCoordinates.getDefaultValue(), "%x%",
-                                format.format(location.getX()), "%y%",
-                                format.format(location.getY()), "%z%",
-                                format.format(location.getZ())));
+                players.append(MessageUtil.format(Messages.messageListEntryPlayer.toString(), "%player%",
+                    player.getDisplayName(), "%world%", world, "%x%",
+                    format.format(location.getX()), "%y%",
+                    format.format(location.getY()), "%z%",
+                    format.format(location.getZ())));
             }
+            MessageUtil.sendMessage(sender, Messages.messageListEntryWorld, "%players%", players.toString(),
+                "%world%", bukkitWorld.getName());
         }
         else {
             for (final World bukkitWorld : Bukkit.getWorlds()) {

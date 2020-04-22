@@ -34,9 +34,10 @@ public class Messages {
     public static final Message messageNoPlayerFound = createMessage("other.no-player-found",
         "&cPlayer with name %name% was not found.");
     public static final Message messageNoPlayersInWorld = createMessage("other.no-player-in-world",
-        "&7No players were found in %world%");
+        "&6%world%&7: There are no players in this world");
     public static final Message messagePlayerCurrentWorld = createMessage("other.player-current-world",
-        "<hover:show_text:\"%location%\">%player% &7is currently in world: &f%world%</hover> ");
+        "<hover:show_text:\"<gray>Location:</gray> <white>%x%</white><gray>, </gray><white>%y%</white><gray>, </gray><white>%z%</white>\">"
+            + "%player% &7is currently in world: &f%world%</hover> ");
     public static final Message messageWorldExists =
         createMessage("world.exists", "&cA world with that name already exists");
     public static final Message messageWorldNameInvalid = createMessage("world.invalid_name",
@@ -75,8 +76,11 @@ public class Messages {
             + "&7%name%</click></hover> &8(&7%generator%&8: &7%type%&8) - %load_status%");
     public static final Message messageListEntryCurrentWorld = createMessage("list.entry.current-world",
         "&8- &f%name% &f(%generator%&7: &f%type%) &8- %load_status%");
-    public static final Message messageListEntryCurrentPlayerWorld = createMessage("list.entry.player-current-world",
-        "<hover:show_text:\"%location%\">%player% --> &7world: &f%world%</hover> ");
+    public static final Message messageListEntryPlayer = createMessage("list.entry.player",
+        "&f<hover:show_text:\"<gray>Location:</gray> <white>%x%</white><gray>, </gray><white>%y%</white><gray>,"
+            + " </gray><white>%z%</white>\">%player%</hover>");
+    public static final Message messageListEntryWorld = createMessage("list.entry.player-current-world",
+        "&6%world%&7: %players%");
     public static final Message messageNoSuchWorld = createMessage("world.non_existent",
         "&cThere is no world with that name");
     public static final Message messageTeleporting = createMessage("teleport.teleporting",
@@ -148,9 +152,6 @@ public class Messages {
         "Name of the dimension linked to this world's end portals");
     public static final Message flagDescriptionProfileGroup = createMessage("flags.profile-group",
         "Name of the profile group that the world belongs to");
-
-    public static final Message miscCoordinates = createMessage("misc.location",
-        "&7Location: &f%x%, %y%, %z%");
 
     public static final DecimalFormat miscCoordinateDecimalFormat = new DecimalFormat("#.##");
 
