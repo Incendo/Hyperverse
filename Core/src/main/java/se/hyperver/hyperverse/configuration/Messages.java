@@ -27,6 +27,12 @@ import java.util.Objects;
 public class Messages {
 
     private static final Map<String, String> configuredMessages = Maps.newHashMap();
+    public static final Message messageConfigReloaded = createMessage("config.reload",
+        "&7Configuration has been reloaded");
+    public static final Message messageMessagesReloaded = createMessage("config.messages.reload",
+        "&7Messages have been reloaded");
+    public static final Message messageMessageReloadFailed = createMessage("config.messages.reload.failure",
+        "&cFailed to reload Hyperverse messages: %reason%");
     public static final Message messageAlreadyInWorld =
         createMessage("world.same-world", "&cYou are already in this world!");
     public static final Message messagePrefix =

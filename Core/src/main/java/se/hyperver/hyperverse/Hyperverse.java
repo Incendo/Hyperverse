@@ -21,8 +21,20 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigRenderOptions;
 import io.papermc.lib.PaperLib;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.ConfigurationOptions;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
+import org.bstats.bukkit.Metrics;
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.commands.HyperCommandManager;
+import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
@@ -30,16 +42,8 @@ import se.hyperver.hyperverse.listeners.PlayerListener;
 import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskChainModule;
+import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.world.WorldManager;
-import com.typesafe.config.ConfigParseOptions;
-import com.typesafe.config.ConfigRenderOptions;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
-import org.bstats.bukkit.Metrics;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -173,6 +177,24 @@ import java.util.Map;
             return false;
         }
         return true;
+    }
+
+    /**
+     * Reload the configuration and messages for hyperverse. If an invoker is
+     * supplied, this method will also send a user-friendly message.
+     *
+     * @param invoker An optional CommandSender who invoked the reload.
+     */
+    public boolean reloadConfiguration(@Nullable final CommandSender invoker) {
+        boolean reloadMessages = loadMessages();
+        ((FileHyperConfiguration) this.hyperConfiguration).loadConfiguration();
+        if (invoker != null) {
+            MessageUtil.sendMessage(invoker, reloadMessages ?
+                Messages.messageMessagesReloaded :
+                Messages.messageMessageReloadFailed, "%reason%", ""); //Force a reload.
+            MessageUtil.sendMessage(invoker, Messages.messageConfigReloaded);
+        }
+        return reloadMessages;
     }
 
     private boolean loadMessages() {

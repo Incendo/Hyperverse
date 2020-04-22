@@ -35,6 +35,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import se.hyperver.hyperverse.Hyperverse;
+import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
@@ -65,17 +66,19 @@ import java.util.stream.Stream;
 public class HyperCommandManager extends BaseCommand {
 
     private final WorldManager worldManager;
+    private final FileHyperConfiguration fileHyperConfiguration;
     private final HyperWorldFactory hyperWorldFactory;
     private final GlobalWorldFlagContainer globalFlagContainer;
     private final TaskChainFactory taskChainFactory;
 
     @Inject public HyperCommandManager(final Hyperverse hyperverse, final WorldManager worldManager,
         final HyperWorldFactory hyperWorldFactory, final GlobalWorldFlagContainer globalFlagContainer,
-        final TaskChainFactory taskChainFactory) {
+        final TaskChainFactory taskChainFactory, final FileHyperConfiguration hyperConfiguration) {
         this.worldManager = Objects.requireNonNull(worldManager);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
         this.globalFlagContainer = Objects.requireNonNull(globalFlagContainer);
         this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
+        this.fileHyperConfiguration = Objects.requireNonNull(hyperConfiguration);
         // Create the command manager
         final BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(hyperverse);
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
@@ -537,6 +540,12 @@ public class HyperCommandManager extends BaseCommand {
             return;
         }
         MessageUtil.sendMessage(sender, Messages.messageWorldRemoved);
+    }
+
+    @Subcommand("reload") @CommandPermission("hyperverse.reload") @CommandAlias("hvreload")
+    @Description("Reload the Hyperverse configuration")
+    public void doConfigReload(final CommandSender sender) {
+      Hyperverse.getPlugin(Hyperverse.class).reloadConfiguration(sender);
     }
 
     @Subcommand("debugpaste") @CommandPermission("hyperverse.debugpaste")
