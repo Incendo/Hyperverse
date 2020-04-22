@@ -240,9 +240,9 @@ public class HyperCommandManager extends BaseCommand {
         }
     }
 
-    @CommandPermission("hyperverse.import") @CommandAlias("hvimport") @Syntax("<world> <generator>")
+    @Subcommand("import") @CommandPermission("hyperverse.import") @CommandAlias("hvimport")
     @CommandCompletion("@import-candidates @generators ") @Description("Load a world as a hyperworld")
-    public void importWorld(final CommandSender sender, String worldName, String generator) {
+    public void importWorld(final CommandSender sender, final String worldName, final String generator) {
         if (worldManager.getWorld(worldName) != null) {
             MessageUtil.sendMessage(sender, Messages.messageWorldAlreadyImported);
             return;

@@ -17,7 +17,6 @@
 
 package se.hyperver.hyperverse.util;
 
-import com.google.inject.Inject;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.world.WorldManager;
@@ -49,6 +48,7 @@ public final class WorldUtil {
 
     /**
      * Check whether or not a world is suitable to be imported.
+     *
      * @param worldName World name.
      * @return True of directory containing a level.dat file with the same name is found.
      */
