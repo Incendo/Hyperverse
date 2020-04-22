@@ -72,6 +72,8 @@ public class Messages {
             + "&7%name%</click></hover> &8(&7%generator%&8: &7%type%&8) - %load_status%");
     public static final Message messageListEntryCurrentWorld = createMessage("list.entry.current-world",
         "&8- &f%name% &f(%generator%&7: &f%type%) &8- %load_status%");
+    public static final Message messageListEntryCurrentPlayerWorld = createMessage("list.entry.player-current-world",
+        "&8 %player% --> &7world: &f%world%");
     public static final Message messageNoSuchWorld = createMessage("world.non_existent",
         "&cThere is no world with that name");
     public static final Message messageTeleporting = createMessage("teleport.teleporting",

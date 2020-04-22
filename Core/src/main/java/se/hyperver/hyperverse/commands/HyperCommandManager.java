@@ -33,7 +33,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
@@ -387,7 +386,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageWorldLoadedSuccessfully);
     }
 
-    @Subcommand("find") @CommandPermission("hyperverse.find")
+    @Subcommand("find") @CommandPermission("hyperverse.find") @CommandAlias("hvf|hvfind")
     @CommandCompletion("@players") @Description("Find the current world for a player.")
     //public void findPlayer(final CommandSender sender, final String... players) {
     public void findPlayer(final CommandSender sender, final String player) {
@@ -401,7 +400,6 @@ public class HyperCommandManager extends BaseCommand {
                 "%world%", bukkitPlayer.getWorld().getName());
         //}
     }
-
     @Subcommand("flag set") @CommandPermission("hyperverse.flag.set")
     @CommandCompletion("@hyperworlds @flags @flag") @Description("Set a world flag")
     public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,
