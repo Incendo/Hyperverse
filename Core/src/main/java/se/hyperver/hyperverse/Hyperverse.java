@@ -186,7 +186,7 @@ import java.util.Map;
      * @param invoker An optional CommandSender who invoked the reload.
      */
     public boolean reloadConfiguration(@Nullable final CommandSender invoker) {
-        boolean reloadMessages = loadMessages();
+        final boolean reloadMessages = loadMessages();
         ((FileHyperConfiguration) this.hyperConfiguration).loadConfiguration();
         if (invoker != null) {
             MessageUtil.sendMessage(invoker, reloadMessages ?
