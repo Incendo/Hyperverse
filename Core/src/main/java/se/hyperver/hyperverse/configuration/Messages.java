@@ -30,6 +30,10 @@ public class Messages {
         createMessage("world.same-world", "&cYou are already in this world!");
     public static final Message messagePrefix =
         createMessage("other.prefix", "&8[&6Hyperverse&8] ");
+    public static final Message messageNoPlayerFound = createMessage("other.no-player-found",
+        "&cPlayer with name %name% was not found.");
+    public static final Message messagePlayerCurrentWorld = createMessage("other.player-current-world",
+        "&7%player% is currently in world: &f%world%");
     public static final Message messageWorldExists =
         createMessage("world.exists", "&cA world with that name already exists");
     public static final Message messageWorldNameInvalid = createMessage("world.invalid_name",
