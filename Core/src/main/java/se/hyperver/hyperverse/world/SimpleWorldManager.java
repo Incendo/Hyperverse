@@ -188,7 +188,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
     @Override
     public WorldImportResult importWorld(@NotNull final World world, final boolean vanilla,
         @Nullable final String generator) {
-        if (this.worldMap.containsKey(world.getUID())) {
+        if (this.getWorld(world.getName()) != null) {
             return WorldImportResult.ALREADY_IMPORTED;
         }
         final WorldConfiguration worldConfiguration = WorldConfiguration.fromWorld(world);
