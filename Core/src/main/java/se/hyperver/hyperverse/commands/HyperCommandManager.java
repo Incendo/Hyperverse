@@ -28,6 +28,7 @@ import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -52,6 +53,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -387,7 +389,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("find") @CommandPermission("hyperverse.find") @CommandAlias("hvf|hvfind")
-    @CommandCompletion("@players") @Description("Find the current world for a player.")
+    @CommandCompletion("@players") @Description("Find the current world for a player")
     //public void findPlayer(final CommandSender sender, final String... players) {
     public void findPlayer(final CommandSender sender, final String player) {
         //for (String player : players) {
@@ -396,10 +398,49 @@ public class HyperCommandManager extends BaseCommand {
                 MessageUtil.sendMessage(sender, Messages.messageNoPlayerFound, "%name%", player);
                 return;
             }
-            MessageUtil.sendMessage(sender, Messages.messagePlayerCurrentWorld, "%player%", player,
-                "%world%", bukkitPlayer.getWorld().getName());
+            final Location location = bukkitPlayer.getLocation();
+            final DecimalFormat format = Messages.miscCoordinateDecimalFormat;
+        MessageUtil
+            .sendMessage(sender, Messages.messagePlayerCurrentWorld, "%player%", player, "%world%",
+                bukkitPlayer.getWorld().getName(), "%location%", MessageUtil
+                    .format(Messages.miscCoordinates.getDefaultValue(), "%x%",
+                        format.format(location.getX()), "%y%", format.format(location.getY()),
+                        "%z%", format.format(location.getZ())));
         //}
     }
+
+    @Subcommand("who") @CommandPermission("hyperverse.who") @CommandAlias("hvwho")
+    @CommandCompletion("@hyperworlds") @Description("Find the current players in a world")
+    public void findPlayersPresent(final CommandSender sender, @Optional final String world) {
+        if (world != null) {
+            final World bukkitWorld = Bukkit.getWorld(world);
+            if (bukkitWorld == null) {
+                MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+                return;
+            }
+            final DecimalFormat format = Messages.miscCoordinateDecimalFormat;
+            if (bukkitWorld.getPlayers().isEmpty()) {
+                MessageUtil.sendMessage(sender, Messages.messageNoPlayersInWorld, "%world%", world);
+                return;
+            }
+            for (final Player player : bukkitWorld.getPlayers()) {
+                final Location location = player.getLocation();
+                MessageUtil
+                    .sendMessage(sender, Messages.messageListEntryCurrentPlayerWorld, "%player%",
+                        player.getDisplayName(), "%world%", world, "%location%", MessageUtil
+                            .format(Messages.miscCoordinates.getDefaultValue(), "%x%",
+                                format.format(location.getX()), "%y%",
+                                format.format(location.getY()), "%z%",
+                                format.format(location.getZ())));
+            }
+        }
+        else {
+            for (final World bukkitWorld : Bukkit.getWorlds()) {
+                findPlayersPresent(sender, bukkitWorld.getName());
+            }
+        }
+    }
+
     @Subcommand("flag set") @CommandPermission("hyperverse.flag.set")
     @CommandCompletion("@hyperworlds @flags @flag") @Description("Set a world flag")
     public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,

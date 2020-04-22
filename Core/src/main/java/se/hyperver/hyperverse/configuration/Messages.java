@@ -20,6 +20,7 @@ package se.hyperver.hyperverse.configuration;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,8 +33,10 @@ public class Messages {
         createMessage("other.prefix", "&8[&6Hyperverse&8] ");
     public static final Message messageNoPlayerFound = createMessage("other.no-player-found",
         "&cPlayer with name %name% was not found.");
+    public static final Message messageNoPlayersInWorld = createMessage("other.no-player-in-world",
+        "&7No players were found in %world%");
     public static final Message messagePlayerCurrentWorld = createMessage("other.player-current-world",
-        "&7%player% is currently in world: &f%world%");
+        "<hover:show_text:\"%location%\">%player% &7is currently in world: &f%world%</hover> ");
     public static final Message messageWorldExists =
         createMessage("world.exists", "&cA world with that name already exists");
     public static final Message messageWorldNameInvalid = createMessage("world.invalid_name",
@@ -73,7 +76,7 @@ public class Messages {
     public static final Message messageListEntryCurrentWorld = createMessage("list.entry.current-world",
         "&8- &f%name% &f(%generator%&7: &f%type%) &8- %load_status%");
     public static final Message messageListEntryCurrentPlayerWorld = createMessage("list.entry.player-current-world",
-        "&8 %player% --> &7world: &f%world%");
+        "<hover:show_text:\"%location%\">%player% --> &7world: &f%world%</hover> ");
     public static final Message messageNoSuchWorld = createMessage("world.non_existent",
         "&cThere is no world with that name");
     public static final Message messageTeleporting = createMessage("teleport.teleporting",
@@ -145,6 +148,11 @@ public class Messages {
         "Name of the dimension linked to this world's end portals");
     public static final Message flagDescriptionProfileGroup = createMessage("flags.profile-group",
         "Name of the profile group that the world belongs to");
+
+    public static final Message miscCoordinates = createMessage("misc.location",
+        "&7Location: &f%x%, %y%, %z%");
+
+    public static final DecimalFormat miscCoordinateDecimalFormat = new DecimalFormat("#.##");
 
     @NotNull public static Map<String, String> getConfiguredMessages() {
         return configuredMessages;

@@ -31,7 +31,7 @@ permissions:
     description: Allows players to import worlds
     default: op
   hyperverse.find:
-    description: Allows players to find the current world of another player.
+    description: Allows players to find the current world of another player
     default: op
   hyperverse.flag.list:
     description: Allows player to list available flags
