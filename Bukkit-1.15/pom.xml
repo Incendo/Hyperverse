@@ -62,16 +62,12 @@
                             <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.acf</shadedPattern>
+                            <pattern>co.aikar</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>me.minidigger.minimessage</pattern>
                             <shadedPattern>se.hyperver.hyperverse.messages</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>co.aikar.taskchain</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.taskchain</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
