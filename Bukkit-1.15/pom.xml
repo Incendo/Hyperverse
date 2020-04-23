@@ -68,8 +68,24 @@
                             <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>co.aikar</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.aikar</shadedPattern>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.commands</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.locales</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.locales</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.taskchain</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.taskchain</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.util</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.util</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.jodah.expiringmap</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.expiringmap</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>me.minidigger.minimessage</pattern>
