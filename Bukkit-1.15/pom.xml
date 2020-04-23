@@ -10,7 +10,13 @@
 
     <modelVersion>4.0.0</modelVersion>
     <name>Bukkit 1.15</name>
-    <artifactId>Bukkit-1.15</artifactId>
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 3</name>
+            <url>https://raw.githubusercontent.com/Sauilitired/Hyperverse/master/LICENSE</url>
+        </license>
+    </licenses><artifactId>Bukkit-1.15</artifactId>
+
 
     <build>
         <defaultGoal>clean package</defaultGoal>

@@ -7,10 +7,19 @@
         <groupId>se.hyperver.hyperverse</groupId>
         <version>0.1.0</version>
     </parent>
+
     <name>Core</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>Core</artifactId>
     <packaging>jar</packaging>
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 3</name>
+            <url>https://raw.githubusercontent.com/Sauilitired/Hyperverse/master/LICENSE</url>
+        </license>
+    </licenses>
+    <url>https://github.com/Sauilitired/Hyperverse</url>
+
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -186,6 +195,16 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <fileTemplate>Core/src/license/license.ftl</fileTemplate>
+                    <thirdPartyFilename>THIRD-PARTY.md</thirdPartyFilename>
+                    <outputDirectory>../</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

@@ -10,9 +10,14 @@
     <version>0.1.0</version>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>
-
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 3</name>
+            <url>https://raw.githubusercontent.com/Sauilitired/Hyperverse/master/LICENSE</url>
+        </license>
+    </licenses>
+    <url>https://github.com/Sauilitired/Hyperverse</url>
     <name>Hyperverse</name>
-
     <description>A minecraft world management plugin</description>
     <properties>
         <java.version>1.8</java.version>
