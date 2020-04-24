@@ -137,6 +137,8 @@ public class Messages {
         "&7The paste file has been uploaded to: %paste%");
     public static final Message messagePasteFailed = createMessage("paste.failed",
         "&cFailed to create the debug paste. Reason: %reason%");
+    public static final Message messageConfigurationReloaded = createMessage("config.reloaded",
+        "&7Hyperverse configuration files were reloaded successfully");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",

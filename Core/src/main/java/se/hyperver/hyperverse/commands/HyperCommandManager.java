@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -578,7 +579,11 @@ public class HyperCommandManager extends BaseCommand {
     @Subcommand("reload") @CommandPermission("hyperverse.reload") @CommandAlias("hvreload")
     @Description("Reload the Hyperverse configuration")
     public void doConfigReload(final CommandSender sender) {
-      Hyperverse.getPlugin(Hyperverse.class).reloadConfiguration(sender);
+        if (Hyperverse.getPlugin(Hyperverse.class).reloadConfiguration(sender)) {
+            MessageUtil.sendMessage(sender, Messages.messageConfigReloaded);
+        } else {
+            throw new CommandException("Failed to reload configuration files");
+        }
     }
 
     @Subcommand("debugpaste") @CommandPermission("hyperverse.debugpaste")

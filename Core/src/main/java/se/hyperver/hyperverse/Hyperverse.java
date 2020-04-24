@@ -32,6 +32,7 @@ import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.commands.HyperCommandManager;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
@@ -54,15 +55,31 @@ import java.util.Map;
 
 /**
  * Plugin main class
+ * {@inheritDoc}
  */
-@Singleton public final class Hyperverse extends JavaPlugin {
+@Singleton public final class Hyperverse extends JavaPlugin implements HyperverseAPI {
 
     public static final int BSTATS_ID = 7177;
 
+    private static HyperverseAPI instance;
     private WorldManager worldManager;
     private Injector injector;
     private HyperDatabase hyperDatabase;
     private HyperConfiguration hyperConfiguration;
+
+    /**
+     * Get the (singleton) implementation of
+     * {@link HyperverseAPI}
+     *
+     * @return API implementation
+     */
+    public static HyperverseAPI getApi() {
+        return instance;
+    }
+
+    @Override public void onLoad() {
+        instance = this;
+    }
 
     @Override public void onEnable() {
         // Disgusting try-catch mess below, but Guice freaks out completely if it encounters
@@ -244,6 +261,22 @@ import java.util.Map;
             return false;
         }
         return true;
+    }
+
+    @Override @NotNull public WorldManager getWorldManager() {
+        return this.worldManager;
+    }
+
+    @Override @NotNull public Injector getInjector() {
+        return this.injector;
+    }
+
+    @Override @NotNull public HyperDatabase getDatabase() {
+        return this.hyperDatabase;
+    }
+
+    @Override @NotNull public HyperConfiguration getConfiguration() {
+        return this.hyperConfiguration;
     }
 
 }
