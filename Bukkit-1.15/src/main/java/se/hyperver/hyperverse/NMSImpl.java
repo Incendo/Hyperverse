@@ -85,7 +85,7 @@ public class NMSImpl implements NMS {
         }
     }
 
-    @Override public @Nullable Location getOrCreateNetherPortal(@NotNull final Entity entity,
+    @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final Entity entity,
         @NotNull final Location origin) {
         final WorldServer worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
         final PortalTravelAgent portalTravelAgent = Objects.requireNonNull(worldServer.getTravelAgent());
@@ -178,6 +178,7 @@ public class NMSImpl implements NMS {
                     spawnY, spawnZ);
 
                 final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+
                 // We re-write the extra Bukkit data as to not
                 // mess up the profile
                 ((CraftPlayer) player).setExtraData(compound);
@@ -187,14 +188,18 @@ public class NMSImpl implements NMS {
                 compound.setString("world", player.getWorld().getName());
                 // Store persistent values
                 ((CraftPlayer) player).storeBukkitValues(compound);
+
                 // We start by doing a total reset
                 entityPlayer.reset();
                 entityPlayer.f(compound);
+
                 // entityPlayer.updateEffects = true;
                 // entityPlayer.updateAbilities();
                 player.teleport(originLocation);
+
                 final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
                 final DimensionManager dimensionManager = worldServer.worldProvider.getDimensionManager();
+
                 // Prevent annoying message
                 entityPlayer.decouple();
                 worldServer.removePlayer(entityPlayer);
@@ -212,8 +217,10 @@ public class NMSImpl implements NMS {
                 } catch (final NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
+
                 entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, dimensionManager,
                     true, originLocation, true);
+
                 // Apply health and foodLevel
                 player.setHealth(health);
                 player.setFoodLevel(foodLevel);
