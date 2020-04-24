@@ -84,7 +84,7 @@ public class HyperCommandManager extends BaseCommand {
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
             context -> worldManager.getWorlds().stream().map(HyperWorld::getConfiguration)
                 .map(WorldConfiguration::getName).filter(worldName -> {
-                    final String selection = context.getConfig("selection", "not_in");
+                    final String selection = context.getConfig("selection", "in");
                     final boolean inWorld =
                         worldName.equalsIgnoreCase(context.getPlayer().getWorld().getName());
                     return selection.equalsIgnoreCase("not_in") != inWorld;
