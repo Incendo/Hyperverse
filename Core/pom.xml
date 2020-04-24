@@ -137,8 +137,14 @@
         </dependency>
         <dependency>
             <groupId>me.minidigger</groupId>
-            <artifactId>MiniMessage</artifactId>
-            <version>1.0.1</version>
+            <artifactId>minimessage-text</artifactId>
+            <version>2.0.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>text-adapter-bukkit</artifactId>
+            <version>3.0.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

@@ -20,6 +20,7 @@ package se.hyperver.hyperverse.util;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
 import me.minidigger.minimessage.MiniMessageParser;
+import net.kyori.text.adapter.bukkit.TextAdapter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,7 @@ public final class MessageUtil {
         final String prefixedMessage = ChatColor.translateAlternateColorCodes('&',
             Messages.messagePrefix.toString() + replacedMessage);
         if (prefixedMessage.contains("<") && prefixedMessage.contains(">")) {
-            recipient.spigot().sendMessage(MiniMessageParser.parseFormat(prefixedMessage));
+            TextAdapter.sendComponent(recipient, MiniMessageParser.parseFormat(prefixedMessage));
         } else {
             recipient.sendMessage(prefixedMessage);
         }
