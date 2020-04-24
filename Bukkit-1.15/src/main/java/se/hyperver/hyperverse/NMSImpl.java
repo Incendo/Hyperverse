@@ -19,6 +19,7 @@ package se.hyperver.hyperverse;
 
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
+import org.bukkit.Bukkit;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.util.NMS;
 import io.papermc.lib.PaperLib;
@@ -167,6 +168,15 @@ public class NMSImpl implements NMS {
                 // give them a little help
                 final float health = compound.getFloat("Health");
                 final int foodLevel = compound.getInt("foodLevel");
+
+                // Restore bed spawn
+                final String spawnWorld = compound.getString("SpawnWorld");
+                final int spawnX = compound.getInt("SpawnX");
+                final int spawnY = compound.getInt("SpawnY");
+                final int spawnZ = compound.getInt("SpawnZ");
+                final Location spawnLocation = new Location(Bukkit.getWorld(spawnWorld), spawnX,
+                    spawnY, spawnZ);
+
                 final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
                 // We re-write the extra Bukkit data as to not
                 // mess up the profile
@@ -208,6 +218,7 @@ public class NMSImpl implements NMS {
                 player.setHealth(health);
                 player.setFoodLevel(foodLevel);
                 player.setPortalCooldown(40);
+                player.setBedSpawnLocation(spawnLocation, true);
             });
         }).execute(whenDone);
     }

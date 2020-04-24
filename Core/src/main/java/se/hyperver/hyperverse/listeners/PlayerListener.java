@@ -180,6 +180,7 @@ public class PlayerListener implements Listener {
                         }, 1L));
                 } else {
                     // The player has no stored data. Reset everything
+                    player.setBedSpawnLocation(player.getWorld().getSpawnLocation(), true);
                     player.getInventory().clear();
                     player.getEnderChest().clear();
                     player.setTotalExperience(0);

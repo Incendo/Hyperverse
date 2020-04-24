@@ -22,10 +22,10 @@ Current Features:
 - Persistent world locations
 - Nether & end portal linking
 - Per world player data
+- Per world beds
 
 Planned Features:
 - More flags
-- Per world beds
 - Portals, sign teleportation
 
 ## Links
