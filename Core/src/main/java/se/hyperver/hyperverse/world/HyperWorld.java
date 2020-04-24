@@ -17,16 +17,18 @@
 
 package se.hyperver.hyperverse.world;
 
-import se.hyperver.hyperverse.exception.HyperWorldValidationException;
-import se.hyperver.hyperverse.flags.FlagParseException;
-import se.hyperver.hyperverse.flags.WorldFlag;
-import se.hyperver.hyperverse.teleportation.TeleportationManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import se.hyperver.hyperverse.exception.HyperWorldValidationException;
+import se.hyperver.hyperverse.flags.FlagParseException;
+import se.hyperver.hyperverse.flags.WorldFlag;
+import se.hyperver.hyperverse.teleportation.TeleportationManager;
+
+import java.util.Collection;
 
 /**
  * World type used throughout Hyperverse
@@ -150,12 +152,19 @@ public interface HyperWorld {
      *
      * @return The worlds' teleportation manager
      */
-    TeleportationManager getTeleportationManager();
+    @NotNull TeleportationManager getTeleportationManager();
 
     /**
      * Refresh the world flags
      */
     void refreshFlags();
+
+    /**
+     * Return all applicable world flags
+     *
+     * @return Immutable view of all flags
+     */
+    @NotNull Collection<WorldFlag<?, ?>> getFlags();
 
     /**
      * Result of unloading or deleting a world

@@ -46,6 +46,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -67,6 +69,7 @@ public class SimpleWorld implements HyperWorld {
     private final HyperDatabase hyperDatabase;
     private final HyperConfiguration hyperConfiguration;
     private final TeleportationManager teleportationManager;
+    private final GlobalWorldFlagContainer globalWorldFlagContainer;
     private World bukkitWorld;
 
     @Inject public SimpleWorld(@Assisted final UUID worldUUID,
@@ -83,6 +86,7 @@ public class SimpleWorld implements HyperWorld {
         this.hyperDatabase = Objects.requireNonNull(hyperDatabase);
         this.hyperConfiguration = Objects.requireNonNull(hyperConfiguration);
         this.teleportationManager = Objects.requireNonNull(teleportationManagerFactory).create(this);
+        this.globalWorldFlagContainer = Objects.requireNonNull(globalFlagContainer);
         this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag, type) -> {
             if (flagsInitialized) {
                 if (type == FlagContainer.WorldFlagUpdateType.FLAG_REMOVED) {
@@ -360,6 +364,15 @@ public class SimpleWorld implements HyperWorld {
         if (this.bukkitWorld != null) {
             this.bukkitWorld.setDifficulty(this.getFlag(DifficultyFlag.class));
         }
+    }
+
+    @Override @NotNull public Collection<WorldFlag<?, ?>> getFlags() {
+        final Collection<Class<?>> recognizedFlags = this.globalWorldFlagContainer.getFlagMap().keySet();
+        final Collection<WorldFlag<?, ?>> flags = new ArrayList<>();
+        for (final Class<?> flagClass : recognizedFlags) {
+            flags.add(this.flagContainer.getFlagErased(flagClass));
+        }
+        return flags;
     }
 
 }
