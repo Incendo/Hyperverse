@@ -91,6 +91,10 @@
                             <pattern>me.minidigger.minimessage</pattern>
                             <shadedPattern>se.hyperver.hyperverse.messages</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.kyori</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
             </plugin>
@@ -101,7 +105,7 @@
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
             <artifactId>Core</artifactId>
-            <version>0.1.0</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
