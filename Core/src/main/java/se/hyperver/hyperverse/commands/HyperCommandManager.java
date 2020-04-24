@@ -82,12 +82,45 @@ public class HyperCommandManager extends BaseCommand {
         // Create the command manager
         final BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(hyperverse);
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
-            context -> worldManager.getWorlds().stream().map(HyperWorld::getConfiguration)
-                .map(WorldConfiguration::getName).filter(worldName -> {
-                    final String selection = context.getConfig("selection", "all");
+            context -> worldManager.getWorlds().stream().filter(hyperWorld -> {
+                final String stateSel = context.getConfig("state", "loaded").toLowerCase();
+                final String playerSel = context.getConfig("players", "").toLowerCase();
+                if (!hyperWorld.isLoaded()) {
+                    return false;
+                }
+                assert hyperWorld.getBukkitWorld() != null;
+                boolean ret = true;
+                switch (stateSel) {
+                    case "loaded":
+                        ret = hyperWorld.isLoaded(); break;
+                    case "not_loaded":
+                        ret = !hyperWorld.isLoaded(); break;
+                    default:
+                        break;
+                }
+                switch (playerSel) {
+                    case "no_players":
+                        ret = ret && hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
+                    case "has_players":
+                        ret = ret && !hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
+                    default:
+                        break;
+                }
+                return ret;
+
+            }).map(HyperWorld::getConfiguration).map(WorldConfiguration::getName)
+                .filter(worldName -> {
+                    final String selection = context.getConfig("player", "").toLowerCase();
                     final boolean inWorld =
                         worldName.equalsIgnoreCase(context.getPlayer().getWorld().getName());
-                    return selection.equalsIgnoreCase("not_in") != inWorld;
+                    switch (selection) {
+                        case "not_in":
+                            return !inWorld;
+                        case "in":
+                            return inWorld;
+                        default:
+                            return true;
+                    }
                 }).collect(Collectors.toList()));
         bukkitCommandManager.getCommandCompletions()
             .registerAsyncCompletion("import-candidates", context -> {
@@ -320,7 +353,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport")
-    @CommandCompletion("@hyperworlds:selection=not_in") @Description("Teleport between hyperverse worlds")
+    @CommandCompletion("@hyperworlds:player=not_in,state=loaded") @Description("Teleport between hyperverse worlds")
     public void doTeleport(final Player player, final HyperWorld world) {
         if (world == null) {
             return;
@@ -349,7 +382,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("unload") @CommandPermission("hyperverse.unload")
-    @CommandCompletion("@hyperworlds") @Description("Unload a world")
+    @CommandCompletion("@hyperworlds:state=loaded") @Description("Unload a world")
     public void doUnload(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
             return;
@@ -368,7 +401,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("load") @CommandPermission("hyperverse.load")
-    @CommandCompletion("@hyperworlds") @Description("Load a world")
+    @CommandCompletion("@hyperworlds:state=unloaded") @Description("Load a world")
     public void doLoad(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
             return;
