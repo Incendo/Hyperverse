@@ -5,7 +5,8 @@
     <parent>
         <artifactId>Hyperverse</artifactId>
         <groupId>se.hyperver.hyperverse</groupId>
-        <version>0.1.0</version>
+        <version>${revision}</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <name>Core</name>

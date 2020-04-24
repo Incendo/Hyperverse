@@ -51,3 +51,37 @@ guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hype
 <p align="center">
 <img src="https://bstats.org/signatures/bukkit/Hyperverse.svg" />
 </p>
+
+## Maven
+
+```xml
+<repositories>
+    <repository>
+        <id>intellectualsites-snapshots</id>
+        <url>https://mvn.intellectualsites.com/content/repositories/snapshots</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+      <groupId>se.hyperver.hyperverse</groupId>
+      <artifactId>Core</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>se.hyperver.hyperverse</groupId>
+      <artifactId>Core</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <classifier>javadoc</classifier>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>se.hyperver.hyperverse</groupId>
+      <artifactId>Core</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
+</dependencies>
+```
