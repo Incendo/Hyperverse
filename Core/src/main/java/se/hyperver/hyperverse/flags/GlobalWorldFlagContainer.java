@@ -17,6 +17,7 @@
 
 package se.hyperver.hyperverse.flags;
 
+import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.flags.implementation.EndFlag;
 import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
 import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
@@ -53,6 +54,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(NetherFlag.NETHER_FLAG_DEFAULT);
         this.addFlag(EndFlag.END_FLAG_DEFAULT);
         this.addFlag(ProfileGroupFlag.PROFILE_GROUP_FLAG_EMPTY);
+        this.addFlag(DifficultyFlag.DIFFICULTY_FLAG_NORMAL);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {

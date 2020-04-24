@@ -29,6 +29,7 @@ import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
+import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.modules.FlagContainerFactory;
 import se.hyperver.hyperverse.modules.HyperWorldCreatorFactory;
 import se.hyperver.hyperverse.modules.TeleportationManagerFactory;
@@ -237,6 +238,7 @@ public class SimpleWorld implements HyperWorld {
         World world = Bukkit.getWorld(this.worldUUID);
         if (world != null) {
             this.bukkitWorld = world;
+            this.refreshFlags();
             return;
         }
         // Otherwise we need to create the world
@@ -254,6 +256,7 @@ public class SimpleWorld implements HyperWorld {
         if (hyperConfiguration.shouldKeepSpawnLoaded()) {
             this.bukkitWorld.setKeepSpawnInMemory(true);
         }
+        this.refreshFlags();
     }
 
     @Override public void teleportPlayer(@NotNull final Player player) {
@@ -337,6 +340,7 @@ public class SimpleWorld implements HyperWorld {
     public <T> void setFlag(@NotNull final WorldFlag<T, ?> flag, @NotNull final String value)
         throws FlagParseException {
         this.flagContainer.addFlag(flag.parse(value));
+        this.refreshFlags();
     }
 
     @Override public <T> void removeFlag(@NotNull final WorldFlag<T, ?> flagInstance) {
@@ -350,6 +354,12 @@ public class SimpleWorld implements HyperWorld {
 
     @Override @NotNull public TeleportationManager getTeleportationManager() {
         return this.teleportationManager;
+    }
+
+    @Override public void refreshFlags() {
+        if (this.bukkitWorld != null) {
+            this.bukkitWorld.setDifficulty(this.getFlag(DifficultyFlag.class));
+        }
     }
 
 }

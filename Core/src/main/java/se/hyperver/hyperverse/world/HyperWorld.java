@@ -153,6 +153,11 @@ public interface HyperWorld {
     TeleportationManager getTeleportationManager();
 
     /**
+     * Refresh the world flags
+     */
+    void refreshFlags();
+
+    /**
      * Result of unloading or deleting a world
      */
     enum WorldUnloadResult {

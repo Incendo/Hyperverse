@@ -140,6 +140,8 @@ public class SimpleWorldManager implements WorldManager, Listener {
                 } else {
                     this.attemptCreate(hyperWorld);
                 }
+            } else {
+                hyperWorld.refreshFlags();
             }
         }
     }

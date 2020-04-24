@@ -140,7 +140,7 @@ public class Messages {
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
-        "World gamemode. Available values: survival, creative, adventure, spectator");
+        "World gamemode. Available values: survival, creative, adventure and spectator");
     public static final Message flagDescriptionLocalRespawn = createMessage("flags.local-respawn",
         "Whether or not players should respawn at their beds/global spawn, or respawn in this world"
             + " if they die inside it");
@@ -158,6 +158,8 @@ public class Messages {
         "Name of the dimension linked to this world's end portals");
     public static final Message flagDescriptionProfileGroup = createMessage("flags.profile-group",
         "Name of the profile group that the world belongs to");
+    public static final Message flagDescriptionDifficulty = createMessage("flags.difficulty",
+        "World difficulty. Available values are: peaceful, easy, normal and hard");
 
     public static final DecimalFormat miscCoordinateDecimalFormat = new DecimalFormat("#.##");
 
