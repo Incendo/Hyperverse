@@ -83,7 +83,7 @@ public class HyperCommandManager extends BaseCommand {
         final BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(hyperverse);
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
             context -> worldManager.getWorlds().stream().filter(hyperWorld -> {
-                final String stateSel = context.getConfig("state", "loaded").toLowerCase();
+                final String stateSel = context.getConfig("state", "").toLowerCase();
                 final String playerSel = context.getConfig("players", "").toLowerCase();
                 if (!hyperWorld.isLoaded()) {
                     return false;
