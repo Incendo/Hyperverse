@@ -86,7 +86,8 @@ public final class SimpleTeleportationManager implements TeleportationManager {
 
     @Override public void teleportPlayer(@NotNull final Player player,
         @NotNull final Location location) {
-        PaperLib.teleportAsync(player, Objects.requireNonNull(location));
+        PaperLib.teleportAsync(player, Objects.requireNonNull(location)).thenAccept(l ->
+            player.setPortalCooldown(100));
     }
 
     @Override @Nullable public Location netherDestination(@NotNull final Entity entity,

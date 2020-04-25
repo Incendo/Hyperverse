@@ -259,6 +259,12 @@ public class PlayerListener implements Listener {
         if (hyperWorld == null) {
             return;
         }
+
+        if (event.getPlayer().getPortalCooldown() > 0) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
             final Location destination = hyperWorld.getTeleportationManager()
                 .netherDestination(event.getPlayer(), event.getFrom());
