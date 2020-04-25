@@ -19,14 +19,25 @@ package se.hyperver.hyperverse.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandManager;
+import co.aikar.commands.BukkitMessageFormatter;
 import co.aikar.commands.CommandHelp;
+import co.aikar.commands.InvalidCommandArgument;
+import co.aikar.commands.MessageType;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Optional;
-import co.aikar.commands.annotation.*;
+import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -35,6 +46,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.Message;
@@ -48,7 +60,11 @@ import se.hyperver.hyperverse.util.IncendoPaster;
 import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.util.SeedUtil;
 import se.hyperver.hyperverse.util.WorldUtil;
-import se.hyperver.hyperverse.world.*;
+import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.world.WorldConfiguration;
+import se.hyperver.hyperverse.world.WorldConfigurationBuilder;
+import se.hyperver.hyperverse.world.WorldManager;
+import se.hyperver.hyperverse.world.WorldType;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +72,14 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +89,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused")
 public class HyperCommandManager extends BaseCommand {
 
+    private final BukkitCommandManager bukkitCommandManager;
     private final WorldManager worldManager;
     private final FileHyperConfiguration fileHyperConfiguration;
     private final HyperWorldFactory hyperWorldFactory;
@@ -80,8 +104,35 @@ public class HyperCommandManager extends BaseCommand {
         this.globalFlagContainer = Objects.requireNonNull(globalFlagContainer);
         this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
         this.fileHyperConfiguration = Objects.requireNonNull(hyperConfiguration);
+
         // Create the command manager
-        final BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(hyperverse);
+        bukkitCommandManager = new BukkitCommandManager(hyperverse);
+        bukkitCommandManager.usePerIssuerLocale(true, true);
+        bukkitCommandManager.getLocales().addMessages(Locale.ENGLISH, Messages.getMessages());
+        bukkitCommandManager.setDefaultFormatter(new BukkitMessageFormatter(ChatColor.GRAY) {
+            @Override public String format(@NotNull final String message) {
+                return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
+                    + super.format(message);
+            }
+        });
+        bukkitCommandManager.setFormat(MessageType.ERROR, new BukkitMessageFormatter(ChatColor.RED) {
+            @Override public String format(final String message) {
+                return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
+                    + ChatColor.RED + message;
+            }
+        });
+        bukkitCommandManager.setFormat(MessageType.SYNTAX, new BukkitMessageFormatter(ChatColor.GRAY, ChatColor.GOLD, ChatColor.WHITE) {
+            @Override public String format(final String message) {
+                return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
+                    + ChatColor.GRAY + super.format(message);
+            }
+        });
+        bukkitCommandManager.setFormat(MessageType.HELP, new BukkitMessageFormatter(ChatColor.GRAY, ChatColor.GOLD, ChatColor.WHITE) {
+            @Override public String format(final String message) {
+                return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
+                    + ChatColor.GRAY + super.format(message);
+            }
+        });
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
             context -> worldManager.getWorlds().stream().filter(hyperWorld -> {
                 final String stateSel = context.getConfig("state", "").toLowerCase();
@@ -112,7 +163,7 @@ public class HyperCommandManager extends BaseCommand {
             }).map(HyperWorld::getConfiguration).map(WorldConfiguration::getName)
                 .filter(worldName -> {
                     final String selection = context.getConfig("player", "").toLowerCase();
-                    final boolean inWorld =
+                    final boolean inWorld = context.getIssuer().isPlayer() &&
                         worldName.equalsIgnoreCase(context.getPlayer().getWorld().getName());
                     switch (selection) {
                         case "not_in":
@@ -137,7 +188,7 @@ public class HyperCommandManager extends BaseCommand {
                     return Collections.emptyList();
                 }
             });
-        bukkitCommandManager.getCommandCompletions().registerCompletion("worldtypes", context -> {
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("worldtypes", context -> {
             if (context.getInput().contains(" ")) {
                 return Collections.emptyList();
             }
@@ -159,10 +210,10 @@ public class HyperCommandManager extends BaseCommand {
                 }
                 return generators;
             });
-        bukkitCommandManager.getCommandCompletions().registerCompletion("flags", context ->
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("flags", context ->
             globalFlagContainer.getFlagMap().values().stream().map(WorldFlag::getName).collect(
                 Collectors.toList()));
-        bukkitCommandManager.getCommandCompletions().registerCompletion("gamerules", context ->
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("gamerules", context ->
             Arrays.stream(GameRule.values()).map(GameRule::getName).collect(Collectors.toList()));
         bukkitCommandManager.getCommandCompletions().registerCompletion("flag", context -> {
             final WorldFlag<?, ?> flag = context.getContextValue(WorldFlag.class);
@@ -171,7 +222,7 @@ public class HyperCommandManager extends BaseCommand {
             }
             return Collections.emptyList();
         });
-        bukkitCommandManager.getCommandCompletions().registerCompletion("gamerule", context -> {
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("gamerule", context -> {
             final GameRule<?> gameRule = context.getContextValue(GameRule.class);
             if (gameRule != null) {
                 if (gameRule.getType() == Boolean.class) {
@@ -182,17 +233,19 @@ public class HyperCommandManager extends BaseCommand {
         });
         bukkitCommandManager.getCommandContexts().registerContext(WorldType.class, context -> {
             final String arg = context.popFirstArg();
-            return WorldType.fromString(arg).orElse(null);
+            return WorldType.fromString(arg).orElseThrow(() ->
+                new InvalidCommandArgument(Messages.messageInvalidWorldType.withoutColorCodes()));
         });
         bukkitCommandManager.getCommandContexts().registerContext(HyperWorld.class, context -> {
             final HyperWorld hyperWorld = worldManager.getWorld(context.popFirstArg());
             if (hyperWorld == null) {
-                MessageUtil.sendMessage(context.getSender(), Messages.messageNoSuchWorld);
+                throw new InvalidCommandArgument(Messages.messageNoSuchWorld.withoutColorCodes());
             }
             return hyperWorld;
         });
         bukkitCommandManager.getCommandContexts().registerContext(GameRule.class, context ->
-            GameRule.getByName(context.popFirstArg()));
+            java.util.Optional.ofNullable(GameRule.getByName(context.popFirstArg()))
+                .orElseThrow(() -> new InvalidCommandArgument(Messages.messageInvalidGameRule.withoutColorCodes())));
         bukkitCommandManager.getCommandContexts().registerContext(WorldFlag.class, context ->
             this.globalFlagContainer.getFlagFromString(context.popFirstArg().toLowerCase()));
         //noinspection deprecation
@@ -207,7 +260,7 @@ public class HyperCommandManager extends BaseCommand {
     @Subcommand("create") @Syntax(
         "<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed]"
             + " [generate-structures: true, false] [settings...]")
-    @CommandPermission("hyperverse.create") @Description("Create a new world")
+    @CommandPermission("hyperverse.create") @Description("{@@command.create}")
     @CommandCompletion("@null @generators @worldtypes @null @null true|false @null")
     public void createWorld(final CommandSender sender, final String world, String generator,
         @Default("overworld") final WorldType type, @Optional final Long specifiedSeed,
@@ -280,7 +333,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("import") @CommandPermission("hyperverse.import") @CommandAlias("hvimport")
-    @CommandCompletion("@import-candidates @generators ") @Description("Load a world as a hyperworld")
+    @CommandCompletion("@import-candidates @generators ") @Description("{@@command.import}")
     public void importWorld(final CommandSender sender, final String worldName, final String generator) {
         if (worldManager.getWorld(worldName) != null) {
             MessageUtil.sendMessage(sender, Messages.messageWorldAlreadyImported);
@@ -314,7 +367,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("list|l|worlds") @CommandPermission("hyperverse.list") @CommandAlias("hvl")
-    @Description("List hyperverse worlds") public void doList(final CommandSender sender) {
+    @Description("{@@command.list}") public void doList(final CommandSender sender) {
         MessageUtil.sendMessage(sender, Messages.messageListHeader);
         Stream<HyperWorld> stream = this.worldManager.getWorlds().stream().sorted(Comparator.comparing(world -> world.getConfiguration().getName()));
         if (sender instanceof Entity) {
@@ -354,9 +407,10 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport")
-    @CommandCompletion("@hyperworlds:player=not_in,state=loaded") @Description("Teleport between hyperverse worlds")
+    @CommandCompletion("@hyperworlds:player=not_in,state=loaded") @Description("{@@command.teleport}")
     public void doTeleport(final Player player, final HyperWorld world) {
         if (world == null) {
+            MessageUtil.sendMessage(player, Messages.messageNoSuchWorld);
             return;
         }
         if (!world.isLoaded()) {
@@ -383,7 +437,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("unload") @CommandPermission("hyperverse.unload")
-    @CommandCompletion("@hyperworlds:state=loaded") @Description("Unload a world")
+    @CommandCompletion("@hyperworlds:state=loaded") @Description("{@@command.unload}")
     public void doUnload(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
             return;
@@ -402,9 +456,10 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("load") @CommandPermission("hyperverse.load")
-    @CommandCompletion("@hyperworlds:state=unloaded") @Description("Load a world")
+    @CommandCompletion("@hyperworlds:state=unloaded") @Description("{@@command.load}")
     public void doLoad(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
         if (world.isLoaded()) {
@@ -426,7 +481,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("find|where") @CommandPermission("hyperverse.find") @CommandAlias("hvf|hvfind")
-    @CommandCompletion("@players") @Description("Find the current world for a player")
+    @CommandCompletion("@players") @Description("{@@command.find}")
     //public void findPlayer(final CommandSender sender, final String... players) {
     public void findPlayer(final CommandSender sender, final String player) {
         //for (String player : players) {
@@ -446,7 +501,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("who") @CommandPermission("hyperverse.who") @CommandAlias("hvwho")
-    @CommandCompletion("@hyperworlds") @Description("Find the current players in a world")
+    @CommandCompletion("@hyperworlds") @Description("{@@command.who}")
     public void findPlayersPresent(final CommandSender sender, @Optional final String world) {
         if (world != null) {
             final World bukkitWorld = Bukkit.getWorld(world);
@@ -479,11 +534,15 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("flag set") @CommandPermission("hyperverse.flag.set")
-    @CommandCompletion("@hyperworlds @flags @flag") @Description("Set a world flag")
+    @CommandCompletion("@hyperworlds @flags @flag") @Description("{@@command.flag.set}")
     public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,
         final WorldFlag<?, ?> flag, final String value) {
         if (flag == null) {
             MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
+            return;
+        }
+        if (hyperWorld == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
         try {
@@ -497,10 +556,14 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
-    @CommandCompletion("@hyperworlds @flags") @Description("Remove a world flag")
+    @CommandCompletion("@hyperworlds @flags") @Description("{@@command.flag.remove}")
     public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
         if (flag == null) {
             MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
+            return;
+        }
+        if (hyperWorld == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
         hyperWorld.removeFlag(flag);
@@ -508,13 +571,19 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")
-    @CommandCompletion("@hyperworlds @gamerules @gamerule") @Description("Set a world gamerule")
+    @CommandCompletion("@hyperworlds @gamerules @gamerule") @Description("{@@command.gamerule.set}")
     public void doGameRuleSet(final CommandSender sender, final HyperWorld hyperWorld,
         final GameRule gameRule, final String value) {
         if (gameRule == null) {
             MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
             return;
         }
+
+        if (hyperWorld == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+            return;
+        }
+
         if (!hyperWorld.isLoaded()) {
             MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
             return;
@@ -545,10 +614,14 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("gamerule remove") @CommandPermission("hyperverse.gamerule.set")
-    @CommandCompletion("@hyperworlds @gamerules") @Description("Remove a world game rule")
+    @CommandCompletion("@hyperworlds @gamerules") @Description("{@@command.gamerule.remove}")
     public void doGameRuleRemove(final CommandSender sender, final HyperWorld hyperWorld, final GameRule gameRule) {
         if (gameRule == null) {
             MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
+            return;
+        }
+        if (hyperWorld == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
         if (!hyperWorld.isLoaded()) {
@@ -561,7 +634,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("delete") @CommandPermission("hyperverse.delete")
-    @CommandCompletion("@hyperworlds") @Description("Delete a world")
+    @CommandCompletion("@hyperworlds") @Description("{@@command.delete}")
     public void doDelete(final CommandSender sender, final HyperWorld hyperWorld) {
         if (hyperWorld == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
@@ -577,7 +650,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("reload") @CommandPermission("hyperverse.reload") @CommandAlias("hvreload")
-    @Description("Reload the Hyperverse configuration")
+    @Description("{@@command.reload}")
     public void doConfigReload(final CommandSender sender) {
         if (Hyperverse.getPlugin(Hyperverse.class).reloadConfiguration(sender)) {
             MessageUtil.sendMessage(sender, Messages.messageConfigReloaded);
@@ -587,7 +660,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Subcommand("debugpaste") @CommandPermission("hyperverse.debugpaste")
-    @Description("Create a debug paste. This will upload your configuration files to Athion. Beware.")
+    @Description("{@@command.debugpaste}")
     public void doDebugPaste(final CommandSender sender) {
         this.taskChainFactory.newChain().async(() -> {
             try {

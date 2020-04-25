@@ -17,11 +17,17 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.util.WorldUtil;
 import org.jetbrains.annotations.NotNull;
+import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.world.WorldConfiguration;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class NetherFlag extends WorldFlag<String, NetherFlag> {
 
@@ -52,6 +58,11 @@ public class NetherFlag extends WorldFlag<String, NetherFlag> {
 
     @Override protected NetherFlag flagOf(@NotNull final String value) {
         return new NetherFlag(value);
+    }
+
+    @Override public Collection<String> getTabCompletions() {
+        return Hyperverse.getApi().getWorldManager().getWorlds().stream()
+            .map(HyperWorld::getConfiguration).map(WorldConfiguration::getName).collect(Collectors.toList());
     }
 
 }

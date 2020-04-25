@@ -17,6 +17,8 @@
 
 package se.hyperver.hyperverse.configuration;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Hyperverse configuration options
  */
@@ -57,5 +59,13 @@ public interface HyperConfiguration {
      *         system should be enabled
      */
     boolean shouldGroupProfiles();
+
+    /**
+     * Get the language code that will be used
+     * to resolve translations
+     *
+     * @return Language code
+     */
+    @NotNull String getLanguageCode();
 
 }

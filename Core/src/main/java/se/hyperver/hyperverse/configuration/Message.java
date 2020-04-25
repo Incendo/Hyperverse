@@ -17,6 +17,8 @@
 
 package se.hyperver.hyperverse.configuration;
 
+import co.aikar.locales.MessageKey;
+import co.aikar.locales.MessageKeyProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -24,8 +26,9 @@ import java.util.Objects;
 /**
  * Configurable messages
  */
-public final class Message {
+public final class Message implements MessageKeyProvider {
 
+    private final MessageKey messageKey;
     private final String key;
     private final String defaultValue;
 
@@ -38,6 +41,7 @@ public final class Message {
     public Message(@NotNull final String key, @NotNull final String defaultValue) {
         this.key = Objects.requireNonNull(key);
         this.defaultValue = Objects.requireNonNull(defaultValue);
+        this.messageKey = MessageKey.of(key);
     }
 
     /**
@@ -60,6 +64,14 @@ public final class Message {
 
     @Override public String toString() {
         return Messages.getConfigured(this);
+    }
+
+    public String withoutColorCodes() {
+        return this.toString().replaceAll("&[A-Za-z0-9]", "");
+    }
+
+    @Override public MessageKey getMessageKey() {
+        return this.messageKey;
     }
 
 }

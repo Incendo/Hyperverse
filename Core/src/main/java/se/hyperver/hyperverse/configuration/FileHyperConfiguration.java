@@ -100,4 +100,8 @@ public class FileHyperConfiguration implements HyperConfiguration {
         return this.fileConfigurationObject.useGroupedProfiles();
     }
 
+    @Override @NotNull public String getLanguageCode() {
+        return this.fileConfigurationObject.getLanguageCode();
+    }
+
 }

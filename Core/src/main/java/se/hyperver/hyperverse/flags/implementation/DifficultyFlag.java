@@ -23,6 +23,8 @@ import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 public final class DifficultyFlag extends WorldFlag<Difficulty, DifficultyFlag> {
@@ -76,6 +78,10 @@ public final class DifficultyFlag extends WorldFlag<Difficulty, DifficultyFlag> 
             default:
                 return DIFFICULTY_FLAG_NORMAL;
         }
+    }
+
+    @Override public Collection<String> getTabCompletions() {
+        return Arrays.asList("peaceful", "easy", "normal", "hard");
     }
 
 }

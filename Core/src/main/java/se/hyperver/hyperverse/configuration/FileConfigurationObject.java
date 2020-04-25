@@ -39,6 +39,8 @@ public class FileConfigurationObject {
     private boolean keepSpawnLoaded = true;
     @Setting(value = "grouped-inventories", comment = "Whether or player profile groups are enabled")
     private boolean groupedProfiles = false;
+    @Setting(value = "language-code", comment = "Language code used to resolve translations")
+    private String languageCode = "en";
 
     public boolean isImportAutomatically() {
         return this.importAutomatically;
@@ -54,6 +56,10 @@ public class FileConfigurationObject {
 
     public boolean useGroupedProfiles() {
         return this.groupedProfiles;
+    }
+
+    public String getLanguageCode() {
+        return this.languageCode;
     }
 
 }

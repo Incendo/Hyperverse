@@ -96,14 +96,21 @@ import java.util.Map;
             e.printStackTrace();
         }
 
-        if (!this.loadMessages()) {
-            getLogger().severe("Failed to load messages");
-        }
-
         if (!this.loadConfiguration()) {
             getLogger().severe("Failed to load configuration file. Disabling!");
             this.getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+
+        // Try to copy stored captions files
+        try {
+            this.attemptCopyCaptions(this.hyperConfiguration.getLanguageCode());
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!this.loadMessages(this.hyperConfiguration.getLanguageCode())) {
+            getLogger().severe("Failed to load messages");
         }
 
         if (this.hyperConfiguration.shouldGroupProfiles()) {
@@ -203,8 +210,8 @@ import java.util.Map;
      * @param invoker An optional CommandSender who invoked the reload.
      */
     public boolean reloadConfiguration(@Nullable final CommandSender invoker) {
-        final boolean reloadMessages = loadMessages();
         ((FileHyperConfiguration) this.hyperConfiguration).loadConfiguration();
+        final boolean reloadMessages = loadMessages(this.hyperConfiguration.getLanguageCode());
         if (invoker != null) {
             MessageUtil.sendMessage(invoker, reloadMessages ?
                 Messages.messageMessagesReloaded :
@@ -214,9 +221,9 @@ import java.util.Map;
         return reloadMessages;
     }
 
-    private boolean loadMessages() {
+    private boolean loadMessages(final String language) {
         // Message configuration
-        final Path messagePath = this.getDataFolder().toPath().resolve("messages.conf");
+        final Path messagePath = this.getDataFolder().toPath().resolve(String.format("messages_%s.conf", language));
         final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
             .builder()
             .setParseOptions(ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
@@ -261,6 +268,14 @@ import java.util.Map;
             return false;
         }
         return true;
+    }
+
+    private void attemptCopyCaptions(final String code) {
+        final String fileName = String.format("messages_%s.conf", code);
+        final Path path = this.getDataFolder().toPath().resolve(fileName);
+        if (!Files.exists(path)) {
+            this.saveResource(fileName, false);
+        }
     }
 
     @Override @NotNull public WorldManager getWorldManager() {

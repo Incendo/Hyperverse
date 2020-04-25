@@ -17,16 +17,20 @@
 
 package se.hyperver.hyperverse.configuration;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
 public class Messages {
 
     private static final Map<String, String> configuredMessages = Maps.newHashMap();
+    private static final Collection<Message> messages = Lists.newLinkedList();
+
     public static final Message messageConfigReloaded = createMessage("config.reload",
         "&7Configuration has been reloaded");
     public static final Message messageMessagesReloaded = createMessage("config.messages.reload",
@@ -104,7 +108,7 @@ public class Messages {
     public static final Message messageWorldAlreadyLoaded = createMessage("world.already_loaded",
         "&cThat world is already loaded");
     public static final Message messageWorldAlreadyImported = createMessage("world.already_imported",
-        "&cThatt world has already been imported");
+        "&cThat world has already been imported");
     public static final Message messageWorldLoadedSuccessfully = createMessage("world.load_success",
         "&7The world has been loaded");
     public static final Message messageFlagParseError = createMessage("flag.parse_error",
@@ -137,8 +141,10 @@ public class Messages {
         "&7The paste file has been uploaded to: %paste%");
     public static final Message messagePasteFailed = createMessage("paste.failed",
         "&cFailed to create the debug paste. Reason: %reason%");
-    public static final Message messageConfigurationReloaded = createMessage("config.reloaded",
-        "&7Hyperverse configuration files were reloaded successfully");
+    public static final Message messageInvalidWorldType = createMessage("invalid.world_type",
+        "&cThat is not a valid world type");
+    public static final Message messageInvalidGameRule = createMessage("invalid.game_rule",
+        "&cThat is not a valid game rule");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
@@ -163,16 +169,58 @@ public class Messages {
     public static final Message flagDescriptionDifficulty = createMessage("flags.difficulty",
         "World difficulty. Available values are: peaceful, easy, normal and hard");
 
+    // Command Descriptions
+    public static final Message commandDescriptionCreate = createMessage("command.create",
+        "Create a new world");
+    public static final Message commandDescriptionList = createMessage("command.list",
+        "List Hyperverse worlds");
+    public static final Message commandDescriptionImport = createMessage("command.import",
+        "Import a world into Hyperverse");
+    public static final Message commandDescriptionTeleport = createMessage("command.teleport",
+        "Teleport between hyperverse worlds");
+    public static final Message commandDescriptionUnload = createMessage("command.unload",
+        "Unload a world");
+    public static final Message commandDescriptionLoad = createMessage("command.load",
+        "Load a world");
+    public static final Message commandDescriptionFind = createMessage("command.find",
+        "See what world a player is in");
+    public static final Message commandDescriptionWho = createMessage("command.who",
+        "Find the current players in a world");
+    public static final Message commandDescriptionFlagSet = createMessage("command.flag.set",
+        "Set a world flag");
+    public static final Message commandDescriptionFlagRemove = createMessage("command.flag.remove",
+        "Remove a world flag");
+    public static final Message commandDescriptionGameRuleSet = createMessage("command.gamerule.set",
+        "Set a world game rule");
+    public static final Message commandDescriptionGameRuleRemove = createMessage("command.gamerule.remove",
+        "Remove a world game rule");
+    public static final Message commandDescriptionDelete = createMessage("command.delete",
+        "Delete a world");
+    public static final Message commandDescriptionReload = createMessage("command.reload",
+        "Reload the Hyperverse configuration files");
+    public static final Message commandDescriptionDebugPaste = createMessage("command.debugpaste",
+        "Create a debug paste. This will upload your configuration files to Athion. Beware!");
+
     public static final DecimalFormat miscCoordinateDecimalFormat = new DecimalFormat("#.##");
 
     @NotNull public static Map<String, String> getConfiguredMessages() {
         return configuredMessages;
     }
 
+    @NotNull public static Map<Message, String> getMessages() {
+        final Map<Message, String> map = Maps.newHashMapWithExpectedSize(messages.size());
+        for (final Message message : messages) {
+            map.put(message, message.toString());
+        }
+        return map;
+    }
+
     public static Message createMessage(@NotNull final String key,
         @NotNull final String defaultValue) {
         configuredMessages.put(key, defaultValue);
-        return new Message(Objects.requireNonNull(key), Objects.requireNonNull(defaultValue));
+        final Message message = new Message(Objects.requireNonNull(key), Objects.requireNonNull(defaultValue));
+        messages.add(message);
+        return message;
     }
 
     public static String getConfigured(@NotNull final Message message) {
