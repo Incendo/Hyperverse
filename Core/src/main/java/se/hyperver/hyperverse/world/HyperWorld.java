@@ -148,6 +148,15 @@ public interface HyperWorld {
         FlagParseException;
 
     /**
+     * Add a flag instance directly to the
+     * world without any parsing
+     *
+     * @param flag Flag instance
+     * @param <T> Flag value type
+     */
+    <T> void setFlagInstance(@NotNull final WorldFlag<T, ?> flag);
+
+    /**
      * Get the teleportation manager belonging to this world
      *
      * @return The worlds' teleportation manager

@@ -58,6 +58,7 @@ import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.IncendoPaster;
 import se.hyperver.hyperverse.util.MessageUtil;
+import se.hyperver.hyperverse.util.MultiverseImporter;
 import se.hyperver.hyperverse.util.SeedUtil;
 import se.hyperver.hyperverse.util.WorldUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -751,6 +752,17 @@ public class HyperCommandManager extends BaseCommand {
             } catch (final Exception ignored) {
             }
         }).execute();
+    }
+
+    @Subcommand("multiverse") @CommandPermission("hyperverse.multiverse")
+    @Description("{@@command.multiverse}")
+    public void doMultiverse(final CommandSender sender) {
+        if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
+            new MultiverseImporter(this.worldManager, this.hyperWorldFactory)
+                .performImport(sender);
+        } else {
+            MessageUtil.sendMessage(sender, Messages.messageMultiverseMissing);
+        }
     }
 
 }

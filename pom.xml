@@ -140,6 +140,10 @@
             <id>IntellectualSites</id>
             <url>https://mvn.intellectualsites.com/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>multiverse</id>
+            <url>http://repo.onarandombox.com/content/repositories/multiverse/</url>
+        </repository>
     </repositories>
 
 </project>

@@ -347,6 +347,11 @@ public class SimpleWorld implements HyperWorld {
         this.refreshFlags();
     }
 
+    @Override public <T> void setFlagInstance(@NotNull final WorldFlag<T, ?> flag) {
+        this.flagContainer.addFlag(flag);
+        this.refreshFlags();
+    }
+
     @Override public <T> void removeFlag(@NotNull final WorldFlag<T, ?> flagInstance) {
         this.flagContainer.removeFlag(flagInstance);
     }

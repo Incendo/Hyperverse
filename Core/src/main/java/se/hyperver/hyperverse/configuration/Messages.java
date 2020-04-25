@@ -146,6 +146,20 @@ public class Messages {
     public static final Message messageInvalidGameRule = createMessage("invalid.game_rule",
         "&cThat is not a valid game rule");
 
+    // Multiverse importer messages
+    public static final Message messageMultiverseMissing = createMessage("multiverse.missing",
+        "&cCannot import Multiverse configurations because Multiverse-Core is not enabled on this server");
+    public static final Message messageMultiverseInitializing = createMessage("multiverse.initializing",
+        "&7Multiverse importing process has started. Detected %worlds% worlds.");
+    public static final Message messageMultiverseCreating = createMessage("multiverse.creating",
+        "&7Multiverse world %world% was detected and had no equivalent in Hyperverse. It will be created.");
+    public static final Message messageMultiverseImporting = createMessage("multiverse.importing",
+        "&7Hyperverse will now import the Multiverse configuration for %world%");
+    public static final Message messageMultiverseImported = createMessage("multiverse.imported",
+        "&7Hyperverse finished importing %world%.");
+    public static final Message messageMultiverseDone = createMessage("multiverse.done",
+        "&7Hyperverse finished importing Multiverse data.");
+
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
         "World gamemode. Available values: survival, creative, adventure and spectator");
@@ -200,6 +214,8 @@ public class Messages {
         "Reload the Hyperverse configuration files");
     public static final Message commandDescriptionDebugPaste = createMessage("command.debugpaste",
         "Create a debug paste. This will upload your configuration files to Athion. Beware!");
+    public static final Message commandDescriptionMultiverse = createMessage("command.multiverse",
+        "Import Multiverse configurations");
 
     public static final DecimalFormat miscCoordinateDecimalFormat = new DecimalFormat("#.##");
 

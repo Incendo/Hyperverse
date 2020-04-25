@@ -42,7 +42,6 @@ public class WorldConfiguration {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    // Immutable Properties
     private String name;
     private WorldType type;
     private String settings;
@@ -123,6 +122,14 @@ public class WorldConfiguration {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setGenerator(@NotNull final String generator) {
+        this.generator = generator;
+    }
+
+    public void setSeed(final long seed) {
+        this.seed = seed;
     }
 
     /**

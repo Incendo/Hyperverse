@@ -54,3 +54,6 @@ permissions:
   hyperverse.who:
     description: Allows players to list players
     default: op
+  hyperverse.multiverse:
+    description: Import Multiverse configurations
+    default: op
