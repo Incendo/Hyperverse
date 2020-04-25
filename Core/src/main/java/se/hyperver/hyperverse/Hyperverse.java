@@ -103,10 +103,12 @@ import java.util.Map;
         }
 
         // Try to copy stored captions files
-        try {
-            this.attemptCopyCaptions(this.hyperConfiguration.getLanguageCode());
-        } catch (final Exception e) {
-            e.printStackTrace();
+        if (!this.hyperConfiguration.getLanguageCode().equalsIgnoreCase("en")) {
+            try {
+                this.attemptCopyCaptions(this.hyperConfiguration.getLanguageCode());
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (!this.loadMessages(this.hyperConfiguration.getLanguageCode())) {
@@ -271,7 +273,7 @@ import java.util.Map;
     }
 
     private void attemptCopyCaptions(final String code) {
-        final String fileName = String.format("messages_%s.conf", code);
+        final String fileName = String.format("messages_%s.conf", code.toLowerCase());
         final Path path = this.getDataFolder().toPath().resolve(fileName);
         if (!Files.exists(path)) {
             this.saveResource(fileName, false);
