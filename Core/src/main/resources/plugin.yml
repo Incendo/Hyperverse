@@ -57,3 +57,6 @@ permissions:
   hyperverse.multiverse:
     description: Import Multiverse configurations
     default: op
+  hyperverse.gamemode.bypass:
+    description: Allows players to bypass the gamemode flag
+    default: op

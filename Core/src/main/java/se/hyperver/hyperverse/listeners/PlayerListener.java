@@ -169,13 +169,15 @@ public class PlayerListener implements Listener {
                     nms.readPlayerData(event.getPlayer(), playerData,
                         () -> Bukkit.getScheduler().runTaskLater(hyperverse, () -> {
                             // We need to trick bukkit into updating the gamemode
-                            final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
-                            if (worldGameMode != GameMode.ADVENTURE) {
-                                player.setGameMode(GameMode.ADVENTURE);
-                            } else {
-                                player.setGameMode(GameMode.SURVIVAL);
-                            }
-                            player.setGameMode(worldGameMode);
+							if (!player.hasPermission("hyperverse.gamemode.bypass")) {
+								final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
+								if (worldGameMode != GameMode.ADVENTURE) {
+									player.setGameMode(GameMode.ADVENTURE);
+								} else {
+									player.setGameMode(GameMode.SURVIVAL);
+								}
+								player.setGameMode(worldGameMode);								
+							}
                             // Apply any other flags here
                         }, 1L));
                 } else {
@@ -202,7 +204,7 @@ public class PlayerListener implements Listener {
                     }
                 }
             }
-        } else {
+        } else if (!player.hasPermission("hyperverse.gamemode.bypass")) {
             player.setGameMode(hyperWorld.getFlag(GamemodeFlag.class));
         }
     }
