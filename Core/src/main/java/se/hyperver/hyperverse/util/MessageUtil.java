@@ -17,14 +17,20 @@
 
 package se.hyperver.hyperverse.util;
 
-import me.minidigger.minimessage.MiniMessageParser;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
 
+import net.kyori.text.adapter.bukkit.TextAdapter;
+import net.md_5.bungee.api.chat.TextComponent;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
+
+import me.minidigger.minimessage.bungee.MiniMessageSerializer;
+import me.minidigger.minimessage.text.MiniMessageParser;
 
 /**
  * Message utility methods
@@ -73,7 +79,12 @@ public final class MessageUtil {
         final String prefixedMessage = ChatColor.translateAlternateColorCodes('&',
             Messages.messagePrefix.toString() + replacedMessage);
         if (prefixedMessage.contains("<") && prefixedMessage.contains(">")) {
-            recipient.spigot().sendMessage(MiniMessageParser.parseFormat(prefixedMessage));
+            if (prefixedMessage.contains(ChatColor.COLOR_CHAR + "")) {
+                final String fixedMessage = MiniMessageSerializer.serialize(TextComponent.fromLegacyText(prefixedMessage));
+                TextAdapter.sendComponent(recipient, MiniMessageParser.parseFormat(fixedMessage));
+            } else {
+                TextAdapter.sendComponent(recipient, MiniMessageParser.parseFormat(prefixedMessage));
+            }
         } else {
             recipient.sendMessage(prefixedMessage);
         }
