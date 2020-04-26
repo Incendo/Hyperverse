@@ -323,7 +323,7 @@ public class PlayerListener implements Listener {
                     PaperLib.teleportAsync(event.getEntity(), location, PlayerTeleportEvent.TeleportCause.COMMAND);
                 } else {
                     hyperverse.getLogger().warning(String.format("Failed to find/create a portal surrounding %s",
-                        location.toString()));
+                        destination.toString()));
                 }
             }
         } else if (event.getLocation().getBlock().getType() == Material.END_PORTAL &&
