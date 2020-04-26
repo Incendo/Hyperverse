@@ -1,3 +1,0 @@
-files:
-  - source: /Core/src/main/resources/raw/messages.conf
-    translation: /Core/src/main/resources/messages_%two_letters_code%.conf
