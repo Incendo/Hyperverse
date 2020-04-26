@@ -17,23 +17,8 @@
 
 package se.hyperver.hyperverse.listeners;
 
-import se.hyperver.hyperverse.Hyperverse;
-import se.hyperver.hyperverse.configuration.HyperConfiguration;
-import se.hyperver.hyperverse.configuration.Messages;
-import se.hyperver.hyperverse.database.HyperDatabase;
-import se.hyperver.hyperverse.database.PersistentLocation;
-import se.hyperver.hyperverse.flags.implementation.EndFlag;
-import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
-import se.hyperver.hyperverse.flags.implementation.LocalRespawnFlag;
-import se.hyperver.hyperverse.flags.implementation.NetherFlag;
-import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
-import se.hyperver.hyperverse.flags.implementation.PveFlag;
-import se.hyperver.hyperverse.flags.implementation.PvpFlag;
-import se.hyperver.hyperverse.util.MessageUtil;
-import se.hyperver.hyperverse.util.NMS;
-import se.hyperver.hyperverse.world.HyperWorld;
-import se.hyperver.hyperverse.world.WorldManager;
-import se.hyperver.hyperverse.world.WorldType;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -56,10 +41,25 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import se.hyperver.hyperverse.Hyperverse;
+import se.hyperver.hyperverse.configuration.HyperConfiguration;
+import se.hyperver.hyperverse.configuration.Messages;
+import se.hyperver.hyperverse.database.HyperDatabase;
+import se.hyperver.hyperverse.database.PersistentLocation;
+import se.hyperver.hyperverse.flags.implementation.EndFlag;
+import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
+import se.hyperver.hyperverse.flags.implementation.LocalRespawnFlag;
+import se.hyperver.hyperverse.flags.implementation.NetherFlag;
+import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
+import se.hyperver.hyperverse.flags.implementation.PveFlag;
+import se.hyperver.hyperverse.flags.implementation.PvpFlag;
+import se.hyperver.hyperverse.util.MessageUtil;
+import se.hyperver.hyperverse.util.NMS;
+import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.world.WorldManager;
+import se.hyperver.hyperverse.world.WorldType;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -68,9 +68,12 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerListener implements Listener {
 
+    private final Cache<UUID, Long> teleportationTimeout = CacheBuilder.newBuilder()
+        .expireAfterWrite(5L, TimeUnit.SECONDS).build();
     private final WorldManager worldManager;
     private final HyperDatabase hyperDatabase;
     private final HyperConfiguration hyperConfiguration;
@@ -303,11 +306,9 @@ public class PlayerListener implements Listener {
             return;
         }
 
-        if (event.getEntity().hasMetadata("hv-portal-throttle")) {
-            final MetadataValue value = event.getEntity().getMetadata("hv-portal-throttle").get(0);
-            if (System.currentTimeMillis() - value.asLong() < 5000L) {
-                return;
-            }
+        final Long lastTeleportion = this.teleportationTimeout.getIfPresent(event.getEntity().getUniqueId());
+        if (lastTeleportion == null || (System.currentTimeMillis() - lastTeleportion) < 5000L) {
+            return;
         }
 
         if (event.getLocation().getBlock().getType() == Material.NETHER_PORTAL &&
@@ -319,7 +320,7 @@ public class PlayerListener implements Listener {
                 // actual portal destination
                 final Location location = nms.getOrCreateNetherPortal(event.getEntity(), destination);
                 if (location != null) {
-                    event.getEntity().setMetadata("hv-portal-throttle", new FixedMetadataValue(this.hyperverse, System.currentTimeMillis()));
+                    this.teleportationTimeout.put(event.getEntity().getUniqueId(), System.currentTimeMillis());
                     PaperLib.teleportAsync(event.getEntity(), location, PlayerTeleportEvent.TeleportCause.COMMAND);
                 } else {
                     hyperverse.getLogger().warning(String.format("Failed to find/create a portal surrounding %s",
