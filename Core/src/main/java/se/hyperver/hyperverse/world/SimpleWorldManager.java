@@ -23,20 +23,19 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.GeneratorUtil;
 import se.hyperver.hyperverse.util.MessageUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerLoadEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,8 +53,7 @@ import java.util.UUID;
 @Singleton
 public class SimpleWorldManager implements WorldManager, Listener {
 
-    private final Map<UUID, HyperWorld> worldMap = Maps.newHashMap();
-    private final Map<String, UUID> uuidMap = Maps.newHashMap();
+    private final Map<String, HyperWorld> worldMap = Maps.newHashMap();
     private final Multimap<String, HyperWorld> waitingForPlugin = HashMultimap.create();
     private final Collection<String> ignoredWorlds = Lists.newLinkedList();
 
@@ -107,12 +105,18 @@ public class SimpleWorldManager implements WorldManager, Listener {
         }
         // Also loop over all other worlds to see if anything was loaded sneakily
         for (final World world : Bukkit.getWorlds()) {
-            if (!this.worldMap.containsKey(world.getUID())) {
-                this.importWorld(world, false, "");
+            if (!this.worldMap.containsKey(world.getName())) {
+                final WorldImportResult importResult = this.importWorld(world, world.equals(Bukkit.getWorlds().get(0)), "");
+                if (importResult != WorldImportResult.SUCCESS) {
+                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
+                        "%world%", world.getName(), "%result%", importResult.getDescription());
+                }
             }
         }
         MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldLoaded, "%num%",
             Integer.toString(this.worldMap.size()));
+        // Now create the worlds
+        this.createWorlds();
     }
 
     @Override public void createWorlds() {
@@ -120,7 +124,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
         // we were idle
         for (final World world : Bukkit.getWorlds()) {
             final HyperWorld hyperWorld = this.getWorld(world.getName());
-            if (hyperWorld != null) {
+            if (hyperWorld != null && hyperWorld.getBukkitWorld() == null) {
                 hyperWorld.setBukkitWorld(world);
             }
         }
@@ -144,10 +148,6 @@ public class SimpleWorldManager implements WorldManager, Listener {
                 hyperWorld.refreshFlags();
             }
         }
-    }
-
-    @EventHandler public void onServerLoadEvent(final ServerLoadEvent event) {
-        this.createWorlds();
     }
 
     @EventHandler public void onPluginLoad(final PluginEnableEvent enableEvent) {
@@ -206,6 +206,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
             }
         }
         final HyperWorld hyperWorld = hyperWorldFactory.create(world.getUID(), worldConfiguration);
+        hyperWorld.setBukkitWorld(world);
         this.addWorld(hyperWorld);
         return WorldImportResult.SUCCESS;
     }
@@ -217,13 +218,11 @@ public class SimpleWorldManager implements WorldManager, Listener {
 
     @Override public void registerWorld(@NotNull final HyperWorld hyperWorld) {
         Objects.requireNonNull(hyperWorld);
-        if (this.worldMap.containsKey(hyperWorld.getWorldUUID()) ||
-            this.uuidMap.containsKey(hyperWorld.getConfiguration().getName())) {
+        if (this.worldMap.containsKey(hyperWorld.getConfiguration().getName())) {
             throw new IllegalArgumentException(
                 String.format("World %s already exists", hyperWorld.getConfiguration().getName()));
         }
-        this.worldMap.put(hyperWorld.getWorldUUID(), hyperWorld);
-        this.uuidMap.put(hyperWorld.getConfiguration().getName().toLowerCase(), hyperWorld.getWorldUUID());
+        this.worldMap.put(hyperWorld.getConfiguration().getName(), hyperWorld);
     }
 
     @Override @NotNull public Collection<HyperWorld> getWorlds() {
@@ -239,15 +238,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
     }
 
     @Override @Nullable public HyperWorld getWorld(@NotNull final String name) {
-        final UUID uuid = this.uuidMap.get(Objects.requireNonNull(name).toLowerCase());
-        if (uuid == null) {
-            return null;
-        }
-        return this.worldMap.get(uuid);
-    }
-
-    @Override @Nullable public HyperWorld getWorld(@NotNull final UUID uuid) {
-        return this.worldMap.get(Objects.requireNonNull(uuid));
+        return this.worldMap.get(name);
     }
 
     @Override @Nullable public HyperWorld getWorld(@NotNull World world) {
@@ -259,8 +250,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
     }
 
     @Override public void unregisterWorld(@NotNull final HyperWorld hyperWorld) {
-        this.worldMap.remove(hyperWorld.getWorldUUID());
-        this.uuidMap.remove(hyperWorld.getConfiguration().getName());
-    }
+        this.worldMap.remove(hyperWorld.getConfiguration().getName());
+   }
 
 }

@@ -51,7 +51,7 @@ public class WorldListener implements Listener {
         }
         MessageUtil.sendMessage(Bukkit.getConsoleSender(),
             Messages.messageWorldLoadDetected, "%world%", world.getName());
-        HyperWorld hyperWorld = this.worldManager.getWorld(world.getUID());
+        HyperWorld hyperWorld = this.worldManager.getWorld(world);
         if (hyperWorld != null
             || (hyperWorld = this.worldManager.getWorld(world.getName())) != null) {
             if (hyperWorld.getBukkitWorld() != null) {
@@ -71,7 +71,7 @@ public class WorldListener implements Listener {
                 MessageUtil
                     .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportedOnLoad,
                         "%world%", world.getName(), "%generator%",
-                        Objects.requireNonNull(this.worldManager.getWorld(world.getUID())).getConfiguration()
+                        Objects.requireNonNull(this.worldManager.getWorld(world)).getConfiguration()
                             .getGenerator());
                 if (hyperConfiguration.shouldKeepSpawnLoaded()) {
                     world.setKeepSpawnInMemory(true);

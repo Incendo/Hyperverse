@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Manages {@link HyperWorld worlds}
@@ -81,14 +80,6 @@ public interface WorldManager {
      * @return World, if it exists
      */
     @Nullable HyperWorld getWorld(@NotNull String name);
-
-    /**
-     * Get a world using its UUID
-     *
-     * @param uuid World UUID
-     * @return World, if it exists
-     */
-    @Nullable HyperWorld getWorld(@NotNull UUID uuid);
 
     /**
      * Get a world from a Bukkit world
