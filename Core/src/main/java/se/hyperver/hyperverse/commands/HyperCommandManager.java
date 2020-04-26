@@ -116,10 +116,10 @@ public class HyperCommandManager extends BaseCommand {
                     + super.format(message);
             }
         });
-        bukkitCommandManager.setFormat(MessageType.ERROR, new BukkitMessageFormatter(ChatColor.RED, ChatColor.GOLD) {
+        bukkitCommandManager.setFormat(MessageType.ERROR, new BukkitMessageFormatter(ChatColor.RED, ChatColor.GOLD, ChatColor.WHITE) {
             @Override public String format(final String message) {
                 return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
-                    + ChatColor.RED + message;
+                    + ChatColor.RED + super.format(message);
             }
         });
         bukkitCommandManager.setFormat(MessageType.SYNTAX, new BukkitMessageFormatter(ChatColor.GRAY, ChatColor.GOLD, ChatColor.WHITE) {
