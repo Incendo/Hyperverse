@@ -96,6 +96,7 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         if (netherLinkedWorld.isEmpty()) {
             return null;
         }
+
         final HyperWorld destination = this.worldManager.getWorld(netherLinkedWorld);
         if (destination == null || !destination.isLoaded()) {
             return null;

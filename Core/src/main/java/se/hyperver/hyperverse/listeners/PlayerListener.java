@@ -260,37 +260,47 @@ public class PlayerListener implements Listener {
     public void onPlayerPortalEvent(final PlayerPortalEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {
+            this.hyperverse.getLogger().warning(String.format("(PlayerPortalEvent) Player %s entered world '%s' but no world could be found",
+                event.getPlayer().getName(), event.getPlayer().getWorld().getName()));
             return;
         }
 
-        if (event.getPlayer().getPortalCooldown() > 0) {
+        final Long lastTeleportion = this.teleportationTimeout.getIfPresent(event.getPlayer().getUniqueId());
+        if (lastTeleportion != null && (System.currentTimeMillis() - lastTeleportion) < 5000L) {
             event.setCancelled(true);
             return;
         }
 
+        final Location destination;
+        final boolean isNether;
+
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
-            final Location destination = hyperWorld.getTeleportationManager()
+            destination = hyperWorld.getTeleportationManager()
                 .netherDestination(event.getPlayer(), event.getFrom());
-            if (destination != null) {
-                final boolean allowedEntry = hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
-                    .getNow(false);
-                if (!allowedEntry) {
-                    MessageUtil.sendMessage(event.getPlayer(), Messages.messageNotPermittedEntry);
-                } else {
-                    event.setTo(destination);
-                }
-            }
+            isNether = true;
         } else if (event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
-            final Location destination = hyperWorld.getTeleportationManager()
+            destination = hyperWorld.getTeleportationManager()
                 .endDestination(event.getPlayer());
-            if (destination != null) {
-                final boolean allowedEntry = hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
-                    .getNow(false);
-                if (!allowedEntry) {
-                    MessageUtil.sendMessage(event.getPlayer(), Messages.messageNotPermittedEntry);
-                } else {
-                    event.setTo(destination);
-                }
+            isNether = false;
+        } else {
+            return;
+        }
+
+        if (destination != null) {
+            final boolean allowedEntry = hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
+                .getNow(false);
+            if (!allowedEntry) {
+                MessageUtil.sendMessage(event.getPlayer(), Messages.messageNotPermittedEntry);
+            } else {
+                event.setTo(destination);
+                this.teleportationTimeout.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
+            }
+        } else {
+            final String flag = isNether ? hyperWorld.getFlag(NetherFlag.class) : hyperWorld.getFlag(EndFlag.class);
+            if (!flag.isEmpty()) {
+                event.setCancelled(true); // We do not want to allow default teleportation unless it has
+                // been configured
+                MessageUtil.sendMessage(event.getPlayer(), Messages.messagePortalNotLinked);
             }
         }
     }
@@ -300,6 +310,7 @@ public class PlayerListener implements Listener {
         if (event.getEntityType() == EntityType.PLAYER) {
             return;
         }
+
         final HyperWorld hyperWorld = this.worldManager.getWorld(
             Objects.requireNonNull(event.getLocation().getWorld()));
         if (hyperWorld == null) {
@@ -307,7 +318,7 @@ public class PlayerListener implements Listener {
         }
 
         final Long lastTeleportion = this.teleportationTimeout.getIfPresent(event.getEntity().getUniqueId());
-        if (lastTeleportion == null || (System.currentTimeMillis() - lastTeleportion) < 5000L) {
+        if (lastTeleportion != null && (System.currentTimeMillis() - lastTeleportion) < 5000L) {
             return;
         }
 
@@ -338,11 +349,16 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onEntityPortalEvent(final EntityPortalEvent event) {
+        if (event.getEntityType() == EntityType.PLAYER) {
+            return;
+        }
+
         final HyperWorld hyperWorld = this.worldManager.getWorld(
             Objects.requireNonNull(event.getFrom().getWorld()));
         if (hyperWorld == null) {
             return;
         }
+
         if (event.getFrom().getBlock().getType() == Material.NETHER_PORTAL &&
             !hyperWorld.getFlag(NetherFlag.class).isEmpty()) {
             event.setCancelled(true);
