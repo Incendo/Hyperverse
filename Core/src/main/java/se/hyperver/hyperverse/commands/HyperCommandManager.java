@@ -116,6 +116,8 @@ public class HyperCommandManager extends BaseCommand {
             try {
                 bukkitCommandManager.enableUnstableAPI("brigadier");
                 new PaperBrigadierManager(hyperverse, (PaperCommandManager) bukkitCommandManager);
+                Hyperverse.getPlugin(Hyperverse.class).getLogger()
+                    .info("Enabling Brigadier support!");
             } catch (final Exception e) {
                 Hyperverse.getPlugin(Hyperverse.class).getLogger()
                     .info("Update Paper to enable Brigadier support!");
@@ -289,12 +291,12 @@ public class HyperCommandManager extends BaseCommand {
         "<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed]"
             + " [generate-structures: true, false] [features: normal, flat, amplified, bucket] [settings...]")
     @CommandPermission("hyperverse.create") @Description("{@@command.create}")
-    @CommandCompletion("@null @generators @worldtypes @null @null true|false @worldfeatures @null")
+    @CommandCompletion("@nothing @generators @worldtypes @range:9223372036854775807 true|false @worldfeatures @nothing")
     public void createWorld(final CommandSender sender, final String world, String generator,
-        @Default("overworld") final WorldType type, @Optional final Long specifiedSeed,
+        @Default("overworld") final WorldType type, @Default("-1") final int specifiedSeed,
         @Default("true") final boolean generateStructures, @Default("normal") final WorldFeatures features,
         @Default final String settings) {
-        final long seed = specifiedSeed == null ? SeedUtil.randomSeed() : specifiedSeed;
+        final long seed = specifiedSeed == -1 ? SeedUtil.randomSeed() : specifiedSeed;
         // Check if the name already exists
         for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
             if (hyperWorld.getConfiguration().getName().equalsIgnoreCase(world)) {
@@ -586,16 +588,16 @@ public class HyperCommandManager extends BaseCommand {
 
     @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
     @CommandCompletion("@hyperworlds @flags") @Description("{@@command.flag.remove}")
-    public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
+    public void doFlagRemove(final CommandSender sender, final HyperWorld world,final WorldFlag<?, ?> flag) {
         if (flag == null) {
             MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
             return;
         }
-        if (hyperWorld == null) {
+        if (world == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
-        hyperWorld.removeFlag(flag);
+        world.removeFlag(flag);
         MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
     }
 
@@ -644,32 +646,32 @@ public class HyperCommandManager extends BaseCommand {
 
     @Subcommand("gamerule remove") @CommandPermission("hyperverse.gamerule.set")
     @CommandCompletion("@hyperworlds @gamerules") @Description("{@@command.gamerule.remove}")
-    public void doGameRuleRemove(final CommandSender sender, final HyperWorld hyperWorld, final GameRule gameRule) {
+    public void doGameRuleRemove(final CommandSender sender, final HyperWorld world,final GameRule gameRule) {
         if (gameRule == null) {
             MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
             return;
         }
-        if (hyperWorld == null) {
+        if (world == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
-        if (!hyperWorld.isLoaded()) {
+        if (!world.isLoaded()) {
             MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
             return;
         }
-        hyperWorld.getBukkitWorld().setGameRule(gameRule,
-            hyperWorld.getBukkitWorld().getGameRuleDefault(gameRule));
+        world.getBukkitWorld().setGameRule(gameRule,
+            world.getBukkitWorld().getGameRuleDefault(gameRule));
         MessageUtil.sendMessage(sender, Messages.messageGameRuleRemoved);
     }
 
     @Subcommand("delete") @CommandPermission("hyperverse.delete")
     @CommandCompletion("@hyperworlds") @Description("{@@command.delete}")
-    public void doDelete(final CommandSender sender, final HyperWorld hyperWorld) {
-        if (hyperWorld == null) {
+    public void doDelete(final CommandSender sender, final HyperWorld world) {
+        if (world == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
-        final HyperWorld.WorldUnloadResult worldUnloadResult = hyperWorld.deleteWorld();
+        final HyperWorld.WorldUnloadResult worldUnloadResult = world.deleteWorld();
         if (worldUnloadResult != HyperWorld.WorldUnloadResult.SUCCESS) {
             MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%"
                 , worldUnloadResult.getDescription());
