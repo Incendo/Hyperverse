@@ -142,6 +142,8 @@ public class Messages {
         "&cFailed to create the debug paste. Reason: %reason%");
     public static final Message messageInvalidWorldType = createMessage("invalid.world_type",
         "&cThat is not a valid world type");
+    public static final Message messageInvalidWorldFeatures = createMessage("invalid.world_features",
+        "&cThat is not a valid type");
     public static final Message messageInvalidGameRule = createMessage("invalid.game_rule",
         "&cThat is not a valid game rule");
 

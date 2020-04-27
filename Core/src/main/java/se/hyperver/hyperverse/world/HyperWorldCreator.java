@@ -63,7 +63,11 @@ public final class HyperWorldCreator extends WorldCreator {
      */
     public void configure() {
         final WorldConfiguration worldConfiguration = this.hyperWorld.getConfiguration();
-        this.type(WorldType.NORMAL);
+        if (worldConfiguration.getWorldFeatures() != null) {
+            this.type(worldConfiguration.getWorldFeatures().getBukkitType());
+        } else {
+            this.type(WorldType.NORMAL);
+        }
         this.environment(worldConfiguration.getType().getBukkitType());
         this.generatorSettings(worldConfiguration.getSettings());
         this.seed(worldConfiguration.getSeed());

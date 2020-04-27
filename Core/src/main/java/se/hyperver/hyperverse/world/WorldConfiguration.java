@@ -44,6 +44,7 @@ public class WorldConfiguration {
 
     private String name;
     private WorldType type;
+    private WorldFeatures worldFeatures;
     private String settings;
     private long seed;
     private boolean generateStructures;
@@ -53,8 +54,8 @@ public class WorldConfiguration {
     private boolean loaded = true;
     private Map<String, String> flags;
 
-    WorldConfiguration(final String name, final WorldType type, final String settings, final long seed,
-        final boolean generateStructures, final String generator, final String generatorArg) {
+    WorldConfiguration(final String name, final WorldType type, final WorldFeatures worldFeatures,
+        final String settings, final long seed, final boolean generateStructures, final String generator, final String generatorArg) {
         this.name = name;
         this.type = type;
         this.settings = settings;
@@ -62,6 +63,7 @@ public class WorldConfiguration {
         this.generateStructures = generateStructures;
         this.generator = generator;
         this.generatorArg = generatorArg;
+        this.worldFeatures = worldFeatures;
         this.flags = new HashMap<>();
     }
 
@@ -85,6 +87,10 @@ public class WorldConfiguration {
         Objects.requireNonNull(world);
         final WorldConfigurationBuilder worldConfigurationBuilder = builder();
         worldConfigurationBuilder.setName(world.getName());
+        if (world.getWorldType() != null) {
+            worldConfigurationBuilder.setWorldFeatures(WorldFeatures
+                .fromBukkitType(world.getWorldType()));
+        }
         worldConfigurationBuilder.setType(WorldType.fromBukkit(world.getEnvironment()));
         worldConfigurationBuilder.setSeed(world.getSeed());
         worldConfigurationBuilder.setGenerateStructures(world.canGenerateStructures());
@@ -130,6 +136,10 @@ public class WorldConfiguration {
 
     public void setSeed(final long seed) {
         this.seed = seed;
+    }
+
+    public WorldFeatures getWorldFeatures() {
+        return this.worldFeatures;
     }
 
     /**

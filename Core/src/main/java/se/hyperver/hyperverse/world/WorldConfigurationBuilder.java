@@ -26,6 +26,7 @@ public class WorldConfigurationBuilder {
 
     private String name;
     private WorldType type = WorldType.OVER_WORLD;
+    private WorldFeatures worldFeatures = WorldFeatures.NORMAL;
     private String settings = "";
     private long seed = SeedUtil.randomSeed();
     private boolean generateStructures = true;
@@ -67,8 +68,14 @@ public class WorldConfigurationBuilder {
         return this;
     }
 
+    public WorldConfigurationBuilder setWorldFeatures(WorldFeatures worldFeatures) {
+        this.worldFeatures = worldFeatures;
+        return this;
+    }
+
     public WorldConfiguration createWorldConfiguration() {
-        return new WorldConfiguration(name, type, settings, seed, generateStructures, generator, generatorArg);
+        return new WorldConfiguration(name, type, worldFeatures, settings, seed,
+            generateStructures, generator, generatorArg);
     }
 
 }

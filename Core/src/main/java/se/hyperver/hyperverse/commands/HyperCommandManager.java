@@ -64,6 +64,7 @@ import se.hyperver.hyperverse.util.WorldUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldConfigurationBuilder;
+import se.hyperver.hyperverse.world.WorldFeatures;
 import se.hyperver.hyperverse.world.WorldManager;
 import se.hyperver.hyperverse.world.WorldType;
 
@@ -196,6 +197,13 @@ public class HyperCommandManager extends BaseCommand {
             return Arrays.stream(WorldType.values()).map(WorldType::name).map(String::toLowerCase)
                 .collect(Collectors.toList());
         });
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("worldfeatures", context -> {
+           if (context.getInput().contains(" ")) {
+               return Collections.emptyList();
+           }
+           return Arrays.stream(WorldFeatures.values()).map(WorldFeatures::name).map(String::toLowerCase)
+               .collect(Collectors.toList());
+        });
         bukkitCommandManager.getCommandCompletions().registerCompletion("null", context ->
             Collections.emptyList());
         bukkitCommandManager.getCommandCompletions()
@@ -237,6 +245,11 @@ public class HyperCommandManager extends BaseCommand {
             return WorldType.fromString(arg).orElseThrow(() ->
                 new InvalidCommandArgument(Messages.messageInvalidWorldType.withoutColorCodes()));
         });
+        bukkitCommandManager.getCommandContexts().registerContext(WorldFeatures.class, context -> {
+            final String arg = context.popFirstArg();
+            return WorldFeatures.fromName(arg).orElseThrow(() ->
+                new InvalidCommandArgument(Messages.messageInvalidWorldFeatures.withoutColorCodes()));
+        });
         bukkitCommandManager.getCommandContexts().registerContext(HyperWorld.class, context -> {
             final HyperWorld hyperWorld = worldManager.getWorld(context.popFirstArg());
             if (hyperWorld == null) {
@@ -260,12 +273,13 @@ public class HyperCommandManager extends BaseCommand {
 
     @Subcommand("create") @Syntax(
         "<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed]"
-            + " [generate-structures: true, false] [settings...]")
+            + " [generate-structures: true, false] [features: normal, flat, amplified, bucket] [settings...]")
     @CommandPermission("hyperverse.create") @Description("{@@command.create}")
-    @CommandCompletion("@null @generators @worldtypes @null @null true|false @null")
+    @CommandCompletion("@null @generators @worldtypes @null @null true|false @worldfeatures @null")
     public void createWorld(final CommandSender sender, final String world, String generator,
         @Default("overworld") final WorldType type, @Optional final Long specifiedSeed,
-        @Default("true") final boolean generateStructures, @Default final String settings) {
+        @Default("true") final boolean generateStructures, @Default("normal") final WorldFeatures features,
+        @Default final String settings) {
         final long seed = specifiedSeed == null ? SeedUtil.randomSeed() : specifiedSeed;
         // Check if the name already exists
         for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
@@ -295,7 +309,7 @@ public class HyperCommandManager extends BaseCommand {
         // Check if the generator is actually valid
         final WorldConfiguration worldConfiguration =
             WorldConfiguration.builder().setName(world).setGenerator(generator).setType(type).setSeed(seed)
-                .setGenerateStructures(generateStructures).setSettings(settings)
+                .setGenerateStructures(generateStructures).setSettings(settings).setWorldFeatures(features)
                 .setGeneratorArg(generatorArgs).createWorldConfiguration();
         final HyperWorld hyperWorld =
             hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
