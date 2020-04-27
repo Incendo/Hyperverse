@@ -668,7 +668,12 @@ public class HyperCommandManager extends BaseCommand {
             final Path path = Bukkit.getWorldContainer().toPath()
                 .resolve(hyperWorld.getConfiguration().getName());
             try {
-                Files.delete(path);
+                try (Stream<Path> walk = Files.walk(path)) {
+                    walk.sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .peek(System.out::println)
+                        .forEach(File::delete);
+                }
             } catch (final Exception e) {
                 MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%",
                     e.getMessage());
