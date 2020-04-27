@@ -23,6 +23,8 @@ import co.aikar.commands.BukkitMessageFormatter;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.MessageType;
+import co.aikar.commands.PaperBrigadierManager;
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
@@ -36,6 +38,7 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
@@ -108,7 +111,18 @@ public class HyperCommandManager extends BaseCommand {
         this.fileHyperConfiguration = Objects.requireNonNull(hyperConfiguration);
 
         // Create the command manager
-        bukkitCommandManager = new BukkitCommandManager(hyperverse);
+        if (PaperLib.isPaper()) {
+            bukkitCommandManager = new PaperCommandManager(hyperverse);
+            try {
+                bukkitCommandManager.enableUnstableAPI("brigadier");
+                new PaperBrigadierManager(hyperverse, (PaperCommandManager) bukkitCommandManager);
+            } catch (final Exception e) {
+                Hyperverse.getPlugin(Hyperverse.class).getLogger()
+                    .info("Update Paper to enable Brigadier support!");
+            }
+        } else {
+            bukkitCommandManager = new BukkitCommandManager(hyperverse);
+        }
         bukkitCommandManager.usePerIssuerLocale(true, true);
         bukkitCommandManager.getLocales().addMessages(Locale.ENGLISH, Messages.getMessages());
         bukkitCommandManager.setDefaultFormatter(new BukkitMessageFormatter(ChatColor.GRAY) {
