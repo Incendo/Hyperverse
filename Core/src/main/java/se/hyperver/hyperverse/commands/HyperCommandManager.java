@@ -73,6 +73,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -650,17 +651,32 @@ public class HyperCommandManager extends BaseCommand {
 
     @Subcommand("delete") @CommandPermission("hyperverse.delete")
     @CommandCompletion("@hyperworlds") @Description("{@@command.delete}")
-    public void doDelete(final CommandSender sender, final HyperWorld hyperWorld) {
+    public void doDelete(final CommandSender sender, final HyperWorld hyperWorld,
+        @Default("false") boolean deleteDirectory) {
         if (hyperWorld == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
         final HyperWorld.WorldUnloadResult worldUnloadResult = hyperWorld.deleteWorld();
         if (worldUnloadResult != HyperWorld.WorldUnloadResult.SUCCESS) {
-            MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%"
-                , worldUnloadResult.getDescription());
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%",
+                worldUnloadResult.getDescription());
             return;
         }
+
+        if (deleteDirectory) {
+            final Path path = Bukkit.getWorldContainer().toPath()
+                .resolve(hyperWorld.getConfiguration().getName());
+            try {
+                Files.delete(path);
+            } catch (final Exception e) {
+                MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%",
+                    e.getMessage());
+                e.printStackTrace();
+                return;
+            }
+        }
+
         MessageUtil.sendMessage(sender, Messages.messageWorldRemoved);
     }
 
