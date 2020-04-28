@@ -272,9 +272,8 @@ public class HyperCommandManager extends BaseCommand {
         commandHelp.showHelp();
     }
 
-    @Subcommand("create") @Syntax(
-        "<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed]"
-            + " [generate-structures: true, false] [features: normal, flat, amplified, bucket] [settings...]")
+    @Category("Management")
+    @Subcommand("create") @Syntax("<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed] [generate-structures: true, false] [features: normal, flat, amplified, bucket] [settings...]")
     @CommandPermission("hyperverse.create") @Description("{@@command.create}")
     @CommandCompletion("@null @generators @worldtypes @null @null true|false @worldfeatures @null")
     public void createWorld(final CommandSender sender, final String world, String generator,
@@ -348,8 +347,8 @@ public class HyperCommandManager extends BaseCommand {
         }
     }
 
-    @Subcommand("import") @CommandPermission("hyperverse.import") @CommandAlias("hvimport")
-    @CommandCompletion("@import-candidates @generators ") @Description("{@@command.import}")
+    @Category("Management") @Subcommand("import") @CommandPermission("hyperverse.import")
+    @CommandAlias("hvimport") @CommandCompletion("@import-candidates @generators ") @Description("{@@command.import}")
     public void importWorld(final CommandSender sender, final String worldName, final String generator) {
         if (worldManager.getWorld(worldName) != null) {
             MessageUtil.sendMessage(sender, Messages.messageWorldAlreadyImported);
@@ -382,8 +381,8 @@ public class HyperCommandManager extends BaseCommand {
         }
     }
 
-    @Subcommand("list|l|worlds") @CommandPermission("hyperverse.list") @CommandAlias("hvl")
-    @Description("{@@command.list}") public void doList(final CommandSender sender) {
+    @Category("Informational") @Subcommand("list|l|worlds") @CommandPermission("hyperverse.list")
+    @CommandAlias("hvl") @Description("{@@command.list}") public void doList(final CommandSender sender) {
         MessageUtil.sendMessage(sender, Messages.messageListHeader);
         Stream<HyperWorld> stream = this.worldManager.getWorlds().stream().sorted(Comparator.comparing(world -> world.getConfiguration().getName()));
         if (sender instanceof Entity) {
@@ -422,7 +421,7 @@ public class HyperCommandManager extends BaseCommand {
         });
     }
 
-    @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport")
+    @Category("Misc") @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport")
     @CommandCompletion("@hyperworlds:player=not_in,state=loaded") @Description("{@@command.teleport}")
     public void doTeleport(final Player player, final HyperWorld world) {
         if (world == null) {
@@ -442,8 +441,8 @@ public class HyperCommandManager extends BaseCommand {
         world.teleportPlayer(player);
     }
 
-    @Subcommand("info|i") @CommandAlias("hvi") @CommandPermission("hyperverse.info")
-    @CommandCompletion("@hyperworlds") @Description("View world info")
+    @Category("Informational") @Subcommand("info|i") @CommandAlias("hvi")
+    @CommandPermission("hyperverse.info") @CommandCompletion("@hyperworlds") @Description("View world info")
     public void doInfo(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
             return;
@@ -452,7 +451,7 @@ public class HyperCommandManager extends BaseCommand {
         world.sendWorldInfo(sender);
     }
 
-    @Subcommand("unload") @CommandPermission("hyperverse.unload")
+    @Category("Management") @Subcommand("unload") @CommandPermission("hyperverse.unload")
     @CommandCompletion("@hyperworlds:state=loaded") @Description("{@@command.unload}")
     public void doUnload(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
@@ -471,7 +470,7 @@ public class HyperCommandManager extends BaseCommand {
         }
     }
 
-    @Subcommand("load") @CommandPermission("hyperverse.load")
+    @Category("Management") @Subcommand("load") @CommandPermission("hyperverse.load")
     @CommandCompletion("@hyperworlds:state=unloaded") @Description("{@@command.load}")
     public void doLoad(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
@@ -496,7 +495,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageWorldLoadedSuccessfully);
     }
 
-    @Subcommand("find|where") @CommandPermission("hyperverse.find") @CommandAlias("hvf|hvfind")
+    @Category("Misc") @Subcommand("find|where") @CommandPermission("hyperverse.find") @CommandAlias("hvf|hvfind")
     @CommandCompletion("@players") @Description("{@@command.find}")
     //public void findPlayer(final CommandSender sender, final String... players) {
     public void findPlayer(final CommandSender sender, final String player) {
@@ -516,7 +515,7 @@ public class HyperCommandManager extends BaseCommand {
         //}
     }
 
-    @Subcommand("who") @CommandPermission("hyperverse.who") @CommandAlias("hvwho")
+    @Category("Misc") @Subcommand("who") @CommandPermission("hyperverse.who") @CommandAlias("hvwho")
     @CommandCompletion("@hyperworlds") @Description("{@@command.who}")
     public void findPlayersPresent(final CommandSender sender, @Optional final String world) {
         if (world != null) {
@@ -549,7 +548,7 @@ public class HyperCommandManager extends BaseCommand {
         }
     }
 
-    @Subcommand("flag set") @CommandPermission("hyperverse.flag.set")
+    @Category("Management") @Subcommand("flag set") @CommandPermission("hyperverse.flag.set")
     @CommandCompletion("@hyperworlds @flags @flag") @Description("{@@command.flag.set}")
     public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,
         final WorldFlag<?, ?> flag, final String value) {
@@ -571,7 +570,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageFlagSet);
     }
 
-    @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
+    @Category("Mangement") @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
     @CommandCompletion("@hyperworlds @flags") @Description("{@@command.flag.remove}")
     public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
         if (flag == null) {
@@ -586,7 +585,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
     }
 
-    @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")
+    @Category("Management") @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")
     @CommandCompletion("@hyperworlds @gamerules @gamerule") @Description("{@@command.gamerule.set}")
     public void doGameRuleSet(final CommandSender sender, final HyperWorld hyperWorld,
         final GameRule gameRule, final String value) {
@@ -629,7 +628,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageGameRuleSet);
     }
 
-    @Subcommand("gamerule remove") @CommandPermission("hyperverse.gamerule.set")
+    @Category("Management") @Subcommand("gamerule remove") @CommandPermission("hyperverse.gamerule.set")
     @CommandCompletion("@hyperworlds @gamerules") @Description("{@@command.gamerule.remove}")
     public void doGameRuleRemove(final CommandSender sender, final HyperWorld hyperWorld, final GameRule gameRule) {
         if (gameRule == null) {
@@ -649,7 +648,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageGameRuleRemoved);
     }
 
-    @Subcommand("delete") @CommandPermission("hyperverse.delete")
+    @Category("Management") @Subcommand("delete") @CommandPermission("hyperverse.delete")
     @CommandCompletion("@hyperworlds") @Description("{@@command.delete}")
     public void doDelete(final CommandSender sender, final HyperWorld hyperWorld,
         @Default("false") boolean deleteDirectory) {
@@ -685,7 +684,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageWorldRemoved);
     }
 
-    @Subcommand("reload") @CommandPermission("hyperverse.reload") @CommandAlias("hvreload")
+    @Category("Misc") @Subcommand("reload") @CommandPermission("hyperverse.reload") @CommandAlias("hvreload")
     @Description("{@@command.reload}")
     public void doConfigReload(final CommandSender sender) {
         if (Hyperverse.getPlugin(Hyperverse.class).reloadConfiguration(sender)) {
@@ -695,7 +694,7 @@ public class HyperCommandManager extends BaseCommand {
         }
     }
 
-    @Subcommand("debugpaste") @CommandPermission("hyperverse.debugpaste")
+    @Category("Misc") @Subcommand("debugpaste") @CommandPermission("hyperverse.debugpaste")
     @Description("{@@command.debugpaste}")
     public void doDebugPaste(final CommandSender sender) {
         this.taskChainFactory.newChain().async(() -> {
@@ -789,7 +788,7 @@ public class HyperCommandManager extends BaseCommand {
         }).execute();
     }
 
-    @Subcommand("multiverse") @CommandPermission("hyperverse.multiverse")
+    @Category("Misc") @Subcommand("multiverse") @CommandPermission("hyperverse.multiverse")
     @Description("{@@command.multiverse}")
     public void doMultiverse(final CommandSender sender) {
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {

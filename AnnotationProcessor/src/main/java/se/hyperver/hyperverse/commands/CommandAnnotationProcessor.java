@@ -167,9 +167,12 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
                 syntax = syntaxBuilder.toString();
             }
 
+            final Category category = commandAlias.getAnnotation(Category.class);
+
             owningCommand.subCommands.add(new SubCommand(names.toArray(new String[0]),
                 commandPermission == null ? "" : commandPermission.value(),
-                description == null ? "" : replace(description.value(), captions), replace(syntax, captions)));
+                description == null ? "" : replace(description.value(), captions), replace(syntax, captions),
+                category == null ? "Misc" : category.value()));
         }
 
         System.out.printf("Writing commands to %s\n", commandOutput.toString());
@@ -212,28 +215,45 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
                 builder.append(", ");
             }
         }
-        builder.append("|\n").append("## Sub-commands\n\n");
-        builder.append("| Command | Permission | Aliases | Description | Syntax |\n")
-               .append("|------------|------------|---------|-------------|--------|\n");
+
+        builder.append("|\n");
+
+        final Map<String, List<SubCommand>> categories = new HashMap<>();
         for (final SubCommand subCommand : command.subCommands) {
-            builder.append("|`/").append(subCommand.subCommand).append("`")
-                   .append("|`").append(subCommand.permission).append("`")
-                   .append("|");
-            for (int i = 1; i < subCommand.names.length; i++) {
-                builder.append("`").append(subCommand.names[i]).append("`");
-                if ((i + 1) < subCommand.names.length) {
-                    builder.append(", ");
+            final List<SubCommand> subCommands = categories.computeIfAbsent(subCommand.category,
+                k -> new ArrayList<>());
+            subCommands.add(subCommand);
+        }
+
+        for (final String category : categories.keySet()) {
+            builder.append("## ").append(category).append("\n");
+            for (final SubCommand subCommand : categories.get(category)) {
+                builder.append("**/").append(subCommand.subCommand).append("**\\\n")
+                       .append("Permission: `").append(subCommand.permission).append("`\\\n");
+
+                if (subCommand.names.length > 1) {
+                    builder.append("Aliases: ");
+                    for (int i = 1; i < subCommand.names.length; i++) {
+                        builder.append("`").append(subCommand.names[i]).append("`");
+                        if ((i + 1) < subCommand.names.length) {
+                            builder.append(", ");
+                        }
+                    }
+                    builder.append("\\\n");
                 }
-            }
-            builder.append("|").append(subCommand.description)
-                   .append("|");
-            if (subCommand.syntax.isEmpty()) {
-                builder.append("|\n");
-            } else {
-                builder.append("`").append(subCommand.syntax).append("`|\n");
+
+                builder.append("Description: ").append(subCommand.description);
+
+                if (!subCommand.syntax.isEmpty()) {
+                    builder.append("\\\nSyntax: `").append(subCommand.fullSyntax).append("`\n");
+                } else {
+                    builder.append("\n");
+                }
+
+                builder.append("\n");
             }
         }
-        builder.append("\n");
+
         return builder.toString();
     }
 
@@ -268,15 +288,17 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
         private final String description;
         private final String syntax;
         private final String fullSyntax;
+        private final String category;
 
         private SubCommand(final String[] names, final String permission, final String description,
-            final String syntax) {
+            final String syntax, final String category) {
             this.names = names;
             this.subCommand = names[0];
             this.permission = permission;
             this.description = description;
             this.syntax = syntax;
             this.fullSyntax = "/" + names[0] + (syntax.isEmpty() ? "" : " ") + syntax;
+            this.category = category;
         }
 
     }
