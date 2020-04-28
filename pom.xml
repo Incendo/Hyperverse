@@ -40,6 +40,7 @@
     <modules>
         <module>Core</module>
         <module>Bukkit-1.15</module>
+        <module>AnnotationProcessor</module>
     </modules>
 
     <build>

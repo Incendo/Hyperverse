@@ -23,6 +23,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>AnnotationProcessor</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.15.2-R0.1-SNAPSHOT</version>
@@ -214,6 +220,9 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
+                    <annotationProcessors>
+                        <annotationProcessor>se.hyperver.hyperverse.commands.CommandAnnotationProcessor</annotationProcessor>
+                    </annotationProcessors>
                 </configuration>
             </plugin>
             <plugin>
