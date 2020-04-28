@@ -198,12 +198,14 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
 
     private final class Command {
 
+        private final String command;
         private final String[] names;
         private final String permission;
         private final List<SubCommand> subCommands = new LinkedList<>();
 
         private Command(final String[] names, final String permission) {
             this.names = Objects.requireNonNull(names);
+            this.command = names[0];
             this.permission = Objects.requireNonNull(permission);
         }
 
@@ -212,6 +214,7 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
 
     private final class SubCommand {
 
+        private final String subCommand;
         private final String[] names;
         private final String permission;
         private final String description;
@@ -221,6 +224,7 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
         private SubCommand(final String[] names, final String permission, final String description,
             final String syntax) {
             this.names = names;
+            this.subCommand = names[0];
             this.permission = permission;
             this.description = description;
             this.syntax = syntax;
