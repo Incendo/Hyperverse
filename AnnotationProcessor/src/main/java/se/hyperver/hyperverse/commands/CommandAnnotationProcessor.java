@@ -44,6 +44,7 @@ import javax.lang.model.type.TypeMirror;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -184,9 +185,56 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
             } catch (final IOException e) {
                 e.printStackTrace();
             }
+            try {
+                final String[] parts = commandEntry.getKey().toString().split("\\.");
+                final String simpleName = parts[parts.length - 1];
+                Files.write(commandOutput.resolve(simpleName + ".md"),
+                    formatMarkdown(commandEntry.getValue()).getBytes(
+                    StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return true;
+    }
+
+    private String formatMarkdown(final Command command) {
+        final StringBuilder builder = new StringBuilder("# Command Reference\n\n")
+            .append("| Subcommand | Permission | Aliases |\n")
+            .append("|------------|------------|---------|\n")
+            .append("|`/").append(command.command).append("`")
+            .append("|`").append(command.permission).append("`")
+            .append("|");
+        for (int i = 1; i < command.names.length; i++) {
+            builder.append("`/").append(command.names[i]).append("`");
+            if ((i + 1) < command.names.length) {
+                builder.append(", ");
+            }
+        }
+        builder.append("|\n").append("## Sub-commands\n\n");
+        builder.append("| Subcommand | Permission | Aliases | Description | Syntax |\n")
+               .append("|------------|------------|---------|-------------|--------|\n");
+        for (final SubCommand subCommand : command.subCommands) {
+            builder.append("|`/").append(subCommand.subCommand).append("`")
+                   .append("|`").append(subCommand.permission).append("`")
+                   .append("|");
+            for (int i = 1; i < subCommand.names.length; i++) {
+                builder.append("`").append(subCommand.names[i]).append("`");
+                if ((i + 1) < subCommand.names.length) {
+                    builder.append(", ");
+                }
+            }
+            builder.append("|").append(subCommand.description)
+                   .append("|");
+            if (subCommand.syntax.isEmpty()) {
+                builder.append("|\n");
+            } else {
+                builder.append("`").append(subCommand.syntax).append("`|\n");
+            }
+        }
+        builder.append("\n");
+        return builder.toString();
     }
 
     private String replace(String source, final JsonObject captions) {
