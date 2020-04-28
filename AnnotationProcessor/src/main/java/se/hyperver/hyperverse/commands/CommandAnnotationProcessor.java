@@ -201,7 +201,7 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
 
     private String formatMarkdown(final Command command) {
         final StringBuilder builder = new StringBuilder("# Command Reference\n\n")
-            .append("| Subcommand | Permission | Aliases |\n")
+            .append("| Command | Permission | Aliases |\n")
             .append("|------------|------------|---------|\n")
             .append("|`/").append(command.command).append("`")
             .append("|`").append(command.permission).append("`")
@@ -213,7 +213,7 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
             }
         }
         builder.append("|\n").append("## Sub-commands\n\n");
-        builder.append("| Subcommand | Permission | Aliases | Description | Syntax |\n")
+        builder.append("| Command | Permission | Aliases | Description | Syntax |\n")
                .append("|------------|------------|---------|-------------|--------|\n");
         for (final SubCommand subCommand : command.subCommands) {
             builder.append("|`/").append(subCommand.subCommand).append("`")
