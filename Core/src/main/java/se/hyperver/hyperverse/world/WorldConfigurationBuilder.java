@@ -29,7 +29,7 @@ public class WorldConfigurationBuilder {
     private WorldFeatures worldFeatures = WorldFeatures.NORMAL;
     private String settings = "";
     private long seed = SeedUtil.randomSeed();
-    private boolean generateStructures = true;
+    private WorldStructureSetting generateStructures = WorldStructureSetting.GENERATE_STRUCTURES;
     private String generator = "";
     private String generatorArg = "";
 
@@ -53,7 +53,7 @@ public class WorldConfigurationBuilder {
         return this;
     }
 
-    public WorldConfigurationBuilder setGenerateStructures(boolean generateStructures) {
+    public WorldConfigurationBuilder setGenerateStructures(WorldStructureSetting generateStructures) {
         this.generateStructures = generateStructures;
         return this;
     }
@@ -75,7 +75,8 @@ public class WorldConfigurationBuilder {
 
     public WorldConfiguration createWorldConfiguration() {
         return new WorldConfiguration(name, type, worldFeatures, settings, seed,
-            generateStructures, generator, generatorArg);
+            generateStructures == WorldStructureSetting.GENERATE_STRUCTURES,
+            generator, generatorArg);
     }
 
 }

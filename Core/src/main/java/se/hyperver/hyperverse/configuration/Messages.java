@@ -146,6 +146,8 @@ public class Messages {
         "&cThat is not a valid type");
     public static final Message messageInvalidGameRule = createMessage("invalid.game_rule",
         "&cThat is not a valid game rule");
+    public static final Message messageInvalidStructureSetting = createMessage("invalid.structure_setting",
+        "&cThat is not a valid world structure setting");
     public static final Message messagePortalNotLinked = createMessage("portal.not_linked",
         "&cI'm sorry, that portal can't take you anywhere!");
 

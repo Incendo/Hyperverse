@@ -93,7 +93,8 @@ public class WorldConfiguration {
         }
         worldConfigurationBuilder.setType(WorldType.fromBukkit(world.getEnvironment()));
         worldConfigurationBuilder.setSeed(world.getSeed());
-        worldConfigurationBuilder.setGenerateStructures(world.canGenerateStructures());
+        worldConfigurationBuilder.setGenerateStructures(world.canGenerateStructures() ?
+            WorldStructureSetting.GENERATE_STRUCTURES : WorldStructureSetting.NO_STRUCTURES);
         // Try to retrieve the generator
         try {
             ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());

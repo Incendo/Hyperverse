@@ -70,6 +70,7 @@ import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldConfigurationBuilder;
 import se.hyperver.hyperverse.world.WorldFeatures;
 import se.hyperver.hyperverse.world.WorldManager;
+import se.hyperver.hyperverse.world.WorldStructureSetting;
 import se.hyperver.hyperverse.world.WorldType;
 
 import java.io.File;
@@ -245,6 +246,23 @@ public class HyperCommandManager extends BaseCommand {
             }
             return Collections.emptyList();
         });
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("structures", context ->
+            Arrays.asList("yes", "true", "generate_structures", "structures", "no", "false", "no_structures"));
+        bukkitCommandManager.getCommandContexts().registerContext(WorldStructureSetting.class, context -> {
+            switch (context.popFirstArg().toLowerCase()) {
+                case "yes":
+                case "true":
+                case "generate_structures":
+                case "structures":
+                    return WorldStructureSetting.GENERATE_STRUCTURES;
+                case "no":
+                case "false":
+                case "no_structures":
+                    return WorldStructureSetting.NO_STRUCTURES;
+                default:
+                    throw new InvalidCommandArgument(Messages.messageInvalidStructureSetting.withoutColorCodes());
+            }
+        });
         bukkitCommandManager.getCommandContexts().registerContext(WorldType.class, context -> {
             final String arg = context.popFirstArg();
             return WorldType.fromString(arg).orElseThrow(() ->
@@ -279,10 +297,10 @@ public class HyperCommandManager extends BaseCommand {
     @Category("Management")
     @Subcommand("create") @Syntax("<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed] [generate-structures: true, false] [features: normal, flat, amplified, bucket] [settings...]")
     @CommandPermission("hyperverse.create") @Description("{@@command.create}")
-    @CommandCompletion("@null @generators @worldtypes @null @null true|false @worldfeatures @null")
+    @CommandCompletion("@null @generators @worldtypes @null @null @structures @worldfeatures @null")
     public void createWorld(final CommandSender sender, final String world, String generator,
         @Default("overworld") final WorldType type, @Optional final Long specifiedSeed,
-        @Default("true") final boolean generateStructures, @Default("normal") final WorldFeatures features,
+        @Default("true") final WorldStructureSetting generateStructures, @Default("normal") final WorldFeatures features,
         @Default final String settings) {
         final long seed = specifiedSeed == null ? SeedUtil.randomSeed() : specifiedSeed;
         // Check if the name already exists
