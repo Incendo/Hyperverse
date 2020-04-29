@@ -671,7 +671,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Category("Management") @Subcommand("delete") @CommandPermission("hyperverse.delete")
-    @CommandCompletion("@hyperworlds") @Description("{@@command.delete}")
+    @CommandCompletion("@hyperworlds true|false") @Description("{@@command.delete}")
     public void doDelete(final CommandSender sender, final HyperWorld hyperWorld,
         @Default("false") boolean deleteDirectory) {
         if (hyperWorld == null) {
