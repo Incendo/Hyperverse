@@ -219,6 +219,8 @@ public class Messages {
         "Create a debug paste. This will upload your configuration files to Athion. Beware!");
     public static final Message commandDescriptionMultiverse = createMessage("command.multiverse",
         "Import Multiverse configurations");
+    public static final Message commandDescriptionPlugin = createMessage("command.plugin",
+        "Show plugin information");
 
     public static final DecimalFormat miscCoordinateDecimalFormat = new DecimalFormat("#.##");
 

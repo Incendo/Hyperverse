@@ -36,6 +36,9 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
+import me.minidigger.minimessage.text.MiniMessageParser;
+import net.kyori.text.adapter.bukkit.TextAdapter;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
@@ -46,6 +49,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
@@ -798,5 +802,18 @@ public class HyperCommandManager extends BaseCommand {
             MessageUtil.sendMessage(sender, Messages.messageMultiverseMissing);
         }
     }
+
+    @Category("Misc") @Subcommand("plugin")
+    @Description("{@@command.plugin}")
+    public void doPlugin(final CommandSender sender) {
+        final Hyperverse plugin = Hyperverse.getPlugin(Hyperverse.class);
+        final PluginDescriptionFile description = plugin.getDescription();
+        Stream.of("<gold>Plugin Version:</gold> <gray>" + description.getVersion() + "</gray>",
+                  "<gold>Author(s):</gold> <gray>" + StringUtils.join(description.getAuthors(), ", ") + "</gray>",
+                  "<gold>Website:</gold> <gray><hover:show_text:\"<gray>Click to open</gray>\"><click:open_url:https://hyperver.se>https://hyperver.se</click></hover></gray>").forEach(msg ->
+            TextAdapter.sendComponent(sender, MiniMessageParser.parseFormat(
+                "<dark_gray>[</dark_gray><gold>Hyperverse</gold><dark_gray>]</dark_gray> " + msg)));
+    }
+
 
 }
