@@ -1,0 +1,66 @@
+//
+// Hyperverse - A Minecraft world management plugin
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+
+package se.hyperver.hyperverse.listeners;
+
+import com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent;
+import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
+import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
+import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.world.WorldManager;
+
+public class PaperListener implements Listener {
+
+    private final WorldManager worldManager;
+
+    PaperListener(final WorldManager worldManager) {
+        this.worldManager = worldManager;
+    }
+
+    @EventHandler
+    public void onEntityPreSpawn(final PreCreatureSpawnEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getSpawnLocation().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        if (hyperWorld.getFlag(CreatureSpawnFlag.class)) {
+            return;
+        }
+        if (event.getReason() != CreatureSpawnEvent.SpawnReason.NATURAL) {
+            return;
+        }
+        event.setCancelled(true);
+        event.setShouldAbortSpawn(true);
+    }
+
+    @EventHandler
+    public void onMobPreSpawn(final PlayerNaturallySpawnCreaturesEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        if (hyperWorld.getFlag(MobSpawnFlag.class)) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+}

@@ -17,11 +17,13 @@
 
 package se.hyperver.hyperverse.flags;
 
+import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.flags.implementation.EndFlag;
 import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
 import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
 import se.hyperver.hyperverse.flags.implementation.LocalRespawnFlag;
+import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.flags.implementation.PveFlag;
@@ -55,6 +57,8 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(EndFlag.END_FLAG_DEFAULT);
         this.addFlag(ProfileGroupFlag.PROFILE_GROUP_FLAG_EMPTY);
         this.addFlag(DifficultyFlag.DIFFICULTY_FLAG_NORMAL);
+        this.addFlag(MobSpawnFlag.MOB_SPAWN_ALLOWED);
+        this.addFlag(CreatureSpawnFlag.CREATURE_SPAWN_ALLOWED);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {

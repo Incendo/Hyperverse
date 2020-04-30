@@ -187,6 +187,10 @@ public class Messages {
         "Name of the profile group that the world belongs to");
     public static final Message flagDescriptionDifficulty = createMessage("flags.difficulty",
         "World difficulty. Available values are: peaceful, easy, normal and hard");
+    public static final Message flagDescriptionCreatureSpawn = createMessage("flags.creature-spawn",
+        "Whether or not creatures are allowed to spawn in the world");
+    public static final Message flagDescriptionMobSpawn = createMessage("flags.mob-spawn",
+        "Whether or not mobs are allowed to spawn in the world");
 
     // Command Descriptions
     public static final Message commandDescriptionCreate = createMessage("command.create",

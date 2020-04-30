@@ -39,7 +39,7 @@ import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
-import se.hyperver.hyperverse.listeners.PlayerListener;
+import se.hyperver.hyperverse.listeners.EventListener;
 import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskChainModule;
@@ -142,7 +142,7 @@ import java.util.Map;
         // Register events
         try {
             this.getServer().getPluginManager().registerEvents(injector.getInstance(WorldListener.class), this);
-            this.getServer().getPluginManager().registerEvents(injector.getInstance(PlayerListener.class), this);
+            this.getServer().getPluginManager().registerEvents(injector.getInstance(EventListener.class), this);
         } catch (final Exception e) {
             e.printStackTrace();
         }
