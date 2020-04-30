@@ -15,5 +15,6 @@
   "command.teleport": "Teleport between hyperverse worlds",
   "command.unload": "Unload a world",
   "command.who": "Find the current players in a world",
-  "command.plugin": "Show plugin plugin information"
+  "command.plugin": "Show plugin plugin information",
+  "command.regenerate": "Regenerate a world"
 }

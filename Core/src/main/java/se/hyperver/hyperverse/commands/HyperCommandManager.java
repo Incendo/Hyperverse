@@ -833,5 +833,70 @@ public class HyperCommandManager extends BaseCommand {
                 "<dark_gray>[</dark_gray><gold>Hyperverse</gold><dark_gray>]</dark_gray> " + msg)));
     }
 
+    @Category("Management") @Subcommand("regenerate|regen") @Description("{@@command.regenerate}")
+    @CommandPermission("hyperverse.regenerate") @CommandCompletion("@hyperworlds")
+    public void doRegenerate(final CommandSender sender, final HyperWorld world) {
+        if (world == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+            return;
+        }
+        final WorldConfiguration configuration = world.getConfiguration().copy();
+        final HyperWorld.WorldUnloadResult worldUnloadResult = world.deleteWorld();
+        if (worldUnloadResult != HyperWorld.WorldUnloadResult.SUCCESS) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%",
+                worldUnloadResult.getDescription());
+            return;
+        }
+
+        final Path path = Bukkit.getWorldContainer().toPath()
+            .resolve(world.getConfiguration().getName());
+        try {
+            try (Stream<Path> walk = Files.walk(path)) {
+                walk.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .peek(System.out::println)
+                    .forEach(File::delete);
+            }
+        } catch (final Exception e) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotRemoved, "%reason%",
+                e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+        MessageUtil.sendMessage(sender, Messages.messageWorldRemoved);
+        final HyperWorld hyperWorld = hyperWorldFactory.create(UUID.randomUUID(), configuration);
+        MessageUtil.sendMessage(sender, Messages.messageWorldCreationStarted);
+        hyperWorld.sendWorldInfo(sender);
+
+        // Make sure we don't detect the world load
+        this.worldManager.ignoreWorld(configuration.getName());
+
+        try {
+            hyperWorld.createBukkitWorld();
+            // Register the world
+            this.worldManager.addWorld(hyperWorld);
+            MessageUtil.sendMessage(sender, Messages.messageWorldCreationFinished);
+            if (sender instanceof Player) {
+                // Attempt to teleport them to the world
+                hyperWorld.teleportPlayer((Player) sender);
+            }
+        } catch (final HyperWorldValidationException validationException) {
+            switch (validationException.getValidationResult()) {
+                case UNKNOWN_GENERATOR:
+                    MessageUtil.sendMessage(sender, Messages.messageGeneratorInvalid,
+                        "%world%", hyperWorld.getConfiguration().getName(),
+                        "%generator%", hyperWorld.getConfiguration().getGenerator());
+                    break;
+                case SUCCESS:
+                    break;
+                default:
+                    MessageUtil.sendMessage(sender, Messages.messageCreationUnknownFailure);
+                    break;
+            }
+        } catch (final Exception e) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldCreationFailed,
+                "%reason%", e.getMessage());
+        }
+    }
 
 }

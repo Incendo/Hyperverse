@@ -227,6 +227,8 @@ public class Messages {
         "Import Multiverse configurations");
     public static final Message commandDescriptionPlugin = createMessage("command.plugin",
         "Show plugin information");
+    public static final Message commandDescriptionRegenerate = createMessage("command.regenerate",
+        "Regenerate a world");
 
     public static final DecimalFormat miscCoordinateDecimalFormat = new DecimalFormat("#.##");
 

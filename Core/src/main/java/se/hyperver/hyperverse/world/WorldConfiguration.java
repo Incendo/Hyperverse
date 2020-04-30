@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * Configuration of a {@link HyperWorld}
  */
-public class WorldConfiguration {
+public class WorldConfiguration implements Cloneable {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -131,12 +131,27 @@ public class WorldConfiguration {
         return null;
     }
 
-    public void setGenerator(@NotNull final String generator) {
-        this.generator = generator;
+    public WorldConfiguration copy() {
+        try {
+            return this.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public void setSeed(final long seed) {
-        this.seed = seed;
+    @Override protected WorldConfiguration clone() throws CloneNotSupportedException {
+        final WorldConfiguration other = (WorldConfiguration) super.clone();
+        other.name = this.name;
+        other.type = this.type;
+        other.settings = this.settings;
+        other.seed = this.seed;
+        other.generateStructures = this.generateStructures;
+        other.generator = this.generator;
+        other.generatorArg = this.generatorArg;
+        other.worldFeatures = this.worldFeatures;
+        other.flags = new HashMap<>(this.flags);
+        return other;
     }
 
     public WorldFeatures getWorldFeatures() {
@@ -180,6 +195,10 @@ public class WorldConfiguration {
         return this.seed;
     }
 
+    public void setSeed(final long seed) {
+        this.seed = seed;
+    }
+
     /**
      * Check if the world should generate structured
      *
@@ -196,6 +215,10 @@ public class WorldConfiguration {
      */
     public String getGenerator() {
         return this.generator;
+    }
+
+    public void setGenerator(@NotNull final String generator) {
+        this.generator = generator;
     }
 
     /**
