@@ -19,6 +19,7 @@ package se.hyperver.hyperverse.world;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.bukkit.Bukkit;
 import se.hyperver.hyperverse.util.GeneratorUtil;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
@@ -97,14 +98,20 @@ public class WorldConfiguration implements Cloneable {
             WorldStructureSetting.GENERATE_STRUCTURES : WorldStructureSetting.NO_STRUCTURES);
         // Try to retrieve the generator
         try {
-            ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());
-            if (chunkGenerator == null) {
-                chunkGenerator = world.getGenerator();
-            }
-            if (chunkGenerator != null) {
-                final JavaPlugin plugin = GeneratorUtil.matchGenerator(chunkGenerator);
-                if (plugin != null) {
-                    worldConfigurationBuilder.setGenerator(plugin.getName());
+            if (Bukkit.getAllowNether() && world.getName().equalsIgnoreCase(Bukkit.getWorlds().get(0).getName() + "_nether")) {
+                worldConfigurationBuilder.setGenerator("");
+            } else if (Bukkit.getAllowNether() && world.getName().equalsIgnoreCase(Bukkit.getWorlds().get(0).getName() + "_the_end")) {
+                worldConfigurationBuilder.setGenerator("");
+            } else {
+                ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());
+                if (chunkGenerator == null) {
+                    chunkGenerator = world.getGenerator();
+                }
+                if (chunkGenerator != null) {
+                    final JavaPlugin plugin = GeneratorUtil.matchGenerator(chunkGenerator);
+                    if (plugin != null) {
+                        worldConfigurationBuilder.setGenerator(plugin.getName());
+                    }
                 }
             }
         } catch (final Exception e) {

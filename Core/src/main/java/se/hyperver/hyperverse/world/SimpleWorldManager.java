@@ -188,7 +188,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
     }
 
     @Override
-    public WorldImportResult importWorld(@NotNull final World world, final boolean vanilla,
+    public WorldImportResult importWorld(@NotNull final World world, boolean vanilla,
         @Nullable final String generator) {
         if (this.getWorld(world.getName()) != null) {
             return WorldImportResult.ALREADY_IMPORTED;
@@ -199,8 +199,7 @@ public class SimpleWorldManager implements WorldManager, Listener {
             if (generator == null && worldGenerator == null) {
                 return WorldImportResult.GENERATOR_NOT_FOUND;
             } else if (generator != null) {
-                if (worldGenerator == null || worldGenerator.isEmpty() || !generator
-                    .equalsIgnoreCase(worldGenerator)) {
+                if (worldGenerator == null || !generator.equalsIgnoreCase(worldGenerator)) {
                     return WorldImportResult.GENERATOR_NOT_FOUND;
                 }
             }
