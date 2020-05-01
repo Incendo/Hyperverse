@@ -592,7 +592,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageFlagSet);
     }
 
-    @Category("Mangement") @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
+    @Category("Management") @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
     @CommandCompletion("@hyperworlds @flags") @Description("{@@command.flag.remove}")
     public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
         if (flag == null) {
