@@ -17,17 +17,14 @@ Current Features:
 - World loading/unloading
 - World teleportation
 - World flags (gamemode, local-spawn, force-spawn, 
-pve, pvp, world-permission, nether, end, profile-group, difficulty)
+pve, pvp, world-permission, nether, end, profile-group, difficulty, creature-spawn, mob-spawn)
 - World game rules
 - Tab completed commands
 - Persistent world locations
 - Nether & end portal linking
 - Per world player data
 - Per world beds
-
-Planned Features:
-- More flags
-- Portals, sign teleportation
+- World regeneration
 
 ## Links
 
@@ -64,20 +61,20 @@ guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hype
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.2.0-SNAPSHOT</version>
+      <version>0.3.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.2.0-SNAPSHOT</version>
+      <version>0.3.0-SNAPSHOT</version>
       <classifier>javadoc</classifier>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.2.0-SNAPSHOT</version>
+      <version>0.3.0-SNAPSHOT</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
     </dependency>
