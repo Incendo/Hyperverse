@@ -833,6 +833,7 @@ public class HyperCommandManager extends BaseCommand {
                 "<dark_gray>[</dark_gray><gold>Hyperverse</gold><dark_gray>]</dark_gray> " + msg)));
     }
 
+    /*
     @Category("Management") @Subcommand("regenerate|regen") @Description("{@@command.regenerate}")
     @CommandPermission("hyperverse.regenerate") @CommandCompletion("@hyperworlds")
     public void doRegenerate(final CommandSender sender, final HyperWorld world) {
@@ -898,5 +899,6 @@ public class HyperCommandManager extends BaseCommand {
                 "%reason%", e.getMessage());
         }
     }
+    */
 
 }
