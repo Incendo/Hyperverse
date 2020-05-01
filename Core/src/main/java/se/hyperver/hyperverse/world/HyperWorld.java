@@ -29,6 +29,7 @@ import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.teleportation.TeleportationManager;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * World type used throughout Hyperverse
@@ -108,9 +109,9 @@ public interface HyperWorld {
     /**
      * Attempt to delete the world
      *
-     * @return Result of deletion
+     * @param result Result of deletion
      */
-    @NotNull WorldUnloadResult deleteWorld();
+    void deleteWorld(@NotNull final Consumer<WorldUnloadResult> result);
 
     /**
      * Attempt to unload the world

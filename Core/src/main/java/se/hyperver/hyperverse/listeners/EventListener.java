@@ -242,7 +242,7 @@ public class EventListener implements Listener {
 
     private boolean setDefaultGameMode(@NotNull final Player player, @NotNull final HyperWorld world) {
         if (player.hasPermission("hyperverse.override.gamemode")) {
-            MessageUtil.sendMessage(player, Messages.messageGameModeOverride, "%move%",
+            MessageUtil.sendMessage(player, Messages.messageGameModeOverride, "%mode%",
                 world.getFlag(GamemodeFlag.class).name().toLowerCase());
             return false;
         }
@@ -444,7 +444,7 @@ public class EventListener implements Listener {
         }
     }
 
-    private boolean shouldCancelSpawn(final HyperWorld world, final Entity entity) {
+    public static boolean shouldCancelSpawn(final HyperWorld world, final Entity entity) {
         if (!world.getFlag(CreatureSpawnFlag.class)) {
             return entity instanceof IronGolem || entity instanceof Animals
                 || entity instanceof WaterMob || entity instanceof Ambient || entity instanceof NPC;

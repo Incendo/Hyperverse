@@ -20,6 +20,14 @@ package se.hyperver.hyperverse.world;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
@@ -33,16 +41,8 @@ import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.modules.FlagContainerFactory;
 import se.hyperver.hyperverse.modules.HyperWorldCreatorFactory;
 import se.hyperver.hyperverse.modules.TeleportationManagerFactory;
-import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.teleportation.TeleportationManager;
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import se.hyperver.hyperverse.util.MessageUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,6 +52,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Implementation of {@link HyperWorld}
@@ -131,16 +132,19 @@ public class SimpleWorld implements HyperWorld {
         return this.bukkitWorld != null;
     }
 
-    @Override @NotNull public WorldUnloadResult deleteWorld() {
+    @Override public void deleteWorld(@NotNull final Consumer<WorldUnloadResult> result) {
         if (this.bukkitWorld != null) {
             if (Bukkit.getWorlds().get(0).equals(this.bukkitWorld)) {
-                return WorldUnloadResult.FAILURE_ONLY_WORLD;
+                result.accept(WorldUnloadResult.FAILURE_ONLY_WORLD);
+                return;
             }
             if (!this.bukkitWorld.getPlayers().isEmpty()) {
-                return WorldUnloadResult.FAILURE_HAS_PLAYERS;
+                result.accept(WorldUnloadResult.FAILURE_HAS_PLAYERS);
+                return;
             }
             if (!Bukkit.unloadWorld(this.bukkitWorld, true)) {
-                return WorldUnloadResult.FAILURE_OTHER;
+                result.accept(WorldUnloadResult.FAILURE_OTHER);
+                return;
             }
             // We unload the world, then we remove the world file,
             // but we don't delete the actual world folder
@@ -153,10 +157,12 @@ public class SimpleWorld implements HyperWorld {
             } catch (final IOException e) {
                 e.printStackTrace();
             }
-        }).sync(() -> this.worldManager.unregisterWorld(this)).execute();
-        // Delete world in the database
-        this.hyperDatabase.clearWorld(this.configuration.getName());
-        return WorldUnloadResult.SUCCESS;
+        }).sync(() -> {
+            this.worldManager.unregisterWorld(this);
+            // Delete world in the database
+            this.hyperDatabase.clearWorld(this.configuration.getName());
+            result.accept(WorldUnloadResult.SUCCESS);
+        }).execute();
     }
 
     @Override @NotNull public WorldUnloadResult unloadWorld() {
