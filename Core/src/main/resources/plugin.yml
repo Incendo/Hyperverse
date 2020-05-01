@@ -59,3 +59,6 @@ permissions:
   hyperverse.regenerate:
     description: Allows players to regenerate worlds
     default: op
+  hyperverse.override.gamemode:
+    description: Allows players to override world gamemode
+    default: false

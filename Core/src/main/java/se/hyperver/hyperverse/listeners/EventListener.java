@@ -57,6 +57,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
@@ -192,16 +193,20 @@ public class EventListener implements Listener {
                 final Path playerData = newWorldDirectory
                     .resolve(String.format("%s.nbt", player.getUniqueId().toString()));
                 if (Files.exists(playerData)) {
+                    final GameMode originalGameMode = player.getGameMode();
                     nms.readPlayerData(event.getPlayer(), playerData,
                         () -> Bukkit.getScheduler().runTaskLater(hyperverse, () -> {
-                            // We need to trick bukkit into updating the gamemode
+                            // We need to trick Bukkit into updating the gamemode
                             final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
                             if (worldGameMode != GameMode.ADVENTURE) {
                                 player.setGameMode(GameMode.ADVENTURE);
                             } else {
                                 player.setGameMode(GameMode.SURVIVAL);
                             }
-                            player.setGameMode(worldGameMode);
+                            player.setGameMode(GameMode.SPECTATOR);
+                            if (!this.setDefaultGameMode(player, hyperWorld)) {
+                                player.setGameMode(originalGameMode);
+                            }
                             // Apply any other flags here
                         }, 1L));
                 } else {
@@ -227,11 +232,21 @@ public class EventListener implements Listener {
                             }
                         }
                     }
+                    this.setDefaultGameMode(player, hyperWorld);
                 }
             }
         } else {
-            player.setGameMode(hyperWorld.getFlag(GamemodeFlag.class));
+            this.setDefaultGameMode(player, hyperWorld);
         }
+    }
+
+    private boolean setDefaultGameMode(@NotNull final Player player, @NotNull final HyperWorld world) {
+        if (player.hasPermission("hyperverse.override.gamemode")) {
+            MessageUtil.sendMessage(player, Messages.messageGameModeOverride);
+            return false;
+        }
+        player.setGameMode(world.getFlag(GamemodeFlag.class));
+        return true;
     }
 
     @EventHandler public void onRespawn(final PlayerRespawnEvent event) {

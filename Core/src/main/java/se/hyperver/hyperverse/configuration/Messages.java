@@ -164,6 +164,8 @@ public class Messages {
         "&7Hyperverse finished importing %world%.");
     public static final Message messageMultiverseDone = createMessage("multiverse.done",
         "&7Hyperverse finished importing Multiverse data.");
+    public static final Message messageGameModeOverride = createMessage("override.gamemode",
+        "<gray>The world has the game mode '<gold>%mode%</gold>' but your permission level prevented this from applying.</gray>");
 
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
