@@ -242,8 +242,10 @@ public class EventListener implements Listener {
 
     private boolean setDefaultGameMode(@NotNull final Player player, @NotNull final HyperWorld world) {
         if (player.hasPermission("hyperverse.override.gamemode")) {
-            MessageUtil.sendMessage(player, Messages.messageGameModeOverride, "%mode%",
-                world.getFlag(GamemodeFlag.class).name().toLowerCase());
+            if (world.getFlag(GamemodeFlag.class) != player.getGameMode()) {
+                MessageUtil.sendMessage(player, Messages.messageGameModeOverride, "%mode%",
+                    world.getFlag(GamemodeFlag.class).name().toLowerCase());
+            }
             return false;
         }
         player.setGameMode(world.getFlag(GamemodeFlag.class));
