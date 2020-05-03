@@ -6,7 +6,7 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/hyperverse/badge)](https://www.codefactor.io/repository/github/sauilitired/hyperverse)
 
-A Minecraft world management plugin for Bukkit 1.15.
+A Minecraft world management plugin for Bukkit 1.15 (backported to 1.14).
 More versions may come to be supported in the future.
 
 ## Features
