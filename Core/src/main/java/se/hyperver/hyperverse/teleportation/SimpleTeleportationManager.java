@@ -19,6 +19,8 @@ package se.hyperver.hyperverse.teleportation;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import org.bukkit.Material;
+import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.flags.implementation.EndFlag;
 import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
@@ -45,13 +47,15 @@ public final class SimpleTeleportationManager implements TeleportationManager {
 
     private final HyperWorld hyperWorld;
     private final WorldManager worldManager;
+    private final HyperConfiguration configuration;
     private final NMS nms;
 
     @Inject public SimpleTeleportationManager(@Assisted HyperWorld hyperWorld,
-        final WorldManager worldManager, final NMS nms) {
+        final WorldManager worldManager, final NMS nms, final HyperConfiguration configuration) {
         this.hyperWorld = hyperWorld;
         this.worldManager = worldManager;
         this.nms = nms;
+        this.configuration = configuration;
     }
 
     @Override public CompletableFuture<Boolean> allowedTeleport(@NotNull final Player player,
@@ -67,21 +71,29 @@ public final class SimpleTeleportationManager implements TeleportationManager {
 
     @Override public CompletableFuture<Boolean> canTeleport(@NotNull final Player player,
         @NotNull final Location location) {
-        return PaperLib.getChunkAtAsync(location).thenApply(chunk ->
-            location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid());
+        if (this.configuration.shouldSafeTeleport()) {
+            return PaperLib.getChunkAtAsync(location).thenApply(
+                chunk -> location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid());
+        } else {
+            return CompletableFuture.completedFuture(true);
+        }
     }
 
     @Override @NotNull public CompletableFuture<Location> findSafe(@NotNull Location location) {
-        return PaperLib.getChunkAtAsync(location).thenApply(chunk -> {
-            Block locationBlock = location.getBlock();
-            do {
-                if (locationBlock.getRelative(BlockFace.DOWN).getType().isSolid()) {
-                    return locationBlock.getLocation();
-                }
-            } while (locationBlock.getY() > 0 &&
-                (locationBlock = locationBlock.getRelative(BlockFace.DOWN)) != null);
-            return location;
-        });
+        if (this.configuration.shouldSafeTeleport()) {
+            return PaperLib.getChunkAtAsync(location).thenApply(chunk -> {
+                Block locationBlock = location.getBlock();
+                do {
+                    if (locationBlock.getRelative(BlockFace.DOWN).getType().isSolid()) {
+                        return locationBlock.getLocation();
+                    }
+                } while (locationBlock.getY() > 0
+                    && (locationBlock = locationBlock.getRelative(BlockFace.DOWN)).getType() != Material.VOID_AIR);
+                return location;
+            });
+        } else {
+            return PaperLib.getChunkAtAsync(location).thenApply(c -> location);
+        }
     }
 
     @Override public void teleportPlayer(@NotNull final Player player,

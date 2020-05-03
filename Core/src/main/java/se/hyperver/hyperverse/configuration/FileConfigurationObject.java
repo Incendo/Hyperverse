@@ -41,6 +41,8 @@ public class FileConfigurationObject {
     private boolean groupedProfiles = false;
     @Setting(value = "language-code", comment = "Language code used to resolve translations. Currently supported: en, sv, de, cn")
     private String languageCode = "en";
+    @Setting(value = "safe-teleport", comment = "Whether or not safe teleportation should be enforced")
+    private boolean safeTeleport = true;
 
     public boolean isImportAutomatically() {
         return this.importAutomatically;
@@ -60,6 +62,10 @@ public class FileConfigurationObject {
 
     public String getLanguageCode() {
         return this.languageCode;
+    }
+
+    public boolean shouldSafeTeleport() {
+        return this.safeTeleport;
     }
 
 }

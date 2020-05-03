@@ -104,4 +104,8 @@ public class FileHyperConfiguration implements HyperConfiguration {
         return this.fileConfigurationObject.getLanguageCode();
     }
 
+    @Override public boolean shouldSafeTeleport() {
+        return this.fileConfigurationObject.shouldSafeTeleport();
+    }
+
 }

@@ -68,4 +68,13 @@ public interface HyperConfiguration {
      */
     @NotNull String getLanguageCode();
 
+    /**
+     * Whether or not Hyperverse should enforce
+     * safe teleportation
+     *
+     * @return True if Hypeverse should enforce
+     *         safe teleportation
+     */
+    boolean shouldSafeTeleport();
+
 }
