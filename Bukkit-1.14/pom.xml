@@ -5,12 +5,18 @@
     <parent>
         <artifactId>Hyperverse</artifactId>
         <groupId>se.hyperver.hyperverse</groupId>
-        <version>0.1.0</version>
+        <version>${revision}</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <name>Bukkit 1.14</name>
-    <artifactId>Bukkit-1.14</artifactId>
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 3</name>
+            <url>https://raw.githubusercontent.com/Sauilitired/Hyperverse/master/LICENSE</url>
+        </license>
+    </licenses><artifactId>Bukkit-1.14</artifactId>
 
     <build>
         <defaultGoal>clean package</defaultGoal>
@@ -61,6 +67,34 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.commands</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.locales</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.locales</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.taskchain</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.taskchain</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.util</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.util</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.jodah.expiringmap</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.expiringmap</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.minidigger.minimessage</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.messages</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.kyori</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
             </plugin>
@@ -71,13 +105,19 @@
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
             <artifactId>Core</artifactId>
-            <version>0.1.0</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <version>1.14.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>19.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
