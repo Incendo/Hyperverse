@@ -61,22 +61,38 @@ guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hype
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <version>0.4.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <version>0.4.0-SNAPSHOT</version>
       <classifier>javadoc</classifier>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <version>0.4.0-SNAPSHOT</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
     </dependency>
 </dependencies>
+```
+
+## API
+
+A majority of the API is accessible using `Hyperverse.getApi()`. For example, creating
+a world is easy as:
+
+```java
+WorldConfiguration worldConfiguration = WorldConfiguration.builder()
+    .setName("your world").setType(WorldType.NETHER)
+    .setWorldFeatures(WorldFeatures.FLATLAND).createWorldConfiguration();
+try {
+    HyperWorld world = Hyperverse.getApi().createWorld(worldConfiguration);
+} catch (HyperWorldCreationException e) {
+    e.printStackTrace();
+}
 ```

@@ -87,7 +87,7 @@ public final class HyperWorldCreator extends WorldCreator {
      * Result of configuration validation
      */
     public enum ValidationResult {
-        SUCCESS, UNKNOWN_GENERATOR
+        SUCCESS, UNKNOWN_GENERATOR, NAME_TAKEN, UNKNOWN_ERROR
     }
 
 }

@@ -21,6 +21,10 @@ import com.google.inject.Injector;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
+import se.hyperver.hyperverse.exception.HyperWorldCreationException;
+import se.hyperver.hyperverse.modules.HyperWorldFactory;
+import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
 
 /**
@@ -62,5 +66,28 @@ public interface HyperverseAPI {
      * @return Configuration instance
      */
     @NotNull HyperConfiguration getConfiguration();
+
+    /**
+     * Get a factory class that creates
+     * {@link se.hyperver.hyperverse.world.HyperWorld worlds}
+     *
+     * @return World factory
+     */
+    @NotNull HyperWorldFactory getWorldFactory();
+
+    /**
+     * Attempt to create a new world from a given configuration.
+     * This will only succeed if there is no world with the
+     * given name present in the system, the name is allowed
+     * and the specified generator exists and is loaded.
+     *
+     * @param configuration The configuration from which the
+     *                      world will be created
+     * @return The created world
+     * @throws HyperWorldCreationException If the world cannot
+     *                                     be created from the given configuration
+     */
+    @NotNull HyperWorld createWorld(@NotNull final WorldConfiguration configuration)
+        throws HyperWorldCreationException;
 
 }

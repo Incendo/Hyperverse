@@ -30,6 +30,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -39,11 +40,17 @@ import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
+import se.hyperver.hyperverse.exception.HyperWorldCreationException;
+import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.listeners.EventListener;
 import se.hyperver.hyperverse.listeners.WorldListener;
+import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskChainModule;
 import se.hyperver.hyperverse.util.MessageUtil;
+import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.world.HyperWorldCreator;
+import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
 
 import java.io.IOException;
@@ -52,6 +59,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Plugin main class
@@ -66,6 +74,7 @@ import java.util.Map;
     private Injector injector;
     private HyperDatabase hyperDatabase;
     private HyperConfiguration hyperConfiguration;
+    private HyperWorldFactory worldFactory;
 
     /**
      * Get the (singleton) implementation of
@@ -150,6 +159,13 @@ import java.util.Map;
         // Create the command manager instance
         try {
             injector.getInstance(HyperCommandManager.class);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        // Get API classes
+        try {
+            this.worldFactory = injector.getInstance(HyperWorldFactory.class);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -294,6 +310,46 @@ import java.util.Map;
 
     @Override @NotNull public HyperConfiguration getConfiguration() {
         return this.hyperConfiguration;
+    }
+
+    @Override public @NotNull HyperWorldFactory getWorldFactory() {
+        return this.worldFactory;
+    }
+
+    @Override public @NotNull HyperWorld createWorld(@NotNull WorldConfiguration configuration)
+        throws HyperWorldCreationException {
+        // Verify that no such world exists
+        for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
+            if (hyperWorld.getConfiguration().getName().equalsIgnoreCase(configuration.getName())) {
+                throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN, configuration);
+            }
+        }
+        if (Bukkit.getWorld(configuration.getName()) != null) {
+            throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN, configuration);
+        }
+
+        // Create the world instance
+        final HyperWorld hyperWorld = this.getWorldFactory().create(UUID.randomUUID(), configuration);
+
+        // Make sure to ignore the load event
+        this.getWorldManager().ignoreWorld(configuration.getName());
+
+        // Try to create and register the world
+        try {
+            hyperWorld.createBukkitWorld();
+            // Register the world
+            this.worldManager.addWorld(hyperWorld);
+        } catch (final HyperWorldValidationException validationException) {
+            if (validationException.getValidationResult() != HyperWorldCreator.ValidationResult.SUCCESS) {
+                throw new HyperWorldCreationException(validationException.getValidationResult(),
+                    configuration);
+            }
+        } catch (final Exception e) {
+            throw new HyperWorldCreationException(e, configuration);
+        }
+
+        // Everything went well
+        return hyperWorld;
     }
 
 }
