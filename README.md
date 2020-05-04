@@ -4,7 +4,7 @@
 
 **Hyperverse is W.I.P!**
 
-[![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/hyperverse/badge)](https://www.codefactor.io/repository/github/sauilitired/hyperverse)
+[![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/hyperverse/badge)](https://www.codefactor.io/repository/github/sauilitired/hyperverse) ![Java CI with Maven](https://github.com/Sauilitired/Hyperverse/workflows/Java%20CI%20with%20Maven/badge.svg)
 
 A Minecraft world management plugin for Bukkit 1.15 (backported to 1.14).
 More versions may come to be supported in the future.
