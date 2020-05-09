@@ -135,6 +135,8 @@ buildNumber.properties
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+AnnotationProcessor/AnnotationProcessor.iml
 Bukkit-1.15/Bukkit-1.15.iml
+Bukkit-1.14/Bukkit-1.14.iml
 Core/Core.iml
 Hyperverse.iml

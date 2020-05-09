@@ -193,6 +193,8 @@ public class Messages {
         "Whether or not creatures are allowed to spawn in the world");
     public static final Message flagDescriptionMobSpawn = createMessage("flags.mob-spawn",
         "Whether or not mobs are allowed to spawn in the world");
+    public static final Message flagDescriptionAdvancements = createMessage("flags.advancements",
+        "Whether or not advancements can be obtained in the world");
 
     // Command Descriptions
     public static final Message commandDescriptionCreate = createMessage("command.create",

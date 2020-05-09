@@ -17,18 +17,7 @@
 
 package se.hyperver.hyperverse.flags;
 
-import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
-import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
-import se.hyperver.hyperverse.flags.implementation.EndFlag;
-import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
-import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
-import se.hyperver.hyperverse.flags.implementation.LocalRespawnFlag;
-import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
-import se.hyperver.hyperverse.flags.implementation.NetherFlag;
-import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
-import se.hyperver.hyperverse.flags.implementation.PveFlag;
-import se.hyperver.hyperverse.flags.implementation.PvpFlag;
-import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
+import se.hyperver.hyperverse.flags.implementation.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -59,6 +48,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(DifficultyFlag.DIFFICULTY_FLAG_NORMAL);
         this.addFlag(MobSpawnFlag.MOB_SPAWN_ALLOWED);
         this.addFlag(CreatureSpawnFlag.CREATURE_SPAWN_ALLOWED);
+        this.addFlag(AdvancementFlag.ADVANCEMENTS_ALLOWED);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {
