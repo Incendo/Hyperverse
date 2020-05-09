@@ -19,9 +19,11 @@ package se.hyperver.hyperverse.listeners;
 
 import com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent;
 import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
+import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import se.hyperver.hyperverse.flags.implementation.AdvancementFlag;
 import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -58,6 +60,18 @@ public class PaperListener implements Listener {
             return;
         }
         if (hyperWorld.getFlag(MobSpawnFlag.class)) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onAdvancementGrant(final PlayerAdvancementCriterionGrantEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        if (hyperWorld.getFlag(AdvancementFlag.class)) {
             return;
         }
         event.setCancelled(true);
