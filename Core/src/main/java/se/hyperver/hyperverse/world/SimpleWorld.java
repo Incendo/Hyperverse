@@ -116,10 +116,13 @@ public class SimpleWorld implements HyperWorld {
     }
 
     @Override public void setBukkitWorld(@NotNull final World world) {
+        if (world.equals(this.bukkitWorld)) { // implicit null check
+            return;
+        }
         if (this.bukkitWorld != null) {
             throw new IllegalStateException("Cannot replace bukkit world");
         }
-        this.bukkitWorld = Objects.requireNonNull(world);
+        this.bukkitWorld = world;
     }
 
     @Override public void saveConfiguration() {
