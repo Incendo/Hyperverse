@@ -295,7 +295,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Category("Management")
-    @Subcommand("create") @Syntax("<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed] [generate-structures: true, false] [features: normal, flat, amplified, bucket] [settings...]")
+    @Subcommand("create") @Syntax("<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed] [generate-structures: true, false] [features: normal, flatland, amplified, bucket] [settings...]")
     @CommandPermission("hyperverse.create") @Description("{@@command.create}")
     @CommandCompletion("@null @generators @worldtypes @null @null @structures @worldfeatures @null")
     public void createWorld(final CommandSender sender, final String world, String generator,

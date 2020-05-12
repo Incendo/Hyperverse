@@ -21,19 +21,24 @@ import org.bukkit.WorldType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
 public enum WorldFeatures {
-    NORMAL(WorldType.NORMAL),
-    FLATLAND(WorldType.FLAT),
-    AMPLIFIED(WorldType.AMPLIFIED),
-    BUFFET(WorldType.BUFFET);
+    NORMAL(WorldType.NORMAL, "normal"),
+    FLATLAND(WorldType.FLAT, "flat", "flatland", "flatworld"),
+    AMPLIFIED(WorldType.AMPLIFIED, "amplified"),
+    BUFFET(WorldType.BUFFET, "buffet");
     
-    private WorldType bukkitType;
+    private final WorldType bukkitType;
+    private final Collection<String> names;
     
-    WorldFeatures(@NotNull final WorldType bukkitType) {
+    WorldFeatures(@NotNull final WorldType bukkitType, @NotNull final String ... names) {
         this.bukkitType = Objects.requireNonNull(bukkitType);
+        this.names = Arrays.asList(names);
     }
 
     @NotNull public WorldType getBukkitType() {
@@ -43,7 +48,7 @@ public enum WorldFeatures {
     @NotNull public static Optional<WorldFeatures> fromName(@NotNull final String name) {
         Objects.requireNonNull(name);
         for (final WorldFeatures worldFeatures : values()) {
-            if (worldFeatures.name().equalsIgnoreCase(name)) {
+            if (worldFeatures.names.contains(name.toLowerCase(Locale.ENGLISH))) {
                 return Optional.of(worldFeatures);
             }
         }
