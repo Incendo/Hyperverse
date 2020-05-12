@@ -80,6 +80,14 @@ public final class PersistentLocation {
         return this.z;
     }
 
+    void setWorld(final String world) {
+        this.world = world;
+    }
+
+    void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
+
     public void setId(final int id) {
         this.id = id;
     }

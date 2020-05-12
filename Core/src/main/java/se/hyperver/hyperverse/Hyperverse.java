@@ -312,11 +312,11 @@ import java.util.UUID;
         return this.hyperConfiguration;
     }
 
-    @Override public @NotNull HyperWorldFactory getWorldFactory() {
+    @Override @NotNull public HyperWorldFactory getWorldFactory() {
         return this.worldFactory;
     }
 
-    @Override public @NotNull HyperWorld createWorld(@NotNull WorldConfiguration configuration)
+    @Override @NotNull public HyperWorld createWorld(@NotNull WorldConfiguration configuration)
         throws HyperWorldCreationException {
         // Verify that no such world exists
         for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {

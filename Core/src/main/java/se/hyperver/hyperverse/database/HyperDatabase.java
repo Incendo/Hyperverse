@@ -22,7 +22,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import se.hyperver.hyperverse.Hyperverse;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -30,11 +29,13 @@ import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import org.jetbrains.annotations.NotNull;
+import se.hyperver.hyperverse.Hyperverse;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -122,7 +123,22 @@ public class HyperDatabase {
 
         taskChainFactory.newChain().async(() -> {
             try {
-                this.locationDao.createOrUpdate(persistentLocation);
+                final PersistentLocation matchLocation = new PersistentLocation();
+                matchLocation.setUuid(persistentLocation.getUuid());
+                matchLocation.setWorld(persistentLocation.getWorld());
+                final List<PersistentLocation> violatingLocation =
+                    this.locationDao.queryForMatchingArgs(matchLocation);
+                if (!violatingLocation.isEmpty()) {
+                    persistentLocation.setId(violatingLocation.get(0).getId());
+                    this.locationDao.update(persistentLocation);
+                    return;
+                }
+            } catch (final SQLException throwable) {
+                throwable.printStackTrace();
+            }
+
+            try {
+                this.locationDao.create(persistentLocation);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
