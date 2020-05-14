@@ -72,6 +72,7 @@ import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.flags.implementation.PveFlag;
 import se.hyperver.hyperverse.flags.implementation.PvpFlag;
+import se.hyperver.hyperverse.flags.implementation.RespawnWorldFlag;
 import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.util.NMS;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -273,6 +274,13 @@ public class EventListener implements Listener {
             }
         } else if (hyperWorld.getFlag(LocalRespawnFlag.class)) {
             event.setRespawnLocation(Objects.requireNonNull(hyperWorld.getSpawn()));
+        } else if (!hyperWorld.getFlag(RespawnWorldFlag.class).isEmpty()) {
+            final HyperWorld respawnWorld = this.worldManager.getWorld(hyperWorld.getFlag(RespawnWorldFlag.class));
+            if (respawnWorld != null) {
+                event.setRespawnLocation(Objects.requireNonNull(respawnWorld.getSpawn()));
+            } else {
+                MessageUtil.sendMessage(player, Messages.messageRespawnWorldNonExistent);
+            }
         }
     }
 

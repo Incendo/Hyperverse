@@ -49,6 +49,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(MobSpawnFlag.MOB_SPAWN_ALLOWED);
         this.addFlag(CreatureSpawnFlag.CREATURE_SPAWN_ALLOWED);
         this.addFlag(AdvancementFlag.ADVANCEMENTS_ALLOWED);
+        this.addFlag(RespawnWorldFlag.RESPAWN_WORLD_FLAG_EMPTY);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {

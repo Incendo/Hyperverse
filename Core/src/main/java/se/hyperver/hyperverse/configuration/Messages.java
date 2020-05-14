@@ -150,6 +150,8 @@ public class Messages {
         "&cThat is not a valid world structure setting");
     public static final Message messagePortalNotLinked = createMessage("portal.not_linked",
         "&cI'm sorry, that portal can't take you anywhere!");
+    public static final Message messageRespawnWorldNonExistent = createMessage("world.respawn_non_existent",
+        "&cThe respawn world linked to this world does not exist");
 
     // Multiverse importer messages
     public static final Message messageMultiverseMissing = createMessage("multiverse.missing",
@@ -195,6 +197,8 @@ public class Messages {
         "Whether or not mobs are allowed to spawn in the world");
     public static final Message flagDescriptionAdvancements = createMessage("flags.advancements",
         "Whether or not advancements can be obtained in the world");
+    public static final Message flagDescriptionRespawnWorld = createMessage("flags.respawn-world",
+        "The world you respawn in if local-respawn is disabled");
 
     // Command Descriptions
     public static final Message commandDescriptionCreate = createMessage("command.create",
