@@ -34,6 +34,7 @@ import se.hyperver.hyperverse.Hyperverse;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +42,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * Class containing the database connection that
@@ -53,12 +55,16 @@ public class HyperDatabase {
     private ConnectionSource connectionSource;
     private TaskChainFactory taskChainFactory;
     private final Hyperverse hyperverse;
-    private final Table<UUID, String, PersistentLocation> locations = HashBasedTable.create();
+    private final EnumMap<LocationType, Table<UUID, String, PersistentLocation>> locations;
 
     @Inject
     public HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
         this.taskChainFactory = taskChainFactory;
         this.hyperverse = hyperverse;
+        this.locations = new EnumMap<>(LocationType.class);
+        for (final LocationType type : LocationType.values()) {
+            locations.put(type, HashBasedTable.create());
+        }
     }
 
     /**
@@ -78,11 +84,23 @@ public class HyperDatabase {
                 }
             }
 
-            this.connectionSource =
-                new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
+            this.connectionSource = new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
             // Setup DAOs
             this.locationDao = DaoManager.createDao(connectionSource, PersistentLocation.class);
             TableUtils.createTableIfNotExists(connectionSource, PersistentLocation.class);
+
+            final Dao<LegacyLocation, Integer> legacyLocationDao = DaoManager.createDao(connectionSource, LegacyLocation.class);
+            try {
+                if (legacyLocationDao.isTableExists()) {
+                    locationDao.create(legacyLocationDao.queryForAll().stream().map(legacyLocation ->
+                        new PersistentLocation(legacyLocation.getUuid(), legacyLocation.getWorld(), legacyLocation.getX(),
+                            legacyLocation.getY(), legacyLocation.getZ(), LocationType.PLAYER_LOCATION)).collect(
+                        Collectors.toList()));
+                    TableUtils.dropTable(legacyLocationDao, false);
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -105,18 +123,20 @@ public class HyperDatabase {
      *
      * @param persistentLocation Location to store
      * @param updateTable        Whether or not the internal table should be updated
+     * @param clear              Whether or not the internal table should be cleared
      */
     public void storeLocation(@NotNull final PersistentLocation persistentLocation,
         final boolean updateTable, final boolean clear) {
 
-        final PersistentLocation storedLocation = this.locations
-            .get(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld());
+        final PersistentLocation storedLocation =
+            this.locations.get(persistentLocation.getLocationType())
+                .get(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld());
         if (storedLocation != null) {
             persistentLocation.setId(storedLocation.getId());
         }
 
         if (updateTable) {
-            this.locations
+            this.locations.get(persistentLocation.getLocationType())
                 .put(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld(),
                     persistentLocation);
         }
@@ -126,6 +146,7 @@ public class HyperDatabase {
                 final PersistentLocation matchLocation = new PersistentLocation();
                 matchLocation.setUuid(persistentLocation.getUuid());
                 matchLocation.setWorld(persistentLocation.getWorld());
+                matchLocation.setLocationType(persistentLocation.getLocationType());
                 final List<PersistentLocation> violatingLocation =
                     this.locationDao.queryForMatchingArgs(matchLocation);
                 if (!violatingLocation.isEmpty()) {
@@ -155,9 +176,12 @@ public class HyperDatabase {
      * @param uuid Player UUID
      */
     public void clearLocations(@NotNull final UUID uuid) {
-        final Collection<String> keys = new HashSet<>(this.locations.columnKeySet());
-        for (final String key : keys) {
-            this.locations.remove(uuid, key);
+        for (final LocationType locationType : LocationType.values()) {
+            final Collection<String> keys =
+                new HashSet<>(this.locations.get(locationType).columnKeySet());
+            for (final String key : keys) {
+                this.locations.remove(uuid, key);
+            }
         }
     }
 
@@ -174,7 +198,8 @@ public class HyperDatabase {
                 final Collection<PersistentLocation> locations =
                     this.locationDao.queryForEq("uuid", Objects.requireNonNull(uuid).toString());
                 for (final PersistentLocation persistentLocation : locations) {
-                    this.locations.put(uuid, persistentLocation.getWorld(), persistentLocation);
+                    this.locations.get(persistentLocation.getLocationType()).
+                        put(uuid, persistentLocation.getWorld(), persistentLocation);
                 }
                 future.complete(locations);
             } catch (SQLException e) {
@@ -189,13 +214,14 @@ public class HyperDatabase {
      * Get a stored persistent location for a given UUID
      * and world
      *
-     * @param uuid  Player UUID
-     * @param world World
+     * @param uuid         Player UUID
+     * @param world        World
+     * @param locationType The location type
      * @return Optional containing the location, if it was stored
      */
     @NotNull public Optional<PersistentLocation> getLocation(@NotNull final UUID uuid,
-        @NotNull final String world) {
-        return Optional.ofNullable(this.locations.get(uuid, world));
+        @NotNull final String world, @NotNull final LocationType locationType) {
+        return Optional.ofNullable(this.locations.get(locationType).get(uuid, world));
     }
 
     /**

@@ -26,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.UUID;
 
-@DatabaseTable(tableName = "locations")
-public final class PersistentLocation {
+@DatabaseTable(tableName = "location")
+public final class LegacyLocation {
 
     @DatabaseField(generatedId = true)
     private int id;
@@ -41,31 +41,22 @@ public final class PersistentLocation {
     private double y;
     @DatabaseField
     private double z;
-    @DatabaseField(uniqueCombo = true)
-    private LocationType locationType;
 
-    public PersistentLocation() {
+    public LegacyLocation() {
     }
 
-    public PersistentLocation(@NotNull final String uuid, @NotNull final String world,
+    public LegacyLocation(@NotNull final String uuid, @NotNull final String world,
         final double x, final double y, final double z) {
-        this(uuid, world, x, y, z, LocationType.PLAYER_LOCATION);
-    }
-
-    public PersistentLocation(@NotNull final String uuid, @NotNull final String world,
-        final double x, final double y, final double z, @NotNull final LocationType locationType) {
         this.uuid = Objects.requireNonNull(uuid);
         this.world = Objects.requireNonNull(world);
-        this.locationType = Objects.requireNonNull(locationType);
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public static PersistentLocation fromLocation(@NotNull final UUID owner,
-        @NotNull final Location location, @NotNull final LocationType locationType) {
-        return new PersistentLocation(owner.toString(), Objects.requireNonNull(location.getWorld()).getName(),
-            location.getX(), location.getY(), location.getZ(), locationType);
+    public static LegacyLocation fromLocation(@NotNull final UUID owner, @NotNull final Location location) {
+        return new LegacyLocation(owner.toString(), Objects.requireNonNull(location.getWorld()).getName(),
+            location.getX(), location.getY(), location.getZ());
     }
 
     @NotNull public String getUuid() {
@@ -96,23 +87,12 @@ public final class PersistentLocation {
         this.uuid = uuid;
     }
 
-    public void setLocationType(final LocationType locationType) {
-        this.locationType = locationType;
-    }
-
     public void setId(final int id) {
         this.id = id;
     }
 
     public int getId() {
         return this.id;
-    }
-
-    public LocationType getLocationType() {
-        if (this.locationType == null) {
-            return LocationType.PLAYER_LOCATION;
-        }
-        return this.locationType;
     }
 
     @NotNull public Location toLocation() {

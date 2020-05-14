@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import se.hyperver.hyperverse.world.HyperWorld;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -31,6 +32,16 @@ import java.util.concurrent.CompletableFuture;
 public interface TeleportationManager {
 
     /**
+     * Get the spawn location for a player in a particular world. This can be a bed
+     * spawn location, the world spawn location, or some other location
+     *
+     * @param player Player to check the location for
+     * @param hyperWorld The world in which the location exists
+     * @return The spawn location
+     */
+    @NotNull Location getSpawnLocation(@NotNull final Player player, @NotNull final HyperWorld hyperWorld);
+
+    /**
      * Check whether or not the player is allowed
      * to teleport to the specified location
      *
@@ -38,7 +49,7 @@ public interface TeleportationManager {
      * @param location Location the player is teleporting to
      * @return True if the player is allowed to teleport to the location
      */
-    CompletableFuture<Boolean> allowedTeleport(@NotNull final Player player,
+    @NotNull CompletableFuture<Boolean> allowedTeleport(@NotNull final Player player,
         @NotNull final Location location);
 
     /**
@@ -49,7 +60,7 @@ public interface TeleportationManager {
      * @param location Location the player is teleporting to
      * @return True if the player is able to teleport to the location
      */
-    CompletableFuture<Boolean> canTeleport(@NotNull final Player player,
+    @NotNull CompletableFuture<Boolean> canTeleport(@NotNull final Player player,
         @NotNull final Location location);
 
     /**

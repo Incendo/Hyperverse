@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
+import se.hyperver.hyperverse.database.LocationType;
 import se.hyperver.hyperverse.database.PersistentLocation;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagContainer;
@@ -285,7 +286,8 @@ public class SimpleWorld implements HyperWorld {
         final Location location;
         if (this.hyperConfiguration.shouldPersistLocations()) {
             location = this.hyperDatabase.getLocation(player.getUniqueId(),
-                this.getConfiguration().getName()).map(PersistentLocation::toLocation)
+                this.getConfiguration().getName(), LocationType.PLAYER_LOCATION)
+                .map(PersistentLocation::toLocation)
                 .orElse(Objects.requireNonNull(this.getSpawn()));
         } else {
             location = this.getSpawn();

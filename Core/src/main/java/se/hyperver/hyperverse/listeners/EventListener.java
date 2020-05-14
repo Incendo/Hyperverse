@@ -43,12 +43,14 @@ import org.bukkit.entity.Shulker;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.WaterMob;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -62,6 +64,7 @@ import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
+import se.hyperver.hyperverse.database.LocationType;
 import se.hyperver.hyperverse.database.PersistentLocation;
 import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.EndFlag;
@@ -134,10 +137,10 @@ public class EventListener implements Listener {
             // The player moved between two different worlds, so we
             // need to update
             final UUID uuid = event.getPlayer().getUniqueId();
-            this.hyperDatabase
-                .storeLocation(PersistentLocation.fromLocation(uuid, from), true, false);
-            this.hyperDatabase
-                .storeLocation(PersistentLocation.fromLocation(uuid, to), true, false);
+            this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, from,
+                LocationType.PLAYER_LOCATION),true, false);
+            this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, to,
+                LocationType.PLAYER_LOCATION), true, false);
 
             if (hyperConfiguration.shouldGroupProfiles()) {
                 final HyperWorld hyperWorld = this.worldManager.getWorld(from.getWorld());
@@ -164,7 +167,8 @@ public class EventListener implements Listener {
             // Persist the locations when the player quits
             final UUID uuid = event.getPlayer().getUniqueId();
             this.hyperDatabase.storeLocation(
-                PersistentLocation.fromLocation(uuid, event.getPlayer().getLocation()), false,
+                PersistentLocation.fromLocation(uuid, event.getPlayer().getLocation(),
+                    LocationType.PLAYER_LOCATION), false,
                 true);
             this.hyperDatabase.clearLocations(uuid);
         }
@@ -273,11 +277,11 @@ public class EventListener implements Listener {
                 }
             }
         } else if (hyperWorld.getFlag(LocalRespawnFlag.class)) {
-            event.setRespawnLocation(Objects.requireNonNull(hyperWorld.getSpawn()));
+            event.setRespawnLocation(hyperWorld.getTeleportationManager().getSpawnLocation(player, hyperWorld));
         } else if (!hyperWorld.getFlag(RespawnWorldFlag.class).isEmpty()) {
             final HyperWorld respawnWorld = this.worldManager.getWorld(hyperWorld.getFlag(RespawnWorldFlag.class));
             if (respawnWorld != null) {
-                event.setRespawnLocation(Objects.requireNonNull(respawnWorld.getSpawn()));
+                event.setRespawnLocation(respawnWorld.getTeleportationManager().getSpawnLocation(player, respawnWorld));
             } else {
                 MessageUtil.sendMessage(player, Messages.messageRespawnWorldNonExistent);
             }
@@ -452,6 +456,22 @@ public class EventListener implements Listener {
                 entity.remove();
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSleep(final PlayerBedEnterEvent event) {
+        if (!hyperConfiguration.shouldPersistLocations()) {
+            return;
+        }
+        if (event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) {
+            return;
+        }
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getBed().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(event.getPlayer().getUniqueId(),
+            event.getBed().getLocation(), LocationType.BED_SPAWN), true, false);
     }
 
     public static boolean shouldCancelSpawn(final HyperWorld world, final Entity entity) {

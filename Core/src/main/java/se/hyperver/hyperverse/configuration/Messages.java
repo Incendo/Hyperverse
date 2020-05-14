@@ -199,6 +199,8 @@ public class Messages {
         "Whether or not advancements can be obtained in the world");
     public static final Message flagDescriptionRespawnWorld = createMessage("flags.respawn-world",
         "The world you respawn in if local-respawn is disabled");
+    public static final Message flagDescriptionIgnoreBeds = createMessage("flags.ignore-beds",
+        "Forces players to respawn at the world spawn location rather than their bed spawns");
 
     // Command Descriptions
     public static final Message commandDescriptionCreate = createMessage("command.create",
