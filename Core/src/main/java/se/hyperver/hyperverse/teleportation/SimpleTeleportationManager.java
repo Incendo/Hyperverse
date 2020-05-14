@@ -156,9 +156,17 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         if (!this.configuration.shouldPersistLocations() || hyperWorld.getFlag(IgnoreBedsFlag.class)) {
             return Objects.requireNonNull(hyperWorld.getSpawn());
         }
-        return Objects.requireNonNull(hyperDatabase.getLocation(player.getUniqueId(), hyperWorld.getConfiguration().getName(),
-            LocationType.BED_SPAWN).map(PersistentLocation::toLocation).filter(SimpleTeleportationManager::hasBedNearby)
-            .orElse(hyperWorld.getSpawn()));
+        final Location spawnLocation = hyperDatabase.getLocation(player.getUniqueId(), hyperWorld.getConfiguration().getName(),
+            LocationType.BED_SPAWN).map(PersistentLocation::toLocation).orElse(null);
+        if (spawnLocation != null && hasBedNearby(spawnLocation)) {
+            final Location adjustedLocation = nms.findBedRespawn(spawnLocation);
+            if (adjustedLocation != null) {
+                return adjustedLocation;
+            } else {
+                return spawnLocation;
+            }
+        }
+        return Objects.requireNonNull(hyperWorld.getSpawn());
     }
 
     private static boolean hasBedNearby(@NotNull final Location location) {

@@ -229,6 +229,17 @@ public class NMSImpl implements NMS {
         }).execute(whenDone);
     }
 
+    @Override @Nullable public Location findBedRespawn(@NotNull final Location spawnLocation) {
+        final CraftWorld craftWorld = (CraftWorld) spawnLocation.getWorld();
+        if (craftWorld == null) {
+            return null;
+        }
+        return EntityHuman.getBed(craftWorld.getHandle(), new BlockPosition(spawnLocation.getBlockX(),
+            spawnLocation.getBlockY(), spawnLocation.getBlockZ()), true)
+            .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.getX(), vec3D.getY(), vec3D.getZ()))
+            .orElse(null);
+    }
+
     private static NBTTagList doubleList(final double... values) {
         final NBTTagList nbttaglist = new NBTTagList();
         for (final double d : values) {

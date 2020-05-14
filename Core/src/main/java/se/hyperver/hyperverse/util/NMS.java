@@ -35,6 +35,8 @@ public interface NMS {
 
     @Nullable Location getDimensionSpawn(@NotNull final Location origin);
 
+    @Nullable Location findBedRespawn(@NotNull final Location spawnLocation);
+
     void writePlayerData(@NotNull final Player player, @NotNull final Path file);
 
     void readPlayerData(@NotNull final Player player, @NotNull final Path file,

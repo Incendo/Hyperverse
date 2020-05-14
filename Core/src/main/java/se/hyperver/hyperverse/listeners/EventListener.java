@@ -458,14 +458,19 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onSleep(final PlayerBedEnterEvent event) {
         if (!hyperConfiguration.shouldPersistLocations()) {
             return;
         }
-        if (event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) {
+
+        final PlayerBedEnterEvent.BedEnterResult bedEnterResult = event.getBedEnterResult();
+        if (bedEnterResult == PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE ||
+            bedEnterResult == PlayerBedEnterEvent.BedEnterResult.TOO_FAR_AWAY ||
+            bedEnterResult == PlayerBedEnterEvent.BedEnterResult.OTHER_PROBLEM) {
             return;
         }
+
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getBed().getWorld());
         if (hyperWorld == null) {
             return;
