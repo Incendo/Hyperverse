@@ -458,8 +458,7 @@ public class HyperCommandManager extends BaseCommand {
             MessageUtil.sendMessage(player, Messages.messageAlreadyInWorld);
             return;
         }
-        MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%",
-            world.getConfiguration().getName());
+        MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%", world.getDisplayName());
         world.teleportPlayer(player);
     }
 
@@ -546,16 +545,21 @@ public class HyperCommandManager extends BaseCommand {
                 MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
                 return;
             }
+            final HyperWorld hyperWorld = this.worldManager.getWorld(bukkitWorld);
+            if (hyperWorld == null) {
+                MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+                return;
+            }
             final DecimalFormat format = Messages.miscCoordinateDecimalFormat;
             if (bukkitWorld.getPlayers().isEmpty()) {
-                MessageUtil.sendMessage(sender, Messages.messageNoPlayersInWorld, "%world%", world);
+                MessageUtil.sendMessage(sender, Messages.messageNoPlayersInWorld, "%world%", hyperWorld.getDisplayName());
                 return;
             }
             final StringBuilder players = new StringBuilder();
             for (final Player player : bukkitWorld.getPlayers()) {
                 final Location location = player.getLocation();
                 players.append(MessageUtil.format(Messages.messageListEntryPlayer.toString(), "%player%",
-                    player.getDisplayName(), "%world%", world, "%x%",
+                    player.getDisplayName(), "%world%", hyperWorld.getDisplayName(), "%x%",
                     format.format(location.getX()), "%y%",
                     format.format(location.getY()), "%z%",
                     format.format(location.getZ()))).append(", ");

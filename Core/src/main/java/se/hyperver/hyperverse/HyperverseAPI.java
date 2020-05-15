@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.exception.HyperWorldCreationException;
+import se.hyperver.hyperverse.features.PluginFeatureManager;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
@@ -89,5 +90,14 @@ public interface HyperverseAPI {
      */
     @NotNull HyperWorld createWorld(@NotNull final WorldConfiguration configuration)
         throws HyperWorldCreationException;
+
+
+    /**
+     * Gets the plugin feature manager. This can be used to register third party plugin
+     * hooks directly into Hyperverse
+     *
+     * @return The plugin feature manager
+     */
+    @NotNull PluginFeatureManager getPluginFeatureManager();
 
 }

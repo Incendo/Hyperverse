@@ -21,6 +21,7 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -39,6 +40,7 @@ import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
+import se.hyperver.hyperverse.flags.implementation.AliasFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.modules.FlagContainerFactory;
 import se.hyperver.hyperverse.modules.HyperWorldCreatorFactory;
@@ -392,6 +394,14 @@ public class SimpleWorld implements HyperWorld {
             flags.add(this.flagContainer.getFlagErased(flagClass));
         }
         return flags;
+    }
+
+    @Override @NotNull public String getDisplayName() {
+        String displayName = this.getFlag(AliasFlag.class);
+        if (displayName.isEmpty()) {
+            displayName = this.getConfiguration().getName();
+        }
+        return ChatColor.translateAlternateColorCodes('&', displayName);
     }
 
 }

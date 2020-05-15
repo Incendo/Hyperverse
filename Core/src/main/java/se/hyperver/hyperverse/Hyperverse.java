@@ -32,6 +32,9 @@ import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +45,8 @@ import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.exception.HyperWorldCreationException;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
+import se.hyperver.hyperverse.features.PluginFeatureManager;
+import se.hyperver.hyperverse.features.external.PlaceholderAPIFeature;
 import se.hyperver.hyperverse.listeners.EventListener;
 import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
@@ -65,11 +70,12 @@ import java.util.UUID;
  * Plugin main class
  * {@inheritDoc}
  */
-@Singleton public final class Hyperverse extends JavaPlugin implements HyperverseAPI {
+@Singleton public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Listener {
 
     public static final int BSTATS_ID = 7177;
 
     private static HyperverseAPI instance;
+    private final PluginFeatureManager pluginFeatureManager = new PluginFeatureManager();
     private WorldManager worldManager;
     private Injector injector;
     private HyperDatabase hyperDatabase;
@@ -88,9 +94,14 @@ import java.util.UUID;
 
     @Override public void onLoad() {
         instance = this;
+        // Register default plugin features
+        this.pluginFeatureManager.registerFeature("PlaceholderAPI", PlaceholderAPIFeature.class);
     }
 
     @Override public void onEnable() {
+        // Register this first
+        Bukkit.getPluginManager().registerEvents(this, this);
+
         // Disgusting try-catch mess below, but Guice freaks out completely if it encounters
         // any errors, and is unable to report them because of the plugin class loader
         if (!this.getDataFolder().exists()) {
@@ -350,6 +361,14 @@ import java.util.UUID;
 
         // Everything went well
         return hyperWorld;
+    }
+
+    @NotNull @Override public PluginFeatureManager getPluginFeatureManager() {
+        return this.pluginFeatureManager;
+    }
+
+    @EventHandler public void onServerLoaded(final ServerLoadEvent event) {
+        this.pluginFeatureManager.loadFeatures();
     }
 
 }

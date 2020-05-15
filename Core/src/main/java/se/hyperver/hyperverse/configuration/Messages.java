@@ -169,6 +169,12 @@ public class Messages {
     public static final Message messageGameModeOverride = createMessage("override.gamemode",
         "<gray>The world has the game mode '<gold>%mode%</gold>' but your permission level prevented this from applying.</gray>");
 
+    // Feature messages
+    public static final Message messageFeaturesLoading = createMessage("feature.loading",
+        "&7Loading plugin features (%num% registered)");
+    public static final Message messageFeatureLoaded = createMessage("feature.loaded",
+        "&7Enabled plugin feature '&6%feature%&7' for plugin '&6%plugin%&7'");
+
     // Flag descriptions
     public static final Message flagDescriptionGamemode = createMessage("flags.gamemode",
         "World gamemode. Available values: survival, creative, adventure and spectator");
@@ -201,6 +207,8 @@ public class Messages {
         "The world you respawn in if local-respawn is disabled");
     public static final Message flagDescriptionIgnoreBeds = createMessage("flags.ignore-beds",
         "Forces players to respawn at the world spawn location rather than their bed spawns");
+    public static final Message flagDescriptionAlias = createMessage("flags.alias",
+        "Name of the world as shown in lists, placeholders, etc");
 
     // Command Descriptions
     public static final Message commandDescriptionCreate = createMessage("command.create",

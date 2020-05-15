@@ -177,6 +177,14 @@ public interface HyperWorld {
     @NotNull Collection<WorldFlag<?, ?>> getFlags();
 
     /**
+     * Get the world display name, if configured, otherwise
+     * it just returns the world name
+     *
+     * @return World display name
+     */
+    @NotNull String getDisplayName();
+
+    /**
      * Result of unloading or deleting a world
      */
     enum WorldUnloadResult {
