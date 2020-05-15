@@ -30,7 +30,7 @@ public class AliasFlag extends WorldFlag<String, AliasFlag> {
     }
 
     @Override public AliasFlag parse(@NotNull final String input) {
-        return flagOf(input);
+        return flagOf(input.replaceAll("&[A-Za-z0-9]", ""));
     }
 
     @Override public AliasFlag merge(@NotNull final String newValue) {

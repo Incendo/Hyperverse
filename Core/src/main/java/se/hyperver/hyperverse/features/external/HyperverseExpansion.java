@@ -18,6 +18,7 @@
 package se.hyperver.hyperverse.features.external;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.minidigger.minimessage.bungee.MiniMessageParser;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import se.hyperver.hyperverse.Hyperverse;
@@ -69,7 +70,7 @@ class HyperverseExpansion extends PlaceholderExpansion {
 
         switch (identifier.toLowerCase()) {
             case "world_display_name":
-                return hyperWorld.getDisplayName();
+                return MiniMessageParser.stripTokens(hyperWorld.getDisplayName());
             case "world_name":
                 return worldConfiguration.getName();
             case "world_generator":

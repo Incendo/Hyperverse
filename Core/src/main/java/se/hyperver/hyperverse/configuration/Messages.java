@@ -41,11 +41,13 @@ public class Messages {
         createMessage("world.same-world", "&cYou are already in this world!");
     public static final Message messagePrefix =
         createMessage("other.prefix", "&8[&6Hyperverse&8] ");
+    public static final Message messagePrefixFancy =
+        createMessage("other.prefix-fancy", "<dark_gray>[<gold>Hyperverse</gold>] </dark_gray>");
     public static final Message messageNoPlayerFound = createMessage("other.no-player-found",
         "&cPlayer with name %name% was not found.");
-    public static final Message messageNoPlayersInWorld = createMessage("other.no-player-in-world",
-        "&6%world%&7: There are no players in this world");
-    public static final Message messagePlayerCurrentWorld = createMessage("other.player-current-world",
+    public static final Message messageNoPlayersInWorld = createMessage("other.no-players-in-world",
+        "<gold>%world%</gold><gray>: There are no players in this world</gray>");
+    public static final Message messagePlayerCurrentWorld = createMessage("other.player-world",
         "<hover:show_text:\"<gray>Location:</gray> <white>%x%</white><gray>, </gray><white>%y%</white><gray>, </gray><white>%z%</white>\"><white>%player%</white> <gray>is currently in world:</gray> <white>%world%</white></hover> ");
     public static final Message messageWorldExists =
         createMessage("world.exists", "&cA world with that name already exists");
@@ -58,7 +60,7 @@ public class Messages {
     public static final Message messageWorldCreationStarted =
         createMessage("world.creation_started", "&7Creating a world with the following properties");
     public static final Message messageWorldProperty =
-        createMessage("world.property", "&8- &7%property%&8: &7%value%");
+        createMessage("world.world-property", "<dark_gray>- </dark_gray><gray>%property%</gray><dark_gray>: </dark_gray><gray>%value%</gray>");
     public static final Message messageWorldCreationFinished =
         createMessage("world.creation_finished", "&7The world was created successfully");
     public static final Message messageWorldImportedOnLoad = createMessage("world.load_imported",
@@ -80,20 +82,20 @@ public class Messages {
         "&7The generator for world '%world%' is now available. The world will be created.");
     public static final Message messageListHeader = createMessage("list.header",
         "&7Available Worlds: ");
-    public static final Message messageListEntry = createMessage("list.entry",
-        "&8- <hover:show_text:\"<gray>Click to teleport to the world</gray>\"><click:run_command:/hvtp %name%>"
-            + "&7%name%</click></hover> &8(&7%generator%&8: &7%type%&8) - %load_status%");
-    public static final Message messageListEntryCurrentWorld = createMessage("list.entry.current-world",
-        "<dark_gray>-</dark_gray> <white>%name% (%generator%&7: &f%type%)</white> <dark_gray>-</dark_gray> %load_status%");
-    public static final Message messageListEntryPlayer = createMessage("list.entry.player",
-        "&f<hover:show_text:\"<gray>Location:</gray> <white>%x%</white><gray>, </gray><white>%y%</white><gray>,"
-            + " </gray><white>%z%</white>\">%player%</hover>");
-    public static final Message messageListEntryWorld = createMessage("list.entry.player-current-world",
-        "&6%world%&7: %players%");
+    public static final Message messageListEntry = createMessage("list.world-entry",
+        "<dark_gray>-</dark_gray> <hover:show_text:\"<gray>Click to teleport to the world</gray>\"><click:run_command:/hvtp %name%>"
+            + "<gray>%display-name%</gray></click></hover> <dark_gray>(<gray>%generator%</gray>: <gray>%type%</gray>) - %load_status%");
+    public static final Message messageListEntryCurrentWorld = createMessage("list.world-entry-current",
+        "<dark_gray>-</dark_gray> <white>%display-name% (%generator%<gray>:</gray> %type%)</white> <dark_gray>-</dark_gray> %load_status%");
+    public static final Message messageListEntryPlayer = createMessage("list.player-entry",
+        "<white><hover:show_text:\"<gray>Location:</gray> <white>%x%</white><gray>, </gray><white>%y%</white><gray>,"
+            + " </gray><white>%z%</white>\">%player%</hover></white>");
+    public static final Message messageListEntryWorld = createMessage("list.entry.player-world",
+        "<gold>%world%</gold><gray>: %players%</gray>");
     public static final Message messageNoSuchWorld = createMessage("world.non_existent",
         "&cThere is no world with that name");
-    public static final Message messageTeleporting = createMessage("teleport.teleporting",
-        "&7You are being teleported to %world%");
+    public static final Message messageTeleporting = createMessage("teleport.teleporting-to-world",
+        "<gray>You are being teleported to %world%</gray>");
     public static final Message messageInfoHeader = createMessage("info.header",
         "&7World Information");
     public static final Message messageWorldCreationFailed = createMessage("world.creation_failed",

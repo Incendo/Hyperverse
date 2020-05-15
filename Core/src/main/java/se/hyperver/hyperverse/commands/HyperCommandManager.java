@@ -36,8 +36,7 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
-import me.minidigger.minimessage.text.MiniMessageParser;
-import net.kyori.text.adapter.bukkit.TextAdapter;
+import me.minidigger.minimessage.bungee.MiniMessageParser;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -439,7 +438,8 @@ public class HyperCommandManager extends BaseCommand {
             }
 
             MessageUtil.sendMessage(sender, message, "%name%", configuration.getName(),
-                "%generator%", generator, "%type%", configuration.getType().name(), "%load_status%", loadStatus);
+                "%display-name%", hyperWorld.getDisplayName(), "%generator%", generator, "%type%",
+                configuration.getType().name(), "%load_status%", loadStatus);
         });
     }
 
@@ -559,13 +559,13 @@ public class HyperCommandManager extends BaseCommand {
             for (final Player player : bukkitWorld.getPlayers()) {
                 final Location location = player.getLocation();
                 players.append(MessageUtil.format(Messages.messageListEntryPlayer.toString(), "%player%",
-                    player.getDisplayName(), "%world%", hyperWorld.getDisplayName(), "%x%",
+                    player.getDisplayName(), "%world%", world, "%x%",
                     format.format(location.getX()), "%y%",
                     format.format(location.getY()), "%z%",
                     format.format(location.getZ()))).append(", ");
             }
             MessageUtil.sendMessage(sender, Messages.messageListEntryWorld, "%players%", players.substring(0, players.length() - 2),
-                "%world%", bukkitWorld.getName());
+                "%world%", hyperWorld.getDisplayName());
         }
         else {
             for (final World bukkitWorld : Bukkit.getWorlds()) {
@@ -834,7 +834,7 @@ public class HyperCommandManager extends BaseCommand {
         Stream.of("<gold>Plugin Version:</gold> <gray>" + description.getVersion() + "</gray>",
                   "<gold>Author(s):</gold> <gray>" + StringUtils.join(description.getAuthors(), ", ") + "</gray>",
                   "<gold>Website:</gold> <gray><hover:show_text:\"<gray>Click to open</gray>\"><click:open_url:https://hyperver.se>https://hyperver.se</click></hover></gray>").forEach(msg ->
-            TextAdapter.sendComponent(sender, MiniMessageParser.parseFormat(
+            sender.spigot().sendMessage(MiniMessageParser.parseFormat(
                 "<dark_gray>[</dark_gray><gold>Hyperverse</gold><dark_gray>]</dark_gray> " + msg)));
     }
 

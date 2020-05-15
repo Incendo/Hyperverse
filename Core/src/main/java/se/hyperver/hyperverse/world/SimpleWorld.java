@@ -21,7 +21,6 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -200,6 +199,10 @@ public class SimpleWorld implements HyperWorld {
         MessageUtil
             .sendMessage(sender, Messages.messageWorldProperty, "%property%", "name", "%value%",
                 configuration.getName());
+        if (!getFlag(AliasFlag.class).isEmpty()) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "alias", "%value%",
+                    getDisplayName());
+        }
         MessageUtil
             .sendMessage(sender, Messages.messageWorldProperty, "%property%", "type", "%value%",
                 configuration.getType().name());
@@ -401,7 +404,7 @@ public class SimpleWorld implements HyperWorld {
         if (displayName.isEmpty()) {
             displayName = this.getConfiguration().getName();
         }
-        return ChatColor.translateAlternateColorCodes('&', displayName);
+        return displayName;
     }
 
 }
