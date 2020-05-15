@@ -260,7 +260,7 @@ public class EventListener implements Listener {
         return true;
     }
 
-    @EventHandler public void onRespawn(final PlayerRespawnEvent event) {
+    @EventHandler(priority = EventPriority.LOW) public void onRespawn(final PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
         final HyperWorld hyperWorld = this.worldManager.getWorld(player.getWorld());
         if (hyperWorld == null) {
