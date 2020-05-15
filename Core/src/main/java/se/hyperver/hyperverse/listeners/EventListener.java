@@ -42,6 +42,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.WaterMob;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -465,9 +466,9 @@ public class EventListener implements Listener {
         }
 
         final PlayerBedEnterEvent.BedEnterResult bedEnterResult = event.getBedEnterResult();
-        if (bedEnterResult == PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE ||
+        if ((event.useBed() == Event.Result.DEFAULT && (bedEnterResult == PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE ||
             bedEnterResult == PlayerBedEnterEvent.BedEnterResult.TOO_FAR_AWAY ||
-            bedEnterResult == PlayerBedEnterEvent.BedEnterResult.OTHER_PROBLEM) {
+            bedEnterResult == PlayerBedEnterEvent.BedEnterResult.OTHER_PROBLEM)) || event.useBed() == Event.Result.DENY) {
             return;
         }
 
