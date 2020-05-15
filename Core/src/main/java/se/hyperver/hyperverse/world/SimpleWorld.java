@@ -33,6 +33,7 @@ import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.database.LocationType;
 import se.hyperver.hyperverse.database.PersistentLocation;
+import se.hyperver.hyperverse.events.HyperWorldDeleteEvent;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.FlagParseException;
@@ -166,6 +167,8 @@ public class SimpleWorld implements HyperWorld {
             // Delete world in the database
             this.hyperDatabase.clearWorld(this.configuration.getName());
             result.accept(WorldUnloadResult.SUCCESS);
+            // Assuming everything went fine
+            HyperWorldDeleteEvent.callFor(this);
         }).execute();
     }
 

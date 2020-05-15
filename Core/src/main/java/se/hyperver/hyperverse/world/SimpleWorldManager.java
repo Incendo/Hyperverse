@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.Messages;
+import se.hyperver.hyperverse.events.HyperWorldCreateEvent;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.GeneratorUtil;
@@ -213,6 +214,8 @@ public class SimpleWorldManager implements WorldManager, Listener {
     @Override public void addWorld(@NotNull final HyperWorld hyperWorld) {
         this.registerWorld(hyperWorld);
         hyperWorld.saveConfiguration();
+        // Assuming everything went fine
+        HyperWorldCreateEvent.callFor(hyperWorld);
     }
 
     @Override public void registerWorld(@NotNull final HyperWorld hyperWorld) {

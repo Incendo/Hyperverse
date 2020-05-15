@@ -67,6 +67,7 @@ import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.database.LocationType;
 import se.hyperver.hyperverse.database.PersistentLocation;
+import se.hyperver.hyperverse.events.PlayerSetSpawnEvent;
 import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.EndFlag;
 import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
@@ -476,6 +477,12 @@ public class EventListener implements Listener {
         if (hyperWorld == null) {
             return;
         }
+
+        final PlayerSetSpawnEvent playerSetSpawnEvent = PlayerSetSpawnEvent.callFor(event.getPlayer(), hyperWorld);
+        if (playerSetSpawnEvent.isCancelled()) {
+            return;
+        }
+
         this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(event.getPlayer().getUniqueId(),
             event.getBed().getLocation(), LocationType.BED_SPAWN), true, false);
     }
