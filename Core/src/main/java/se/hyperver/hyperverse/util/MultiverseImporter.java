@@ -23,12 +23,16 @@ import com.google.inject.assistedinject.Assisted;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.configuration.Messages;
+import se.hyperver.hyperverse.flags.implementation.AliasFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
 import se.hyperver.hyperverse.flags.implementation.PvpFlag;
+import se.hyperver.hyperverse.flags.implementation.RespawnWorldFlag;
 import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -82,6 +86,14 @@ import java.util.UUID;
                 .createFlagInstance(multiverseWorld.getAccessPermission().getName()));
             hyperWorld.setFlagInstance(PvpFlag.PVP_FLAG_TRUE.createFlagInstance(multiverseWorld.isPVPEnabled()));
             hyperWorld.setFlagInstance(GamemodeFlag.GAMEMODE_SURVIVAL.createFlagInstance(multiverseWorld.getGameMode()));
+            final String worldAlias = multiverseWorld.getAlias();
+            if (worldAlias != null && !worldAlias.isEmpty()) {
+                hyperWorld.setFlagInstance(AliasFlag.ALIAS_NONE.createFlagInstance(worldAlias));
+            }
+            final World respawnToWorld = multiverseWorld.getRespawnToWorld();
+            if (respawnToWorld != null && !respawnToWorld.equals(Bukkit.getWorlds().get(0))) {
+                hyperWorld.setFlagInstance(RespawnWorldFlag.RESPAWN_WORLD_FLAG_EMPTY.createFlagInstance(respawnToWorld.getName()));
+            }
             hyperWorld.saveConfiguration();
             MessageUtil.sendMessage(commandSender, Messages.messageMultiverseImported,
             "%world%", multiverseWorld.getName());
