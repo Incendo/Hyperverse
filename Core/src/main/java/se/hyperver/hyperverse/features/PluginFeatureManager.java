@@ -67,7 +67,9 @@ public class PluginFeatureManager {
         MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageFeaturesLoading, "%num%",
             Integer.toString(this.registeredFeatures.size()));
         for (final String feature : this.registeredFeatures.keySet()) {
-            this.loadFeature(feature);
+            if (isPluginPresent(feature)) {
+                this.loadFeature(feature);
+            }
         }
         this.loaded = true;
     }
