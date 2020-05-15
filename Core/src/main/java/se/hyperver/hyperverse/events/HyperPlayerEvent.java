@@ -17,29 +17,28 @@
 
 package se.hyperver.hyperverse.events;
 
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 
 import java.util.Objects;
 
 /**
- * Events involving {@link se.hyperver.hyperverse.world.HyperWorld hyper worlds}
+ * Events involving {@link org.bukkit.entity.Player} inside of a
+ * {@link se.hyperver.hyperverse.world.HyperWorld}
+ * {@inheritDoc}
  */
-public abstract class HyperWorldEvent extends HyperverseEvent {
+public abstract class HyperPlayerEvent extends HyperWorldEvent {
 
-    private final HyperWorld world;
+    private final Player player;
 
-    public HyperWorldEvent(@NotNull final HyperWorld world) {
-        this.world = Objects.requireNonNull(world, "world");
+    public HyperPlayerEvent(@NotNull final Player player, @NotNull final HyperWorld hyperWorld) {
+        super(hyperWorld);
+        this.player = Objects.requireNonNull(player, "player");
     }
 
-    /**
-     * Get the world involved in this event
-     *
-     * @return Event world
-     */
-    @NotNull public final HyperWorld getWorld() {
-        return this.world;
+    @NotNull public final Player getPlayer() {
+        return this.player;
     }
 
 }

@@ -24,8 +24,6 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 
-import java.util.Objects;
-
 /**
  * Called when a {@link org.bukkit.entity.Player} attempts to set their
  * spawn point using a bed in a {@link se.hyperver.hyperverse.world.HyperWorld}.
@@ -34,16 +32,14 @@ import java.util.Objects;
  * This will not affect the vanilla spawn point, however. To do that, one would
  * need to interact with {@link org.bukkit.event.player.PlayerBedEnterEvent}
  */
-public class PlayerSetSpawnEvent extends HyperWorldEvent implements Cancellable {
+public class PlayerSetSpawnEvent extends HyperPlayerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private final Player player;
     private boolean cancelled;
 
     private PlayerSetSpawnEvent(@NotNull final Player player, @NotNull final HyperWorld world) {
-        super(world);
-        this.player = Objects.requireNonNull(player);
+        super(player, world);
         this.cancelled = false;
     }
 
@@ -67,10 +63,6 @@ public class PlayerSetSpawnEvent extends HyperWorldEvent implements Cancellable 
 
     @Override public boolean isCancelled() {
         return this.cancelled;
-    }
-
-    @NotNull public Player getPlayer() {
-        return this.player;
     }
 
 }

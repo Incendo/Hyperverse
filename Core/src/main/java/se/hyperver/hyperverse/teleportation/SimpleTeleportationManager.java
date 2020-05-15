@@ -162,8 +162,6 @@ public final class SimpleTeleportationManager implements TeleportationManager {
             final Location adjustedLocation = nms.findBedRespawn(spawnLocation);
             if (adjustedLocation != null) {
                 return adjustedLocation;
-            } else {
-                return spawnLocation;
             }
         }
         return Objects.requireNonNull(hyperWorld.getSpawn());

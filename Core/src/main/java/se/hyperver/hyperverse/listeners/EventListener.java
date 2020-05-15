@@ -67,6 +67,7 @@ import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.database.LocationType;
 import se.hyperver.hyperverse.database.PersistentLocation;
+import se.hyperver.hyperverse.events.PlayerSeekSpawnEvent;
 import se.hyperver.hyperverse.events.PlayerSetSpawnEvent;
 import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.EndFlag;
@@ -265,6 +266,7 @@ public class EventListener implements Listener {
         if (hyperWorld == null) {
             return;
         }
+
         if (hyperWorld.getConfiguration().getType() == WorldType.END
             && event.getPlayer().getLocation().getBlock().getType() == Material.END_PORTAL) {
             final Location destination =
@@ -278,16 +280,28 @@ public class EventListener implements Listener {
                     event.setRespawnLocation(destination);
                 }
             }
-        } else if (hyperWorld.getFlag(LocalRespawnFlag.class)) {
-            event.setRespawnLocation(hyperWorld.getTeleportationManager().getSpawnLocation(player, hyperWorld));
+            return;
+        }
+
+        Location spawnLocation = event.getRespawnLocation();
+
+        if (hyperWorld.getFlag(LocalRespawnFlag.class)) {
+            spawnLocation = hyperWorld.getTeleportationManager().getSpawnLocation(player, hyperWorld);
         } else if (!hyperWorld.getFlag(RespawnWorldFlag.class).isEmpty()) {
             final HyperWorld respawnWorld = this.worldManager.getWorld(hyperWorld.getFlag(RespawnWorldFlag.class));
             if (respawnWorld != null) {
-                event.setRespawnLocation(respawnWorld.getTeleportationManager().getSpawnLocation(player, respawnWorld));
+                spawnLocation = respawnWorld.getTeleportationManager().getSpawnLocation(player, respawnWorld);
             } else {
                 MessageUtil.sendMessage(player, Messages.messageRespawnWorldNonExistent);
             }
         }
+
+        final PlayerSeekSpawnEvent seekSpawnEvent = PlayerSeekSpawnEvent.callFor(player, hyperWorld, spawnLocation);
+        if (seekSpawnEvent.isCancelled()) {
+            return;
+        }
+
+        event.setRespawnLocation(seekSpawnEvent.getRespawnLocation());
     }
 
     @EventHandler public void onEntityDamageEvent(final EntityDamageByEntityEvent event) {
