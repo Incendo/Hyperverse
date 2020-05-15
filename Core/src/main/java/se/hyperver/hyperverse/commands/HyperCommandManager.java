@@ -17,32 +17,16 @@
 
 package se.hyperver.hyperverse.commands;
 
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.BukkitCommandManager;
-import co.aikar.commands.BukkitMessageFormatter;
-import co.aikar.commands.CommandHelp;
-import co.aikar.commands.InvalidCommandArgument;
-import co.aikar.commands.MessageType;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.HelpCommand;
+import co.aikar.commands.*;
 import co.aikar.commands.annotation.Optional;
-import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.*;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import me.minidigger.minimessage.bungee.MiniMessageParser;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameRule;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -59,18 +43,9 @@ import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
-import se.hyperver.hyperverse.util.IncendoPaster;
-import se.hyperver.hyperverse.util.MessageUtil;
-import se.hyperver.hyperverse.util.MultiverseImporter;
-import se.hyperver.hyperverse.util.SeedUtil;
-import se.hyperver.hyperverse.util.WorldUtil;
-import se.hyperver.hyperverse.world.HyperWorld;
-import se.hyperver.hyperverse.world.WorldConfiguration;
-import se.hyperver.hyperverse.world.WorldConfigurationBuilder;
-import se.hyperver.hyperverse.world.WorldFeatures;
-import se.hyperver.hyperverse.world.WorldManager;
-import se.hyperver.hyperverse.world.WorldStructureSetting;
+import se.hyperver.hyperverse.util.*;
 import se.hyperver.hyperverse.world.WorldType;
+import se.hyperver.hyperverse.world.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,14 +54,7 @@ import java.lang.management.RuntimeMXBean;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -555,17 +523,17 @@ public class HyperCommandManager extends BaseCommand {
                 MessageUtil.sendMessage(sender, Messages.messageNoPlayersInWorld, "%world%", hyperWorld.getDisplayName());
                 return;
             }
-            final StringBuilder players = new StringBuilder();
+            final StringJoiner players = new StringJoiner(", ");
             for (final Player player : bukkitWorld.getPlayers()) {
                 final Location location = player.getLocation();
-                players.append(MessageUtil.format(Messages.messageListEntryPlayer.toString(), "%player%",
-                    player.getDisplayName(), "%world%", world, "%x%",
-                    format.format(location.getX()), "%y%",
-                    format.format(location.getY()), "%z%",
-                    format.format(location.getZ()))).append(", ");
+                players.add(MessageUtil
+                    .format(Messages.messageListEntryPlayer.toString(), "%player%",
+                        ChatColor.stripColor(player.getDisplayName()), "%world%", world, "%x%",
+                        format.format(location.getX()), "%y%", format.format(location.getY()),
+                        "%z%", format.format(location.getZ())));
             }
-            MessageUtil.sendMessage(sender, Messages.messageListEntryWorld, "%players%", players.substring(0, players.length() - 2),
-                "%world%", hyperWorld.getDisplayName());
+            MessageUtil.sendMessage(sender, Messages.messageListEntryWorld, "%players%",
+                players.toString().trim(), "%world%", hyperWorld.getDisplayName());
         }
         else {
             for (final World bukkitWorld : Bukkit.getWorlds()) {
