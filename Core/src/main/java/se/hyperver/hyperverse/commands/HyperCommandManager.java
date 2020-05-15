@@ -558,9 +558,9 @@ public class HyperCommandManager extends BaseCommand {
                     player.getDisplayName(), "%world%", world, "%x%",
                     format.format(location.getX()), "%y%",
                     format.format(location.getY()), "%z%",
-                    format.format(location.getZ())));
+                    format.format(location.getZ()))).append(", ");
             }
-            MessageUtil.sendMessage(sender, Messages.messageListEntryWorld, "%players%", players.toString(),
+            MessageUtil.sendMessage(sender, Messages.messageListEntryWorld, "%players%", players.substring(0, players.length() - 2),
                 "%world%", bukkitWorld.getName());
         }
         else {
