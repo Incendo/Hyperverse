@@ -77,7 +77,11 @@ import java.util.UUID;
                 this.worldManager.addWorld(hyperWorld);
             }
             hyperWorld.setBukkitWorld(multiverseWorld.getCBWorld());
-            hyperWorld.getConfiguration().setGenerator(multiverseWorld.getGenerator());
+            String generator = multiverseWorld.getGenerator();
+            if (generator == null || generator.equalsIgnoreCase("null")) {
+                generator = "vanilla";
+            }
+            hyperWorld.getConfiguration().setGenerator(generator);
             hyperWorld.getConfiguration().setSeed(multiverseWorld.getSeed());
             MessageUtil.sendMessage(commandSender, Messages.messageMultiverseImporting,
                 "%world%", multiverseWorld.getName());
