@@ -357,8 +357,8 @@ public class HyperCommandManager extends BaseCommand {
             bukkitWorld = hyperWorld.getBukkitWorld();
             assert bukkitWorld != null;
         } catch (HyperWorldValidationException e) {
-            MessageUtil.sendMessage(sender, Messages.messageWorldImportFailure, "%reason%",
-                e.getMessage());
+            MessageUtil.sendMessage(sender, Messages.messageWorldImportFailure, "%reason%", worldName, "%world%",
+                e.getMessage(), "%result%");
             return;
         }
         worldManager.addWorld(hyperWorld);
