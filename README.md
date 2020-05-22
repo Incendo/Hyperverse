@@ -32,6 +32,7 @@ pve, pvp, world-permission, nether, end, profile-group, difficulty, creature-spa
 ### Downloads
 - [Spigot](https://www.spigotmc.org/resources/hyperverse-w-i-p.77550/)
 - [Development Builds](https://ci.athion.net/job/Hyperverse/)
+- [Issue Tracker](https://issues.intellectualsites.com/projects/58b45c18-71d9-4e6a-9095-68761926c007)
 
 ### Documentation
 - [Wiki](https://wiki.intellectualsites.com/hyperverse/home)
