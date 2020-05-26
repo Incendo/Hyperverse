@@ -557,7 +557,7 @@ public class HyperCommandManager extends BaseCommand {
 
     @Category("Misc") @Subcommand("teleportgroup|tpgroup") @CommandAlias("hvtpgroup")
     @CommandPermission("hyperverse.teleportgroup")
-    @CommandCompletion("@profile_groups:has_perms=true")
+    @CommandCompletion("@profile_groups:has_perms=true") @Description("{@command.teleportgroup}")
     public void doGroupedTeleport(final Player sender, final String profileGroup) {
         final CompletableFuture<Collection<PersistentLocation>> future =
             (CompletableFuture<Collection<PersistentLocation>>) Hyperverse

@@ -225,6 +225,8 @@ public class Messages {
         "Import a world into Hyperverse");
     public static final Message commandDescriptionTeleport = createMessage("command.teleport",
         "Teleport between hyperverse worlds");
+    public static final Message commandDescriptionTeleportGroup = createMessage(
+        "command.teleportgroup", "Teleport to the last saved location in a specified profile-group");
     public static final Message commandDescriptionUnload = createMessage("command.unload",
         "Unload a world");
     public static final Message commandDescriptionLoad = createMessage("command.load",
