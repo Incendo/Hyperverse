@@ -38,10 +38,12 @@ import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
+import se.hyperver.hyperverse.database.PersistentLocation;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
+import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.*;
 import se.hyperver.hyperverse.world.WorldType;
@@ -55,6 +57,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -212,6 +215,14 @@ public class HyperCommandManager extends BaseCommand {
                 }
             }
             return Collections.emptyList();
+        });
+        bukkitCommandManager.getCommandCompletions().registerCompletion("profile_groups", context -> {
+            Stream<String> groups = worldManager.getWorlds().stream().map(world -> world.getFlag(ProfileGroupFlag.class)).filter(s -> !s.isEmpty());
+            String requirePerms = context.getConfig("has_perms", "false");
+            if (requirePerms.equalsIgnoreCase("true")) {
+                groups = groups.filter(profile -> context.getSender().hasPermission("hyperverse.teleportgroup." + profile));
+            }
+            return groups.collect(Collectors.toList());
         });
         bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("structures", context ->
             Arrays.asList("yes", "true", "generate_structures", "structures", "no", "false", "no_structures"));
@@ -531,15 +542,48 @@ public class HyperCommandManager extends BaseCommand {
         }
         for (final Player player : playerList) {
             if (world.getBukkitWorld() == player.getWorld()) {
-                MessageUtil.sendMessage(sender, Messages.messagePlayerAlreadyInWorld, "%player%", player.getName());
+                MessageUtil.sendMessage(sender, Messages.messagePlayerAlreadyInWorld, "%player%",
+                    player.getName());
                 continue;
             }
             MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%", world.getDisplayName());
             if (player != sender) {
-                MessageUtil.sendMessage(sender, Messages.messageTeleportingPlayer, "%player%", player.getName(), "%world%", world.getDisplayName());
+                MessageUtil.sendMessage(sender, Messages.messageTeleportingPlayer, "%player%",
+                    player.getName(), "%world%", world.getDisplayName());
             }
             world.teleportPlayer(player);
         }
+    }
+
+    @Category("Misc") @Subcommand("teleportgroup|tpgroup") @CommandAlias("hvtpgroup")
+    @CommandPermission("hyperverse.teleportgroup")
+    @CommandCompletion("@profile_groups:has_perms=true")
+    public void doGroupedTeleport(final Player sender, final String profileGroup) {
+        final CompletableFuture<Collection<PersistentLocation>> future =
+            (CompletableFuture<Collection<PersistentLocation>>) Hyperverse
+                .getPlugin(Hyperverse.class).getDatabase().getLocations(sender.getUniqueId());
+
+        future.thenAccept(persistentLocations -> {
+            final java.util.Optional<PersistentLocation> optional =
+                persistentLocations.stream().filter(persistentLocation -> {
+                    final HyperWorld hyperWorld =
+                        worldManager.getWorld(persistentLocation.getWorld());
+                    if (hyperWorld == null) {
+                        return false;
+                    }
+                    return hyperWorld.getFlag(ProfileGroupFlag.class)
+                        .equalsIgnoreCase(profileGroup);
+                }).max(Comparator.comparingInt(PersistentLocation::getId));
+
+            if (!optional.isPresent()) {
+                MessageUtil.sendMessage(sender, Messages.messageInvalidProfileGroup);
+                return;
+            }
+            final PersistentLocation location = optional.get();
+            final HyperWorld hyperWorld = worldManager.getWorld(location.getWorld());
+            assert hyperWorld != null;
+            doTeleport(sender, hyperWorld);
+        });
     }
 
     @Category("Informational") @Subcommand("info|i") @CommandAlias("hvi")

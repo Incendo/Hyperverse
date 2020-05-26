@@ -152,6 +152,8 @@ public class Messages {
         "&cThat is not a valid game rule");
     public static final Message messageInvalidStructureSetting = createMessage("invalid.structure_setting",
         "&cThat is not a valid world structure setting");
+    public static final Message messageInvalidProfileGroup =
+        createMessage("invalid.profile_group", "&cThat is not a valid profile group");
     public static final Message messagePortalNotLinked = createMessage("portal.not_linked",
         "&cI'm sorry, that portal can't take you anywhere!");
     public static final Message messageRespawnWorldNonExistent = createMessage("world.respawn_non_existent",
