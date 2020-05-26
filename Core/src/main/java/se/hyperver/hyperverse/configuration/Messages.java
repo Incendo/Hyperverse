@@ -144,16 +144,16 @@ public class Messages {
         "&7The paste file has been uploaded to: %paste%");
     public static final Message messagePasteFailed = createMessage("paste.failed",
         "&cFailed to create the debug paste. Reason: %reason%");
+    public static final Message messageInvalidProfileGroup =
+        createMessage("invalid.profile_group", "&cThat is not a valid profile group");
+    public static final Message messageInvalidGameRule = createMessage("invalid.game_rule",
+        "&cThat is not a valid game rule");
     public static final Message messageInvalidWorldType = createMessage("invalid.world_type",
         "&cThat is not a valid world type");
     public static final Message messageInvalidWorldFeatures = createMessage("invalid.world_feature",
         "&cThat is not a valid feature type");
-    public static final Message messageInvalidGameRule = createMessage("invalid.game_rule",
-        "&cThat is not a valid game rule");
     public static final Message messageInvalidStructureSetting = createMessage("invalid.structure_setting",
         "&cThat is not a valid world structure setting");
-    public static final Message messageInvalidProfileGroup =
-        createMessage("invalid.profile_group", "&cThat is not a valid profile group");
     public static final Message messagePortalNotLinked = createMessage("portal.not_linked",
         "&cI'm sorry, that portal can't take you anywhere!");
     public static final Message messageRespawnWorldNonExistent = createMessage("world.respawn_non_existent",
