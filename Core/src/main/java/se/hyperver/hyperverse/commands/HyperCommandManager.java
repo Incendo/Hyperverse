@@ -682,9 +682,7 @@ public class HyperCommandManager extends BaseCommand {
     @Category("Misc") @Subcommand("reload") @CommandPermission("hyperverse.reload") @CommandAlias("hvreload")
     @Description("{@@command.reload}")
     public void doConfigReload(final CommandSender sender) {
-        if (Hyperverse.getPlugin(Hyperverse.class).reloadConfiguration(sender)) {
-            MessageUtil.sendMessage(sender, Messages.messageConfigReloaded);
-        } else {
+        if (!Hyperverse.getPlugin(Hyperverse.class).reloadConfiguration(sender)) {
             throw new CommandException("Failed to reload configuration files");
         }
     }
