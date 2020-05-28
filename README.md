@@ -4,7 +4,7 @@
 
 **Hyperverse is W.I.P!**
 
-[![TeamCity](https://ci.intellectualsites.com/app/rest/builds/aggregated/strob:(buildType:(project:(id:Hyperverse_2)))/statusIcon.svg)]
+[![TeamCity](https://ci.intellectualsites.com/app/rest/builds/aggregated/strob:(buildType:(project:(id:Hyperverse_2)))/statusIcon.svg)](https://ci.intellectualsites.com/project.html?projectId=Hyperverse_2&tab=projectOverview&guest=1)
 [![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/hyperverse/badge)](https://www.codefactor.io/repository/github/sauilitired/hyperverse) ![Java CI with Maven](https://github.com/Sauilitired/Hyperverse/workflows/Java%20CI%20with%20Maven/badge.svg)
 
 A Minecraft world management plugin for Bukkit 1.15 (backported to 1.14).
@@ -32,7 +32,8 @@ pve, pvp, world-permission, nether, end, profile-group, difficulty, creature-spa
 
 ### Downloads
 - [Spigot](https://www.spigotmc.org/resources/hyperverse-w-i-p.77550/)
-- [Development Builds](https://ci.athion.net/job/Hyperverse/)
+- [Development Builds #1](https://ci.athion.net/job/Hyperverse/)
+- [Development Builds #2](https://ci.intellectualsites.com/project.html?projectId=Hyperverse_2&tab=projectOverview&guest=1)
 - [Issue Tracker](https://issues.intellectualsites.com/projects/58b45c18-71d9-4e6a-9095-68761926c007)
 
 ### Documentation
