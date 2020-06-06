@@ -41,6 +41,7 @@ import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.flags.implementation.AliasFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
+import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
 import se.hyperver.hyperverse.modules.FlagContainerFactory;
 import se.hyperver.hyperverse.modules.HyperWorldCreatorFactory;
 import se.hyperver.hyperverse.modules.TeleportationManagerFactory;
@@ -292,7 +293,7 @@ public class SimpleWorld implements HyperWorld {
         }
 
         final Location location;
-        if (this.hyperConfiguration.shouldPersistLocations()) {
+        if (!this.getFlag(ForceSpawn.class) && this.hyperConfiguration.shouldPersistLocations()) {
             location = this.hyperDatabase.getLocation(player.getUniqueId(),
                 this.getConfiguration().getName(), LocationType.PLAYER_LOCATION)
                 .map(PersistentLocation::toLocation)
