@@ -31,18 +31,44 @@ public enum WorldFeatures {
     NORMAL(WorldType.NORMAL, "normal"),
     FLATLAND(WorldType.FLAT, "flat", "flatland", "flatworld"),
     AMPLIFIED(WorldType.AMPLIFIED, "amplified"),
-    BUFFET(WorldType.BUFFET, "buffet");
-    
+    BUFFET("BUFFET", "buffet");
+
+    private static final IllegalStateException INCOMPATIBLE_VERSION =  new IllegalStateException("WorldType is unavailable on this version.");
     private final WorldType bukkitType;
     private final Collection<String> names;
-    
+
     WorldFeatures(@NotNull final WorldType bukkitType, @NotNull final String ... names) {
         this.bukkitType = Objects.requireNonNull(bukkitType);
         this.names = Arrays.asList(names);
     }
 
-    @NotNull public WorldType getBukkitType() {
+    WorldFeatures(@NotNull final String enumName, @NotNull final String... names) {
+        WorldType worldType;
+        try {
+          worldType = WorldType.valueOf(enumName);
+        } catch (IllegalArgumentException ex) {
+            worldType = null;
+        }
+        this.bukkitType = worldType;
+        this.names = Arrays.asList(names);
+    }
+
+    /**
+     * Get the Bukkit enum world type for this world feature.
+     * @return Returns a never null {@link WorldType}.
+     * @throws IllegalStateException Thrown if the bukkit world type is not available.
+     *                               This method will always throw an {@link IllegalStateException}
+     *                               if {@link #isAvailable()} returns false.
+     */
+    @NotNull public WorldType getBukkitType() throws IllegalStateException{
+        if (this.bukkitType == null) {
+          throw INCOMPATIBLE_VERSION;
+        }
         return this.bukkitType;
+    }
+
+    public boolean isAvailable() {
+        return this.bukkitType != null;
     }
 
     @NotNull public static Optional<WorldFeatures> fromName(@NotNull final String name) {
