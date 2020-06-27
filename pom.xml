@@ -38,6 +38,7 @@
 
     <modules>
         <module>Core</module>
+        <module>Bukkit-1.16</module>
         <module>Bukkit-1.15</module>
         <module>Bukkit-1.14</module>
         <module>AnnotationProcessor</module>
