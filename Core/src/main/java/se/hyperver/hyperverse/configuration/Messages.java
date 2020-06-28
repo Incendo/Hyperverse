@@ -39,6 +39,7 @@ public class Messages {
         "&cFailed to reload Hyperverse messages: %reason%");
     public static final Message messageAlreadyInWorld =
         createMessage("world.same-world", "&cYou are already in this world!");
+    public static final Message messagePlayerAlreadyInWorld = createMessage("world.player-same-world", "&c%player% is already in that world!");
     public static final Message messagePrefix =
         createMessage("other.prefix", "&8[&6Hyperverse&8] ");
     public static final Message messagePrefixFancy =
@@ -96,6 +97,7 @@ public class Messages {
         "&cThere is no world with that name");
     public static final Message messageTeleporting = createMessage("teleport.teleporting-to-world",
         "<gray>You are being teleported to %world%</gray>");
+    public static final Message messageTeleportingPlayer = createMessage("teleport.teleporting-other", "<gray>%player% is being teleported to %world%</gray>");
     public static final Message messageInfoHeader = createMessage("info.header",
         "&7World Information");
     public static final Message messageWorldCreationFailed = createMessage("world.creation_failed",

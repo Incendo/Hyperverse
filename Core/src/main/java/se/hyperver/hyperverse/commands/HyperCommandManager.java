@@ -230,6 +230,83 @@ public class HyperCommandManager extends BaseCommand {
                     throw new InvalidCommandArgument(Messages.messageInvalidStructureSetting.withoutColorCodes());
             }
         });
+        bukkitCommandManager.getCommandCompletions()
+            .registerCompletion("vararg_players", context -> {
+                String[] input = context.getInput().split(" ");
+                final int toPop;
+                try {
+                    toPop = Integer.parseInt(context.getConfig("pop"));
+                } catch (final NumberFormatException ex) {
+                    ex.printStackTrace();
+                    return Collections.emptyList();
+                }
+                if (toPop > input.length) {
+                    throw new IllegalArgumentException(
+                        "Config to pop is greater than input length!");
+                }
+                input = Arrays.copyOfRange(input, toPop, input.length - 1);
+                for (int index = 0; index < input.length; index++) {
+                    input[index] = input[index].toLowerCase();
+                }
+                final List<String> players = new ArrayList<>(Arrays.asList(input));
+                if (context.getPlayer() != null && !context.getConfig("self", "false")
+                    .equalsIgnoreCase("true")) {
+                    players.remove(context.getPlayer().getName());
+                }
+                return Bukkit.getOnlinePlayers().stream().map(Player::getName)
+                    .filter(player -> !players.contains(player.toLowerCase()))
+                    .sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+
+            });
+        bukkitCommandManager.getCommandCompletions().registerCompletion("vararg_player_world", context -> {
+            String[] input = context.getInput().split(" ");
+            final int toPop;
+            try {
+                toPop = Integer.parseInt(context.getConfig("pop"));
+            } catch (final NumberFormatException ex) {
+                ex.printStackTrace();
+                return Collections.emptyList();
+            }
+            if (toPop > input.length) {
+                throw new IllegalArgumentException(
+                    "Config to pop is greater than input length!");
+            }
+            final String inWorld = context.getConfig("in_world", "false");
+            final boolean checkInWorld = !inWorld.equalsIgnoreCase("false");
+            input = Arrays.copyOfRange(input, toPop, input.length - 1);
+            for (int index = 0; index < input.length; index++) {
+                input[index] = input[index].toLowerCase();
+            }
+            final List<String> players = new ArrayList<>(Arrays.asList(input));
+            if (context.getPlayer() != null && !context.getConfig("self", "false")
+                .equalsIgnoreCase("true")) {
+                players.remove(context.getPlayer().getName());
+            }
+             Stream<? extends Player> stream = Bukkit.getOnlinePlayers().stream();
+            if (checkInWorld) {
+                final HyperWorld world = context.getContextValue(HyperWorld.class);
+                if (world == null) {
+                    return Collections.emptyList();
+                }
+                stream = stream.filter(player -> player.getWorld() != world.getBukkitWorld());
+            }
+            return stream.map(Player::getName)
+                .filter(player -> !players.contains(player.toLowerCase()))
+                .sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+        });
+        /*bukkitCommandManager.getCommandContexts().registerContext(Player[].class, context -> {
+            final List<String> args = context.getArgs();
+            final Player[] arr = new Player[args.size()];
+            for (int index = 0; index < args.size(); index++) {
+                final Player player = Bukkit.getPlayer(args.get(index));
+                if (player == null) {
+                    throw new InvalidCommandArgument(MessageUtil.format(Messages.messageNoPlayerFound.toString(), "%name%", args.get(index)));
+                }
+                arr[index] = player;
+            }
+            args.clear();
+            return arr;
+        });*/
         bukkitCommandManager.getCommandContexts().registerContext(WorldType.class, context -> {
             final String arg = context.popFirstArg();
             return WorldType.fromString(arg).orElseThrow(() ->
@@ -428,6 +505,41 @@ public class HyperCommandManager extends BaseCommand {
         }
         MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%", world.getDisplayName());
         world.teleportPlayer(player);
+    }
+
+    @Category("Misc") @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hypverse.teleport.other")
+    @CommandCompletion("@hyperworlds:state=loaded @vararg_player_world:pop=0,in_world=true")
+    public void doMassTeleport(final CommandSender sender, final HyperWorld world, final String[] players) {
+        if (world == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+            return;
+        }
+        if (!world.isLoaded()) {
+            MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
+            return;
+        }
+        final List<Player> playerList = new ArrayList<>(players.length);
+        for (final String rawPlayer : players) {
+            final Player player = Bukkit.getPlayer(rawPlayer);
+            if (player == null) {
+                MessageUtil.sendMessage(sender, Messages.messageNoPlayerFound, "%player%", rawPlayer);
+                return;
+            }
+            if (!playerList.contains(player)) {
+                playerList.add(player);
+            }
+        }
+        for (final Player player : playerList) {
+            if (world.getBukkitWorld() == player.getWorld()) {
+                MessageUtil.sendMessage(sender, Messages.messagePlayerAlreadyInWorld, "%player%", player.getName());
+                continue;
+            }
+            MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%", world.getDisplayName());
+            if (player != sender) {
+                MessageUtil.sendMessage(sender, Messages.messageTeleportingPlayer, "%player%", player.getName(), "%world%", world.getDisplayName());
+            }
+            world.teleportPlayer(player);
+        }
     }
 
     @Category("Informational") @Subcommand("info|i") @CommandAlias("hvi")
