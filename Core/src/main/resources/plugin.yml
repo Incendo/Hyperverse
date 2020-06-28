@@ -20,9 +20,9 @@ permissions:
   hyperverse.teleport:
     description: Allows players to teleport between worlds
     default: op
-    hyperverse.teleport.other:
-      description: Allows players to teleport other players between worlds.
-      default: op
+  hyperverse.teleport.other:
+    description: Allows players to teleport other players between worlds.
+    default: op
   hyperverse.teleportgroup:
     description: Allows players to teleport to their last location in a given profile group
     default: op
