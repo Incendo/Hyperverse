@@ -236,7 +236,7 @@ public class NMSImpl implements NMS {
             return null;
         }
         return EntityHuman.getBed(craftWorld.getHandle(), new BlockPosition(spawnLocation.getBlockX(),
-            spawnLocation.getBlockY(), spawnLocation.getBlockZ()), true, true) //TODO Complete the last arg. No idea what it does (FLAG 1)
+            spawnLocation.getBlockY(), spawnLocation.getBlockZ()), true, true)
             .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.getX(), vec3D.getY(), vec3D.getZ()))
             .orElse(null);
     }

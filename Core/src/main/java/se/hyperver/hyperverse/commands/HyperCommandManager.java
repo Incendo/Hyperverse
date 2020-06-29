@@ -84,7 +84,7 @@ public class HyperCommandManager extends BaseCommand {
         this.fileHyperConfiguration = Objects.requireNonNull(hyperConfiguration);
 
         // Create the command manager
-        bukkitCommandManager = new BukkitCommandManager(hyperverse);
+        bukkitCommandManager = new PaperCommandManager(hyperverse);
         bukkitCommandManager.usePerIssuerLocale(true, true);
         bukkitCommandManager.getLocales().addMessages(Locale.ENGLISH, Messages.getMessages());
         bukkitCommandManager.setDefaultFormatter(new BukkitMessageFormatter(ChatColor.GRAY) {
@@ -528,6 +528,14 @@ public class HyperCommandManager extends BaseCommand {
     @Category("Misc") @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hypverse.teleport.other")
     @CommandCompletion("@hyperworlds:state=loaded @vararg_player_world:pop=0,in_world=true")
     public void doMassTeleport(final CommandSender sender, final HyperWorld world, final String[] players) {
+        if (players.length == 0) {
+            if (sender instanceof Player) {
+                doTeleport((Player) sender, world);
+            } else {
+                MessageUtil.sendMessage(sender, Messages.messageSpecifyPlayer);
+            }
+            return;
+        }
         if (world == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;

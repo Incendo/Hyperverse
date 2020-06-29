@@ -46,6 +46,7 @@ public class Messages {
         createMessage("other.prefix-fancy", "<dark_gray>[<gold>Hyperverse</gold>] </dark_gray>");
     public static final Message messageNoPlayerFound = createMessage("other.no-player-found",
         "&cPlayer with name %name% was not found.");
+    public static final Message messageSpecifyPlayer = createMessage("other.specify-player", "&cPlease specify a player!");
     public static final Message messageNoPlayersInWorld = createMessage("other.no-players-in-world",
         "<gold>%world%</gold><gray>: There are no players in this world</gray>");
     public static final Message messagePlayerCurrentWorld = createMessage("other.player-world",
