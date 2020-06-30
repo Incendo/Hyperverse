@@ -950,14 +950,12 @@ public class HyperCommandManager extends BaseCommand {
 
     @Category("Misc") @Subcommand("myworlds") @CommandPermission("hyperverse.plugin.import")
     public void doMyWorlds(final CommandSender sender) {
-        try {
-            Class.forName("com.bergerkiller.bukkit.mw.MyWorlds");
-        } catch (ClassNotFoundException ex) {
-            MessageUtil
-                .sendMessage(sender, Messages.messageImportPluginMissing, "%plugin%", "MyWorlds");
-            return;
+        if (Bukkit.getPluginManager().isPluginEnabled("MyWorlds")) {
+            new MyWorldsImporter(this.worldManager, this.hyperWorldFactory).performImport(sender);
+        } else { MessageUtil
+            .sendMessage(sender, Messages.messageImportPluginMissing, "%plugin%", "MyWorlds");
+
         }
-        new MyWorldsImporter(this.worldManager, this.hyperWorldFactory).performImport(sender);
     }
 
     @Category("Misc") @Subcommand("plugin")
