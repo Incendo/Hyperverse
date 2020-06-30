@@ -65,4 +65,7 @@ public class EndFlag extends WorldFlag<String, EndFlag> {
             .map(HyperWorld::getConfiguration).map(WorldConfiguration::getName).collect(Collectors.toList());
     }
 
+    @Override public @NotNull String getValueAsString() {
+        return getValue();
+    }
 }

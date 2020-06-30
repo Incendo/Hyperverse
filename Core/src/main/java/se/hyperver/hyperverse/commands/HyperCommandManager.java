@@ -335,6 +335,13 @@ public class HyperCommandManager extends BaseCommand {
             }
             return hyperWorld;
         });
+        bukkitCommandManager.getCommandContexts().registerIssuerAwareContext(HyperWorld.class, context -> {
+            final HyperWorld hyperWorld = worldManager.getWorld(context.getPlayer().getWorld());
+            if (hyperWorld == null) {
+                throw new InvalidCommandArgument(Messages.messageNoSuchWorld.withoutColorCodes());
+            }
+            return hyperWorld;
+        });
         bukkitCommandManager.getCommandContexts().registerContext(GameRule.class, context ->
             java.util.Optional.ofNullable(GameRule.getByName(context.popFirstArg()))
                 .orElseThrow(() -> new InvalidCommandArgument(Messages.messageInvalidGameRule.withoutColorCodes())));
@@ -735,6 +742,20 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
     }
 
+    @Category("Management") @Subcommand("flag info") @CommandPermission("hyperverse.flag.info") @CommandCompletion("@hyperworlds @flags")
+    public void showFlagStatus(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
+        if (flag == null) {
+            MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
+            return;
+        }
+        if (hyperWorld == null) {
+            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
+            return;
+        }
+        final String value =  flag.getValueAsString();
+        MessageUtil.sendMessage(sender, Messages.messageFlagDisplayInfo, "%flag%", flag.getName(), "%value%", value.isEmpty() ? "Unset" : value);
+    }
+
     @Category("Management") @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")
     @CommandCompletion("@hyperworlds @gamerules @gamerule") @Description("{@@command.gamerule.set}")
     public void doGameRuleSet(final CommandSender sender, final HyperWorld hyperWorld,
@@ -916,8 +937,7 @@ public class HyperCommandManager extends BaseCommand {
 
                 try {
                     final String rawResponse = incendoPaster.upload();
-                    final JsonObject jsonObject =
-                        new JsonParser().parse(rawResponse).getAsJsonObject();
+                    final JsonObject jsonObject = JsonParser.parseString(rawResponse).getAsJsonObject();
 
                     if (jsonObject.has("created")) {
                         final String pasteId = jsonObject.get("paste_id").getAsString();

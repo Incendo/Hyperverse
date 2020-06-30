@@ -53,4 +53,8 @@ public class RespawnWorldFlag extends WorldFlag<String, RespawnWorldFlag> {
     @Override protected RespawnWorldFlag flagOf(@NotNull final String value) {
         return new RespawnWorldFlag(value);
     }
+
+    @Override public @NotNull String getValueAsString() {
+        return getValue();
+    }
 }

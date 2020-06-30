@@ -95,6 +95,7 @@ public class Messages {
         "<gold>%world%</gold><gray>: %players%</gray>");
     public static final Message messageNoSuchWorld = createMessage("world.non_existent",
         "&cThere is no world with that name");
+    public static final Message messageNotHyperWorld = createMessage("world.not-hyperworld", "&cYou are not in a HyperWorld.");
     public static final Message messageTeleporting = createMessage("teleport.teleporting-to-world",
         "<gray>You are being teleported to %world%</gray>");
     public static final Message messageTeleportingPlayer = createMessage("teleport.teleporting-other", "<gray>%player% is being teleported to %world%</gray>");
@@ -122,6 +123,7 @@ public class Messages {
         "&7The flag was updated");
     public static final Message messageFlagRemoved = createMessage("flag.removed",
         "&7The flag was removed");
+    public static final Message messageFlagDisplayInfo = createMessage("flag.display_info", "&7Flag: %flag%, Value: %value%");
     public static final Message messageGameRuleParseError = createMessage("gamerule.parse_error",
         "&cThat is not a valid value for the game rule");
     public static final Message messageGameRuleUnknown = createMessage("gamerule.unknown",

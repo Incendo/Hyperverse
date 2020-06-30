@@ -79,4 +79,7 @@ public abstract class BooleanFlag<F extends WorldFlag<Boolean, F>> extends World
         return Arrays.asList("true", "false");
     }
 
+    @Override public @NotNull String getValueAsString() {
+        return getValue().toString();
+    }
 }

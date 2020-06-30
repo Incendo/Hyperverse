@@ -65,4 +65,7 @@ public class NetherFlag extends WorldFlag<String, NetherFlag> {
             .map(HyperWorld::getConfiguration).map(WorldConfiguration::getName).collect(Collectors.toList());
     }
 
+    @Override public @NotNull String getValueAsString() {
+        return getValue();
+    }
 }

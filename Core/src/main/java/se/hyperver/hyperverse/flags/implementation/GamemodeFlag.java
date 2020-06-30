@@ -89,4 +89,8 @@ public class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
     @Override public Collection<String> getTabCompletions() {
         return Arrays.asList("survival", "creative", "adventure", "spectator");
     }
+
+    @Override public @NotNull String getValueAsString() {
+        return getValue().name();
+    }
 }

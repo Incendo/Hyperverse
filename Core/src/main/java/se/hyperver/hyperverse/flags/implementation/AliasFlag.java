@@ -49,4 +49,7 @@ public class AliasFlag extends WorldFlag<String, AliasFlag> {
         return new AliasFlag(value);
     }
 
+    @Override public @NotNull String getValueAsString() {
+        return getValue();
+    }
 }

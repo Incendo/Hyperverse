@@ -54,4 +54,7 @@ public class ProfileGroupFlag extends WorldFlag<String, ProfileGroupFlag> {
         return new ProfileGroupFlag(value);
     }
 
+    @Override public @NotNull String getValueAsString() {
+        return getValue();
+    }
 }
