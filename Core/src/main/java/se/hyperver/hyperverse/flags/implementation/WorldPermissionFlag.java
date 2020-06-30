@@ -61,7 +61,4 @@ public class WorldPermissionFlag extends WorldFlag<String, WorldPermissionFlag> 
         return new WorldPermissionFlag(value);
     }
 
-    @Override public @NotNull String getValueAsString() {
-        return getValue();
-    }
 }

@@ -750,7 +750,7 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
     }
 
-    @Category("Management") @Subcommand("flag info") @CommandPermission("hyperverse.flag.info") @CommandCompletion("@hyperworlds @flags")
+    @Category("Management") @Subcommand("flag info") @CommandPermission("hyperverse.flag.info") @CommandCompletion("@flags|@hyperworlds") @SuppressWarnings("unchecked")
     public void showFlagStatus(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
         if (flag == null) {
             MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
@@ -760,8 +760,9 @@ public class HyperCommandManager extends BaseCommand {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
             return;
         }
-        final String value =  flag.getValueAsString();
-        MessageUtil.sendMessage(sender, Messages.messageFlagDisplayInfo, "%flag%", flag.getName(), "%value%", value.isEmpty() ? "Unset" : value);
+        final String value =  String.valueOf(flag.getValue()), defaultValue;
+        defaultValue =  String.valueOf((globalFlagContainer.getFlag(flag.getClass()).getValue()));
+        MessageUtil.sendMessage(sender, Messages.messageFlagDisplayInfo, "%description%", flag.getFlagDescription().toString(), "%current%", value.isEmpty() ? "Unset" : value, "%default%", defaultValue);
     }
 
     @Category("Management") @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")

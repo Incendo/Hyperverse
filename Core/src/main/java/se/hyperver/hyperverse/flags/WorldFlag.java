@@ -58,12 +58,6 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
     }
 
     /**
-     * Get the String representation of the value.
-     * @return Non-nullable String representation of {@link #getValue()}
-     */
-    @NotNull public abstract String getValueAsString();
-
-    /**
      * Parse a string into a flag, and throw an exception in the case that the
      * string does not represent a valid flag value. This instance won't change its
      * state, but instead an instance holding the parsed flag value will be returned.

@@ -84,7 +84,4 @@ public final class DifficultyFlag extends WorldFlag<Difficulty, DifficultyFlag> 
         return Arrays.asList("peaceful", "easy", "normal", "hard");
     }
 
-    @Override public @NotNull String getValueAsString() {
-        return getValue().name();
-    }
 }

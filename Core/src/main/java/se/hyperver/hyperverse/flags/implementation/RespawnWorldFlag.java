@@ -54,7 +54,4 @@ public class RespawnWorldFlag extends WorldFlag<String, RespawnWorldFlag> {
         return new RespawnWorldFlag(value);
     }
 
-    @Override public @NotNull String getValueAsString() {
-        return getValue();
-    }
 }

@@ -124,7 +124,7 @@ public class Messages {
         "&7The flag was updated");
     public static final Message messageFlagRemoved = createMessage("flag.removed",
         "&7The flag was removed");
-    public static final Message messageFlagDisplayInfo = createMessage("flag.display_info", "&7Flag: %flag%, Value: %value%");
+    public static final Message messageFlagDisplayInfo = createMessage("flag.display_info", "&7Description: %description% \n" + messagePrefix + "&7Default: %default%, Current: %current%");
     public static final Message messageGameRuleParseError = createMessage("gamerule.parse_error",
         "&cThat is not a valid value for the game rule");
     public static final Message messageGameRuleUnknown = createMessage("gamerule.unknown",

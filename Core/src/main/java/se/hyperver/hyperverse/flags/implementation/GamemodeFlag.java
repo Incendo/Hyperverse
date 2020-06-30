@@ -90,7 +90,4 @@ public class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
         return Arrays.asList("survival", "creative", "adventure", "spectator");
     }
 
-    @Override public @NotNull String getValueAsString() {
-        return getValue().name();
-    }
 }
