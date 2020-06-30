@@ -1,7 +1,7 @@
 name: Hyperverse
 version: ${project.version}
 main: se.hyperver.hyperverse.Hyperverse
-api-version: "1.13"
+api-version: "1.14"
 authors: [Citymonstret, andrewandy]
 description: A minecraft world management plugin
 softdepend:
@@ -49,6 +49,9 @@ permissions:
     default: op
   hyperverse.flag.set:
     description: Allows players to set world flags
+    default: op
+  hyperverse.flag.info:
+    description: Allows players to view information regarding a flag in a given world.
     default: op
   hyperverse.gamerule.set:
     description: Allow players to world gamerules
