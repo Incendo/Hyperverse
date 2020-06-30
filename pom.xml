@@ -111,6 +111,10 @@
 
     <repositories>
         <repository>
+            <id>IntellectualSites</id>
+            <url>https://mvn.intellectualsites.com/content/groups/public/</url>
+        </repository>
+        <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
@@ -137,10 +141,6 @@
         <repository>
             <id>sponge</id>
             <url>https://repo.spongepowered.org/maven</url>
-        </repository>
-        <repository>
-            <id>IntellectualSites</id>
-            <url>https://mvn.intellectualsites.com/content/groups/public/</url>
         </repository>
         <repository>
             <id>multiverse</id>
