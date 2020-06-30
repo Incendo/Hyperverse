@@ -937,15 +937,27 @@ public class HyperCommandManager extends BaseCommand {
         }).execute();
     }
 
-    @Category("Misc") @Subcommand("multiverse") @CommandPermission("hyperverse.multiverse")
+    @Category("Misc") @Subcommand("multiverse") @CommandPermission("hyperverse.plugin.import")
     @Description("{@@command.multiverse}")
     public void doMultiverse(final CommandSender sender) {
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
             new MultiverseImporter(this.worldManager, this.hyperWorldFactory)
                 .performImport(sender);
         } else {
-            MessageUtil.sendMessage(sender, Messages.messageMultiverseMissing);
+            MessageUtil.sendMessage(sender, Messages.messageImportPluginMissing,"%plugin%", "Multiverse");
         }
+    }
+
+    @Category("Misc") @Subcommand("myworlds") @CommandPermission("hyperverse.plugin.import")
+    public void doMyWorlds(final CommandSender sender) {
+        try {
+            Class.forName("com.bergerkiller.bukkit.mw.MyWorlds");
+        } catch (ClassNotFoundException ex) {
+            MessageUtil
+                .sendMessage(sender, Messages.messageImportPluginMissing, "%plugin%", "MyWorlds");
+            return;
+        }
+        new MyWorldsImporter(this.worldManager, this.hyperWorldFactory).performImport(sender);
     }
 
     @Category("Misc") @Subcommand("plugin")

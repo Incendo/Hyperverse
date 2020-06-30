@@ -4,6 +4,9 @@ main: se.hyperver.hyperverse.Hyperverse
 api-version: "1.13"
 authors: [Citymonstret, andrewandy]
 description: A minecraft world management plugin
+softdepend:
+  - Multiverse
+  - MyWorlds
 permissions:
   hyperverse.worlds:
     description: Allows players to use the Hyperverse command
@@ -59,8 +62,8 @@ permissions:
   hyperverse.who:
     description: Allows players to list players
     default: op
-  hyperverse.multiverse:
-    description: Allows players to import Multiverse configurations
+  hyperverse.plugin.import:
+    description: Allows players to import configurations from external plugins.
     default: op
   hyperverse.regenerate:
     description: Allows players to regenerate worlds

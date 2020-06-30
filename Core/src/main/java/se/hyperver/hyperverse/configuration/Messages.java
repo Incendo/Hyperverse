@@ -158,22 +158,22 @@ public class Messages {
         "&cI'm sorry, that portal can't take you anywhere!");
     public static final Message messageRespawnWorldNonExistent = createMessage("world.respawn_non_existent",
         "&cThe respawn world linked to this world does not exist");
-
-    // Multiverse importer messages
-    public static final Message messageMultiverseMissing = createMessage("multiverse.missing",
-        "&cCannot import Multiverse configurations because Multiverse-Core is not enabled on this server");
-    public static final Message messageMultiverseInitializing = createMessage("multiverse.initializing",
-        "&7Multiverse importing process has started. Detected %worlds% worlds.");
-    public static final Message messageMultiverseCreating = createMessage("multiverse.creating",
-        "&7Multiverse world %world% was detected and had no equivalent in Hyperverse. It will be created.");
-    public static final Message messageMultiverseImporting = createMessage("multiverse.importing",
-        "&7Hyperverse will now import the Multiverse configuration for %world%");
-    public static final Message messageMultiverseImported = createMessage("multiverse.imported",
-        "&7Hyperverse finished importing %world%.");
-    public static final Message messageMultiverseDone = createMessage("multiverse.done",
-        "&7Hyperverse finished importing Multiverse data.");
     public static final Message messageGameModeOverride = createMessage("override.gamemode",
         "<gray>The world has the game mode '<gold>%mode%</gold>' but your permission level prevented this from applying.</gray>");
+
+    // Foreign plugin importer messages
+    public static final Message messageImportPluginMissing = createMessage("importer.missing",
+        "&cCannot import %plugin% configurations because %plugin% is not enabled on this server");
+    public static final Message messageImportPluginInitializing = createMessage("importer.initializing",
+        "&7%plugin% importing process has started. Detected %worlds% worlds.");
+    public static final Message messageImportPluginCreating = createMessage("importer.creating",
+        "&7%plugin% world %world% was detected and had no equivalent in Hyperverse. It will be created.");
+    public static final Message messageImportingExternalWorld = createMessage("importer.importing",
+        "&7Hyperverse will now import the %plugin% configuration for %world%");
+    public static final Message messageMultiverseImported = createMessage("importer.imported",
+        "&7Hyperverse finished importing %world%.");
+    public static final Message messageImportDone = createMessage("importer.done",
+        "&7Hyperverse finished importing %plugin% data.");
 
     // Feature messages
     public static final Message messageFeaturesLoading = createMessage("feature.loading",

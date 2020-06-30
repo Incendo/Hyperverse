@@ -58,14 +58,14 @@ import java.util.UUID;
         final MVWorldManager worldManager = multiverseCore.getMVWorldManager();
         final Collection<MultiverseWorld> worlds = worldManager.getMVWorlds();
 
-        MessageUtil.sendMessage(commandSender, Messages.messageMultiverseInitializing,
-            "%worlds%", Integer.toString(worlds.size()));
+        MessageUtil.sendMessage(commandSender, Messages.messageImportPluginInitializing,
+            "%worlds%", Integer.toString(worlds.size()), "%plugin%", "Multiverse");
 
         for (final MultiverseWorld multiverseWorld : worlds) {
             HyperWorld hyperWorld = this.worldManager.getWorld(multiverseWorld.getName());
             if (hyperWorld == null) {
-                MessageUtil.sendMessage(commandSender, Messages.messageMultiverseCreating,
-                    "%world%", multiverseWorld.getName());
+                MessageUtil.sendMessage(commandSender, Messages.messageImportPluginCreating,
+                    "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse");
                 final WorldConfiguration worldConfiguration = WorldConfiguration.fromWorld(multiverseWorld.getCBWorld());
                 final UUID uuid;
                 if (multiverseWorld.getCBWorld() != null) {
@@ -83,8 +83,8 @@ import java.util.UUID;
             }
             hyperWorld.getConfiguration().setGenerator(generator);
             hyperWorld.getConfiguration().setSeed(multiverseWorld.getSeed());
-            MessageUtil.sendMessage(commandSender, Messages.messageMultiverseImporting,
-                "%world%", multiverseWorld.getName());
+            MessageUtil.sendMessage(commandSender, Messages.messageImportingExternalWorld,
+                "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse");
             hyperWorld.setFlagInstance(DifficultyFlag.DIFFICULTY_FLAG_NORMAL.createFlagInstance(multiverseWorld.getDifficulty()));
             hyperWorld.setFlagInstance(WorldPermissionFlag.WORLD_PERMISSION_FLAG_DEFAULT
                 .createFlagInstance(multiverseWorld.getAccessPermission().getName()));
@@ -100,9 +100,9 @@ import java.util.UUID;
             }
             hyperWorld.saveConfiguration();
             MessageUtil.sendMessage(commandSender, Messages.messageMultiverseImported,
-            "%world%", multiverseWorld.getName());
+            "%world%", multiverseWorld.getName(),"%plugin%", "Multiverse");
         }
-        MessageUtil.sendMessage(commandSender, Messages.messageMultiverseDone);
+        MessageUtil.sendMessage(commandSender, Messages.messageImportDone, "%plugin%", "Multiverse");
     }
 
 }
