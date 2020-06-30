@@ -548,7 +548,7 @@ public class HyperCommandManager extends BaseCommand {
         for (final String rawPlayer : players) {
             final Player player = Bukkit.getPlayer(rawPlayer);
             if (player == null) {
-                MessageUtil.sendMessage(sender, Messages.messageNoPlayerFound, "%player%", rawPlayer);
+                MessageUtil.sendMessage(sender, Messages.messageNoPlayerFound, "%name%", rawPlayer);
                 return;
             }
             if (!playerList.contains(player)) {
