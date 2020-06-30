@@ -328,25 +328,28 @@ public class HyperCommandManager extends BaseCommand {
             return WorldFeatures.fromName(arg).orElseThrow(() ->
                 new InvalidCommandArgument(Messages.messageInvalidWorldFeatures.withoutColorCodes()));
         });
-        bukkitCommandManager.getCommandContexts().registerContext(HyperWorld.class, context -> {
-            final HyperWorld hyperWorld = worldManager.getWorld(context.popFirstArg());
-            if (hyperWorld == null) {
-                throw new InvalidCommandArgument(Messages.messageNoSuchWorld.withoutColorCodes());
-            }
-            return hyperWorld;
-        });
         bukkitCommandManager.getCommandContexts().registerIssuerAwareContext(HyperWorld.class, context -> {
-            final HyperWorld hyperWorld = worldManager.getWorld(context.getPlayer().getWorld());
+            HyperWorld hyperWorld = worldManager.getWorld(context.getFirstArg());
             if (hyperWorld == null) {
-                throw new InvalidCommandArgument(Messages.messageNoSuchWorld.withoutColorCodes());
+                hyperWorld = worldManager.getWorld(context.getPlayer().getWorld());
+                if (hyperWorld == null) {
+                    throw new InvalidCommandArgument(Messages.messageNoSuchWorld.withoutColorCodes());
+                }
+            } else {
+                context.popFirstArg(); // remove the world argument as it's a valid world
             }
             return hyperWorld;
         });
         bukkitCommandManager.getCommandContexts().registerContext(GameRule.class, context ->
             java.util.Optional.ofNullable(GameRule.getByName(context.popFirstArg()))
                 .orElseThrow(() -> new InvalidCommandArgument(Messages.messageInvalidGameRule.withoutColorCodes())));
-        bukkitCommandManager.getCommandContexts().registerContext(WorldFlag.class, context ->
-            this.globalFlagContainer.getFlagFromString(context.popFirstArg().toLowerCase()));
+        bukkitCommandManager.getCommandContexts().registerContext(WorldFlag.class, context -> {
+            final WorldFlag<?, ?> flag = this.globalFlagContainer.getFlagFromString(context.popFirstArg().toLowerCase());
+            if (flag == null) {
+                throw new InvalidCommandArgument(Messages.messageFlagUnknown.withoutColorCodes());
+            }
+            return flag;
+        });
         //noinspection deprecation
         bukkitCommandManager.enableUnstableAPI("help");
         bukkitCommandManager.registerCommand(this);
@@ -527,7 +530,7 @@ public class HyperCommandManager extends BaseCommand {
 
     @Category("Misc") @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport.other")
     @CommandCompletion("@hyperworlds:state=loaded @vararg_player_world:pop=0,in_world=true")
-    public void doMassTeleport(final CommandSender sender, final HyperWorld world, final String[] players) {
+    public void doMassTeleport(final CommandSender sender, final HyperWorld world, String[] players) {
         if (players.length == 0) {
             if (sender instanceof Player) {
                 doTeleport((Player) sender, world);
@@ -717,14 +720,6 @@ public class HyperCommandManager extends BaseCommand {
     @CommandCompletion("@hyperworlds @flags @flag") @Description("{@@command.flag.set}")
     public void doFlagSet(final CommandSender sender, final HyperWorld hyperWorld,
         final WorldFlag<?, ?> flag, final String value) {
-        if (flag == null) {
-            MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
-            return;
-        }
-        if (hyperWorld == null) {
-            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
-            return;
-        }
         try {
             hyperWorld.setFlag(flag, value);
         } catch (final FlagParseException e) {
@@ -738,28 +733,12 @@ public class HyperCommandManager extends BaseCommand {
     @Category("Management") @Subcommand("flag remove") @CommandPermission("hyperverse.flag.set")
     @CommandCompletion("@hyperworlds @flags") @Description("{@@command.flag.remove}")
     public void doFlagRemove(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
-        if (flag == null) {
-            MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
-            return;
-        }
-        if (hyperWorld == null) {
-            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
-            return;
-        }
         hyperWorld.removeFlag(flag);
         MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
     }
 
     @Category("Management") @Subcommand("flag info") @CommandPermission("hyperverse.flag.info") @CommandCompletion("@flags|@hyperworlds") @SuppressWarnings("unchecked")
     public void showFlagStatus(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
-        if (flag == null) {
-            MessageUtil.sendMessage(sender, Messages.messageFlagUnknown);
-            return;
-        }
-        if (hyperWorld == null) {
-            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
-            return;
-        }
         final String value =  String.valueOf(flag.getValue()), defaultValue;
         defaultValue =  String.valueOf((globalFlagContainer.getFlag(flag.getClass()).getValue()));
         MessageUtil.sendMessage(sender, Messages.messageFlagDisplayInfo, "%description%", flag.getFlagDescription().toString(), "%current%", value.isEmpty() ? "Unset" : value, "%default%", defaultValue);
@@ -769,16 +748,6 @@ public class HyperCommandManager extends BaseCommand {
     @CommandCompletion("@hyperworlds @gamerules @gamerule") @Description("{@@command.gamerule.set}")
     public void doGameRuleSet(final CommandSender sender, final HyperWorld hyperWorld,
         final GameRule gameRule, final String value) {
-        if (gameRule == null) {
-            MessageUtil.sendMessage(sender, Messages.messageGameRuleUnknown);
-            return;
-        }
-
-        if (hyperWorld == null) {
-            MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
-            return;
-        }
-
         if (!hyperWorld.isLoaded()) {
             MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
             return;
