@@ -43,6 +43,7 @@ import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
+import se.hyperver.hyperverse.flags.implementation.AdvancementFlag;
 import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.*;
@@ -331,7 +332,9 @@ public class HyperCommandManager extends BaseCommand {
         bukkitCommandManager.getCommandContexts().registerIssuerAwareContext(HyperWorld.class, context -> {
             HyperWorld hyperWorld = worldManager.getWorld(context.getFirstArg());
             if (hyperWorld == null) {
-                hyperWorld = worldManager.getWorld(context.getPlayer().getWorld());
+                if (context.getPlayer() != null) {
+                    hyperWorld = worldManager.getWorld(context.getPlayer().getWorld());
+                }
                 if (hyperWorld == null) {
                     throw new InvalidCommandArgument(Messages.messageNoSuchWorld.withoutColorCodes());
                 }
@@ -723,10 +726,15 @@ public class HyperCommandManager extends BaseCommand {
         try {
             hyperWorld.setFlag(flag, value);
         } catch (final FlagParseException e) {
-            MessageUtil.sendMessage(sender, Messages.messageFlagParseError,
-                "%flag%", e.getFlag().getName(), "%value%", e.getValue(), "%reason%", e.getErrorMessage());
+            MessageUtil.sendMessage(sender, Messages.messageFlagParseError, "%flag%", e.getFlag().getName(), "%value%", e.getValue(), "%reason%", e.getErrorMessage());
             return;
         }
+        MessageUtil.sendMessage(sender, Messages.messageFlagSet);
+    }
+
+    @Category("Management") @Subcommand("flag reset") @CommandPermission("hyperverse.flag.set") @CommandCompletion("@flags|@hyperworlds @flags") @SuppressWarnings("unchecked")
+    public void doFlagReset(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?,?> flag) {
+        hyperWorld.setFlagInstance(globalFlagContainer.getFlag(flag.getClass()));
         MessageUtil.sendMessage(sender, Messages.messageFlagSet);
     }
 
@@ -737,11 +745,11 @@ public class HyperCommandManager extends BaseCommand {
         MessageUtil.sendMessage(sender, Messages.messageFlagRemoved);
     }
 
-    @Category("Management") @Subcommand("flag info") @CommandPermission("hyperverse.flag.info") @CommandCompletion("@flags|@hyperworlds") @SuppressWarnings("unchecked")
-    public void showFlagStatus(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?, ?> flag) {
-        final String value =  String.valueOf(flag.getValue()), defaultValue;
-        defaultValue =  String.valueOf((globalFlagContainer.getFlag(flag.getClass()).getValue()));
-        MessageUtil.sendMessage(sender, Messages.messageFlagDisplayInfo, "%description%", flag.getFlagDescription().toString(), "%current%", value.isEmpty() ? "Unset" : value, "%default%", defaultValue);
+    @Category("Management") @Subcommand("flag info") @CommandPermission("hyperverse.flag.info") @CommandCompletion("@flags|@hyperworlds @flags") @SuppressWarnings("unchecked")
+    public <T> void showFlagStatus(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<T, ?> flag) {
+        final String value = String.valueOf(hyperWorld.getFlag((Class<? extends WorldFlag<T, ?>>) flag.getClass())), defaultValue;
+        defaultValue = String.valueOf((globalFlagContainer.getFlag(flag.getClass()).getValue()));
+        MessageUtil.sendMessage(sender, Messages.messageFlagDisplayInfo, "%description%", flag.getFlagDescription().toString(), "%current%", value.isEmpty() ? "Unset" : value, "%default%", defaultValue.isEmpty() ? "Unset" : defaultValue);
     }
 
     @Category("Management") @Subcommand("gamerule set") @CommandPermission("hyperverse.gamerule.set")

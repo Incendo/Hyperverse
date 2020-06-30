@@ -193,16 +193,16 @@ public class NMSImpl implements NMS {
                 entityPlayer.reset();
                 entityPlayer.load(compound);
 
-                // entityPlayer.updateEffects = true;
-                // entityPlayer.updateAbilities();
-                player.teleport(originLocation);
-
                 final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
                 final DimensionManager dimensionManager = worldServer.getDimensionManager();
+
 
                 // Prevent annoying message
                 entityPlayer.decouple();
                 worldServer.removePlayer(entityPlayer);
+                // entityPlayer.updateEffects = true;
+                // entityPlayer.updateAbilities();
+                player.teleport(originLocation);
                 // worldServer.removePlayer above should remove the player from the
                 // map, but that doesn't always happen. This is a last effort
                 // attempt to prevent the annoying "Force re-added" message
