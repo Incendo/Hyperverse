@@ -31,7 +31,7 @@ import java.util.UUID;
     public void performImport(@NotNull final CommandSender sender) {
         Collection<WorldConfig> worlds = WorldConfig.all();
         MessageUtil
-            .sendMessage(sender, Messages.messageImportPluginInitializing, "%plugin%", "MyWorlds");
+            .sendMessage(sender, Messages.messageImportPluginInitializing, "%plugin%", "MyWorlds", "%worlds%", String.valueOf(worlds.size()));
         for (WorldConfig config : worlds) {
             HyperWorld hyperWorld = this.worldManager.getWorld(config.worldname);
             final World bukkitWorld = config.getWorld();
@@ -40,24 +40,28 @@ import java.util.UUID;
                 hyperWorld = this.hyperWorldFactory
                     .create(bukkitWorld == null ? UUID.randomUUID() : bukkitWorld.getUID(),
                         configuration);
+                this.worldManager.addWorld(hyperWorld);
             }
             hyperWorld.setFlagInstance(
                 config.forcedRespawn ? ForceSpawn.FORCE_SPAWN_TRUE : ForceSpawn.FORCE_SPAWN_FALSE);
-            hyperWorld.setFlagInstance(
-                GamemodeFlag.GAMEMODE_CREATIVE.createFlagInstance(config.gameMode));
+            if (config.gameMode != null) {
+                hyperWorld.setFlagInstance(GamemodeFlag.GAMEMODE_CREATIVE.createFlagInstance(config.gameMode));
+            }
             hyperWorld.setFlagInstance(config.bedRespawnEnabled ?
                 LocalRespawnFlag.RESPAWN_TRUE :
                 LocalRespawnFlag.RESPAWN_FALSE);
             hyperWorld.setFlagInstance(config.pvp ? PvpFlag.PVP_FLAG_TRUE : PvpFlag.PVP_FLAG_FALSE);
-            hyperWorld.setFlagInstance(
-                DifficultyFlag.DIFFICULTY_FLAG_NORMAL.createFlagInstance(config.difficulty));
-            hyperWorld.setFlagInstance(config.spawnControl.getAnimals() ?
-                CreatureSpawnFlag.CREATURE_SPAWN_ALLOWED :
-                CreatureSpawnFlag.CREATURE_SPAWN_FORBIDDEN);
-            hyperWorld.setFlagInstance(config.spawnControl.getMonsters() ?
-                MobSpawnFlag.MOB_SPAWN_ALLOWED :
-                MobSpawnFlag.MOB_SPAWN_FORBIDDEN);
-            this.worldManager.addWorld(hyperWorld);
+            if (config.difficulty != null) {
+                hyperWorld.setFlagInstance(DifficultyFlag.DIFFICULTY_FLAG_NORMAL.createFlagInstance(config.difficulty));
+            }
+            if (config.spawnControl != null) {
+                hyperWorld.setFlagInstance(config.spawnControl.getAnimals() ?
+                    CreatureSpawnFlag.CREATURE_SPAWN_ALLOWED :
+                    CreatureSpawnFlag.CREATURE_SPAWN_FORBIDDEN);
+                hyperWorld.setFlagInstance(config.spawnControl.getMonsters() ?
+                    MobSpawnFlag.MOB_SPAWN_ALLOWED :
+                    MobSpawnFlag.MOB_SPAWN_FORBIDDEN);
+            }
             MessageUtil.sendMessage(sender, Messages.messageMultiverseImported, "%world%",
                 config.worldname, "%plugin%", "MyWorlds");
         }

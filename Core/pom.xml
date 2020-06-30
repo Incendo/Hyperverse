@@ -204,6 +204,7 @@
             <groupId>com.bergerkiller.bukkit</groupId>
             <artifactId>MyWorlds</artifactId>
             <version>1.15.2-v1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
