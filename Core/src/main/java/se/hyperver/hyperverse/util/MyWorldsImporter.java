@@ -8,11 +8,10 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.configuration.Messages;
+import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.implementation.*;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
-import se.hyperver.hyperverse.world.HyperWorld;
-import se.hyperver.hyperverse.world.WorldConfiguration;
-import se.hyperver.hyperverse.world.WorldManager;
+import se.hyperver.hyperverse.world.*;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -31,28 +30,59 @@ import java.util.UUID;
     public void performImport(@NotNull final CommandSender sender) {
         Collection<WorldConfig> worlds = WorldConfig.all();
         MessageUtil
-            .sendMessage(sender, Messages.messageImportPluginInitializing, "%plugin%", "MyWorlds", "%worlds%", String.valueOf(worlds.size()));
+            .sendMessage(sender, Messages.messageImportPluginInitializing, "%plugin%", "My_Worlds",
+                "%worlds%", String.valueOf(worlds.size()));
         for (WorldConfig config : worlds) {
             HyperWorld hyperWorld = this.worldManager.getWorld(config.worldname);
             final World bukkitWorld = config.getWorld();
             if (hyperWorld == null) {
-                final WorldConfiguration configuration = WorldConfiguration.fromWorld(bukkitWorld);
+                final WorldConfiguration configuration;
+                if (bukkitWorld != null) {
+                    configuration = WorldConfiguration.fromWorld(bukkitWorld);
+                } else {
+                    WorldConfigurationBuilder builder = WorldConfiguration.builder();
+                    builder.setName(config.worldname);
+                    if (config.getChunkGeneratorName() != null) {
+                        builder = builder.setGenerator(config.getChunkGeneratorName());
+                    }
+                    if (config.worldmode.getEnvironment() != null) {
+                        builder = builder
+                            .setType(WorldType.fromBukkit(config.worldmode.getEnvironment()));
+                        builder = builder.setWorldFeatures(
+                            WorldFeatures.fromBukkitType(config.worldmode.getType()));
+                    }
+                    configuration = builder.createWorldConfiguration();
+                }
                 hyperWorld = this.hyperWorldFactory
                     .create(bukkitWorld == null ? UUID.randomUUID() : bukkitWorld.getUID(),
                         configuration);
                 this.worldManager.addWorld(hyperWorld);
+                if (config.spawnPoint != null) {
+                    try {
+                        hyperWorld.createBukkitWorld();
+                        assert hyperWorld.getBukkitWorld() != null;
+                        hyperWorld.getBukkitWorld()
+                            .setSpawnLocation(config.spawnPoint.toLocation());
+                    } catch (HyperWorldValidationException ex) {
+                        ex.printStackTrace();
+                        MessageUtil.sendMessage(sender, Messages.messageCreationUnknownFailure);
+                        return;
+                    }
+                }
             }
             hyperWorld.setFlagInstance(
                 config.forcedRespawn ? ForceSpawn.FORCE_SPAWN_TRUE : ForceSpawn.FORCE_SPAWN_FALSE);
             if (config.gameMode != null) {
-                hyperWorld.setFlagInstance(GamemodeFlag.GAMEMODE_CREATIVE.createFlagInstance(config.gameMode));
+                hyperWorld.setFlagInstance(
+                    GamemodeFlag.GAMEMODE_CREATIVE.createFlagInstance(config.gameMode));
             }
             hyperWorld.setFlagInstance(config.bedRespawnEnabled ?
                 LocalRespawnFlag.RESPAWN_TRUE :
                 LocalRespawnFlag.RESPAWN_FALSE);
             hyperWorld.setFlagInstance(config.pvp ? PvpFlag.PVP_FLAG_TRUE : PvpFlag.PVP_FLAG_FALSE);
             if (config.difficulty != null) {
-                hyperWorld.setFlagInstance(DifficultyFlag.DIFFICULTY_FLAG_NORMAL.createFlagInstance(config.difficulty));
+                hyperWorld.setFlagInstance(
+                    DifficultyFlag.DIFFICULTY_FLAG_NORMAL.createFlagInstance(config.difficulty));
             }
             if (config.spawnControl != null) {
                 hyperWorld.setFlagInstance(config.spawnControl.getAnimals() ?
@@ -63,9 +93,9 @@ import java.util.UUID;
                     MobSpawnFlag.MOB_SPAWN_FORBIDDEN);
             }
             MessageUtil.sendMessage(sender, Messages.messageMultiverseImported, "%world%",
-                config.worldname, "%plugin%", "MyWorlds");
+                config.worldname, "%plugin%", "My_Worlds");
         }
-        MessageUtil.sendMessage(sender, Messages.messageImportDone, "%plugin%", "MyWorlds");
+        MessageUtil.sendMessage(sender, Messages.messageImportDone, "%plugin%", "My_Worlds");
     }
 
 }

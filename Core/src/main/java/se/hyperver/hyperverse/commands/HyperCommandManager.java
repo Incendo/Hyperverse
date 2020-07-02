@@ -956,7 +956,7 @@ public class HyperCommandManager extends BaseCommand {
 
     @Category("Misc") @Subcommand("myworlds") @CommandPermission("hyperverse.plugin.import")
     public void doMyWorlds(final CommandSender sender) {
-        if (Bukkit.getPluginManager().isPluginEnabled("MyWorlds")) {
+        if (Bukkit.getPluginManager().isPluginEnabled("My_Worlds")) {
             new MyWorldsImporter(this.worldManager, this.hyperWorldFactory).performImport(sender);
         } else { MessageUtil
             .sendMessage(sender, Messages.messageImportPluginMissing, "%plugin%", "MyWorlds");
