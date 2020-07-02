@@ -173,7 +173,7 @@ public class Messages {
         "&7%plugin% world %world% was detected and had no equivalent in Hyperverse. It will be created.");
     public static final Message messageImportingExternalWorld = createMessage("importer.importing",
         "&7Hyperverse will now import the %plugin% configuration for %world%");
-    public static final Message messageMultiverseImported = createMessage("importer.imported",
+    public static final Message messageExternalImportCompleted = createMessage("importer.imported",
         "&7Hyperverse finished importing %world%.");
     public static final Message messageImportDone = createMessage("importer.done",
         "&7Hyperverse finished importing %plugin% data.");

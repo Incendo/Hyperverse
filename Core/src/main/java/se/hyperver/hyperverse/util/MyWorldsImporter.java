@@ -92,7 +92,7 @@ import java.util.UUID;
                     MobSpawnFlag.MOB_SPAWN_ALLOWED :
                     MobSpawnFlag.MOB_SPAWN_FORBIDDEN);
             }
-            MessageUtil.sendMessage(sender, Messages.messageMultiverseImported, "%world%",
+            MessageUtil.sendMessage(sender, Messages.messageExternalImportCompleted, "%world%",
                 config.worldname, "%plugin%", "My_Worlds");
         }
         MessageUtil.sendMessage(sender, Messages.messageImportDone, "%plugin%", "My_Worlds");

@@ -99,7 +99,7 @@ import java.util.UUID;
                 hyperWorld.setFlagInstance(RespawnWorldFlag.RESPAWN_WORLD_FLAG_EMPTY.createFlagInstance(respawnToWorld.getName()));
             }
             hyperWorld.saveConfiguration();
-            MessageUtil.sendMessage(commandSender, Messages.messageMultiverseImported,
+            MessageUtil.sendMessage(commandSender, Messages.messageExternalImportCompleted,
             "%world%", multiverseWorld.getName(),"%plugin%", "Multiverse");
         }
         MessageUtil.sendMessage(commandSender, Messages.messageImportDone, "%plugin%", "Multiverse");
