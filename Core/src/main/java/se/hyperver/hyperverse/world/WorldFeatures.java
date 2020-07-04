@@ -74,7 +74,7 @@ public enum WorldFeatures {
     @NotNull public static Optional<WorldFeatures> fromName(@NotNull final String name) {
         Objects.requireNonNull(name);
         for (final WorldFeatures worldFeatures : values()) {
-            if (worldFeatures.names.contains(name.toLowerCase(Locale.ENGLISH))) {
+            if (worldFeatures.names.contains(name.toLowerCase(Locale.ENGLISH)) && worldFeatures.bukkitType != null) {
                 return Optional.of(worldFeatures);
             }
         }
