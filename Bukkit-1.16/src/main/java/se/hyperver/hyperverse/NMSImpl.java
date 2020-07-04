@@ -200,7 +200,6 @@ public class NMSImpl implements NMS {
                 final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
                 final DimensionManager dimensionManager = worldServer.getDimensionManager();
 
-
                 // Prevent annoying message
                 entityPlayer.decouple();
                 worldServer.removePlayer(entityPlayer);
