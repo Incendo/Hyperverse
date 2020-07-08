@@ -531,7 +531,7 @@ public class HyperCommandManager extends BaseCommand {
         world.teleportPlayer(player);
     }
 
-    @Category("Misc") @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport.other")
+    @Category("Misc") @Subcommand("teleport|tp") @CommandAlias("hvtp") @CommandPermission("hyperverse.teleport")
     @CommandCompletion("@hyperworlds:state=loaded @vararg_player_world:pop=0,in_world=true")
     public void doMassTeleport(final CommandSender sender, final HyperWorld world, String[] players) {
         if (players.length == 0) {
@@ -594,7 +594,7 @@ public class HyperCommandManager extends BaseCommand {
                     }
                     return hyperWorld.getFlag(ProfileGroupFlag.class)
                         .equalsIgnoreCase(profileGroup);
-                }).max(Comparator.comparingInt(PersistentLocation::getId));
+                }).min(Comparator.comparingInt(PersistentLocation::getId)); //Lowest number is most recent?
 
             if (!optional.isPresent()) {
                 MessageUtil.sendMessage(sender, Messages.messageInvalidProfileGroup);
