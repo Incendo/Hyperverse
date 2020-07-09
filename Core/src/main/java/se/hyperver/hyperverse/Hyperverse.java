@@ -46,6 +46,7 @@ import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.exception.HyperWorldCreationException;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.features.PluginFeatureManager;
+import se.hyperver.hyperverse.features.external.EssentialsFeature;
 import se.hyperver.hyperverse.features.external.PlaceholderAPIFeature;
 import se.hyperver.hyperverse.listeners.EventListener;
 import se.hyperver.hyperverse.listeners.WorldListener;
@@ -53,6 +54,8 @@ import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskChainModule;
 import se.hyperver.hyperverse.util.MessageUtil;
+import se.hyperver.hyperverse.util.SafeTeleportService;
+import se.hyperver.hyperverse.util.Service;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.WorldConfiguration;
@@ -63,6 +66,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,12 +74,15 @@ import java.util.UUID;
  * Plugin main class
  * {@inheritDoc}
  */
-@Singleton public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Listener {
+@Singleton
+public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Listener {
 
     public static final int BSTATS_ID = 7177;
 
     private static HyperverseAPI instance;
     private final PluginFeatureManager pluginFeatureManager = new PluginFeatureManager();
+    private final Map<Class<? extends Service>, Service> serviceMap = new HashMap<>();
+
     private WorldManager worldManager;
     private Injector injector;
     private HyperDatabase hyperDatabase;
@@ -96,6 +103,8 @@ import java.util.UUID;
         instance = this;
         // Register default plugin features
         this.pluginFeatureManager.registerFeature("PlaceholderAPI", PlaceholderAPIFeature.class);
+        this.pluginFeatureManager.registerFeature("EssentialsX", EssentialsFeature.class);
+        this.registerService(SafeTeleportService.class, SafeTeleportService.defaultService());
     }
 
     @Override public void onEnable() {
@@ -111,7 +120,8 @@ import java.util.UUID;
         }
 
         try {
-            this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(), new TaskChainModule(this));
+            this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(),
+                new TaskChainModule(this));
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -161,8 +171,10 @@ import java.util.UUID;
 
         // Register events
         try {
-            this.getServer().getPluginManager().registerEvents(injector.getInstance(WorldListener.class), this);
-            this.getServer().getPluginManager().registerEvents(injector.getInstance(EventListener.class), this);
+            this.getServer().getPluginManager()
+                .registerEvents(injector.getInstance(WorldListener.class), this);
+            this.getServer().getPluginManager()
+                .registerEvents(injector.getInstance(EventListener.class), this);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -196,10 +208,15 @@ import java.util.UUID;
         try {
             this.hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
             this.getLogger().info("§6Hyperverse Options");
-            this.getLogger().info("§8- §7use persistent locations? " + this.hyperConfiguration.shouldPersistLocations());
-            this.getLogger().info("§8- §7keep spawns loaded? " + this.hyperConfiguration.shouldKeepSpawnLoaded());
-            this.getLogger().info("§8- §7should detect worlds? " + this.hyperConfiguration.shouldImportAutomatically());
-            this.getLogger().info("§8- §7should separate player profiles? " + this.hyperConfiguration.shouldGroupProfiles());
+            this.getLogger().info("§8- §7use persistent locations? " + this.hyperConfiguration
+                .shouldPersistLocations());
+            this.getLogger().info(
+                "§8- §7keep spawns loaded? " + this.hyperConfiguration.shouldKeepSpawnLoaded());
+            this.getLogger().info("§8- §7should detect worlds? " + this.hyperConfiguration
+                .shouldImportAutomatically());
+            this.getLogger().info(
+                "§8- §7should separate player profiles? " + this.hyperConfiguration
+                    .shouldGroupProfiles());
         } catch (final Exception e) {
             e.printStackTrace();
             return false;
@@ -252,16 +269,15 @@ import java.util.UUID;
 
     private boolean loadMessages(final String language) {
         // Message configuration
-        final Path messagePath = this.getDataFolder().toPath().resolve(String.format("messages_%s.conf", language));
-        final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
-            .builder()
-            .setParseOptions(ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
-            .setRenderOptions(ConfigRenderOptions.defaults()
-                .setComments(true)
-                .setFormatted(true)
-                .setOriginComments(false)
-                .setJson(false))
-            .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
+        final Path messagePath =
+            this.getDataFolder().toPath().resolve(String.format("messages_%s.conf", language));
+        final AbstractConfigurationLoader<CommentedConfigurationNode> loader =
+            HoconConfigurationLoader.builder().setParseOptions(
+                ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
+                .setRenderOptions(
+                    ConfigRenderOptions.defaults().setComments(true).setFormatted(true)
+                        .setOriginComments(false).setJson(false))
+                .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
 
         ConfigurationNode translationNode;
         try {
@@ -332,15 +348,18 @@ import java.util.UUID;
         // Verify that no such world exists
         for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
             if (hyperWorld.getConfiguration().getName().equalsIgnoreCase(configuration.getName())) {
-                throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN, configuration);
+                throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN,
+                    configuration);
             }
         }
         if (Bukkit.getWorld(configuration.getName()) != null) {
-            throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN, configuration);
+            throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN,
+                configuration);
         }
 
         // Create the world instance
-        final HyperWorld hyperWorld = this.getWorldFactory().create(UUID.randomUUID(), configuration);
+        final HyperWorld hyperWorld =
+            this.getWorldFactory().create(UUID.randomUUID(), configuration);
 
         // Make sure to ignore the load event
         this.getWorldManager().ignoreWorld(configuration.getName());
@@ -351,7 +370,8 @@ import java.util.UUID;
             // Register the world
             this.worldManager.addWorld(hyperWorld);
         } catch (final HyperWorldValidationException validationException) {
-            if (validationException.getValidationResult() != HyperWorldCreator.ValidationResult.SUCCESS) {
+            if (validationException.getValidationResult()
+                != HyperWorldCreator.ValidationResult.SUCCESS) {
                 throw new HyperWorldCreationException(validationException.getValidationResult(),
                     configuration);
             }
@@ -369,6 +389,21 @@ import java.util.UUID;
 
     @EventHandler public void onServerLoaded(final ServerLoadEvent event) {
         this.pluginFeatureManager.loadFeatures();
+    }
+
+    @Override public <T extends Service> void registerService(@NotNull final Class<T> clazz,
+        @NotNull final T implementation) {
+        this.serviceMap.put(clazz, implementation);
+    }
+
+    @Override @NotNull @SuppressWarnings("ALL") public <T extends Service> T getService(
+        @NotNull final Class<T> clazz) {
+        final Service service = this.serviceMap.get(clazz);
+        if (service == null) {
+            throw new IllegalArgumentException(
+                String.format("No service registered for '%s'", clazz.getCanonicalName()));
+        }
+        return (T) service;
     }
 
 }

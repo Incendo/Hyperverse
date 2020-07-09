@@ -24,6 +24,7 @@ import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.exception.HyperWorldCreationException;
 import se.hyperver.hyperverse.features.PluginFeatureManager;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
+import se.hyperver.hyperverse.util.Service;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
@@ -91,7 +92,6 @@ public interface HyperverseAPI {
     @NotNull HyperWorld createWorld(@NotNull final WorldConfiguration configuration)
         throws HyperWorldCreationException;
 
-
     /**
      * Gets the plugin feature manager. This can be used to register third party plugin
      * hooks directly into Hyperverse
@@ -99,5 +99,23 @@ public interface HyperverseAPI {
      * @return The plugin feature manager
      */
     @NotNull PluginFeatureManager getPluginFeatureManager();
+
+    /**
+     * Register a {@link Service} implementation
+     *
+     * @param clazz          Service class
+     * @param implementation Service implementation
+     * @param <T>            Service type
+     */
+    <T extends Service> void registerService(@NotNull Class<T> clazz, @NotNull T implementation);
+
+    /**
+     * Get the {@link Service} implementation for a service class
+     *
+     * @param clazz Service class
+     * @param <T>   Service type
+     * @return Service implementation
+     */
+    @NotNull <T extends Service> T getService(@NotNull Class<T> clazz);
 
 }
