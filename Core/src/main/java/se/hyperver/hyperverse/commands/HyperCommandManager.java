@@ -43,7 +43,6 @@ import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
-import se.hyperver.hyperverse.flags.implementation.AdvancementFlag;
 import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.*;
@@ -923,7 +922,7 @@ public class HyperCommandManager extends BaseCommand {
 
                 try {
                     final String rawResponse = incendoPaster.upload();
-                    final JsonObject jsonObject = JsonParser.parseString(rawResponse).getAsJsonObject();
+                    final JsonObject jsonObject = new JsonParser().parse(rawResponse).getAsJsonObject();
 
                     if (jsonObject.has("created")) {
                         final String pasteId = jsonObject.get("paste_id").getAsString();
