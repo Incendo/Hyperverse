@@ -21,14 +21,13 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.database.LocationType;
@@ -38,6 +37,7 @@ import se.hyperver.hyperverse.flags.implementation.IgnoreBedsFlag;
 import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
 import se.hyperver.hyperverse.util.NMS;
+import se.hyperver.hyperverse.util.SafeTeleportService;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldManager;
 import se.hyperver.hyperverse.world.WorldType;
@@ -50,15 +50,17 @@ import java.util.concurrent.CompletableFuture;
  */
 public final class SimpleTeleportationManager implements TeleportationManager {
 
+    private final Hyperverse hyperverse;
     private final HyperWorld hyperWorld;
     private final WorldManager worldManager;
     private final HyperConfiguration configuration;
     private final HyperDatabase hyperDatabase;
     private final NMS nms;
 
-    @Inject public SimpleTeleportationManager(@Assisted HyperWorld hyperWorld,
+    @Inject public SimpleTeleportationManager(final Hyperverse hyperverse, @Assisted final HyperWorld hyperWorld,
         final WorldManager worldManager, final NMS nms, final HyperConfiguration configuration,
         final HyperDatabase hyperDatabase) {
+        this.hyperverse = hyperverse;
         this.hyperWorld = hyperWorld;
         this.worldManager = worldManager;
         this.nms = nms;
@@ -89,16 +91,8 @@ public final class SimpleTeleportationManager implements TeleportationManager {
 
     @Override @NotNull public CompletableFuture<Location> findSafe(@NotNull Location location) {
         if (this.configuration.shouldSafeTeleport()) {
-            return PaperLib.getChunkAtAsync(location).thenApply(chunk -> {
-                Block locationBlock = location.getBlock();
-                do {
-                    if (locationBlock.getRelative(BlockFace.DOWN).getType().isSolid()) {
-                        return locationBlock.getLocation();
-                    }
-                } while (locationBlock.getY() > 0
-                    && (locationBlock = locationBlock.getRelative(BlockFace.DOWN)).getType() != Material.VOID_AIR);
-                return location;
-            });
+            return PaperLib.getChunkAtAsync(location).thenApply(chunk ->
+                this.hyperverse.getService(SafeTeleportService.class).findSafeLocation(location));
         } else {
             return PaperLib.getChunkAtAsync(location).thenApply(c -> location);
         }
