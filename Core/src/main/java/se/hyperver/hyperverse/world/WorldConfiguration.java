@@ -224,6 +224,11 @@ public class WorldConfiguration implements Cloneable {
         return this.generator;
     }
 
+    /**
+     * Set the world generator
+     *
+     * @param generator New generator
+     */
     public void setGenerator(@NotNull final String generator) {
         this.generator = generator;
     }

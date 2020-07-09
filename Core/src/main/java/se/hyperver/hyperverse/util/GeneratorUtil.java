@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Generator utility methods
@@ -91,7 +92,13 @@ public final class GeneratorUtil {
             generatorName.equalsIgnoreCase("vanilla")) {
             return true;
         }
-        return Bukkit.getPluginManager().isPluginEnabled(generatorName);
+        final String pluginName;
+        if (generatorName.contains(":")) {
+            pluginName = generatorName.split(Pattern.quote(":"))[0];
+        } else {
+            pluginName = generatorName;
+        }
+        return Bukkit.getPluginManager().isPluginEnabled(pluginName);
     }
 
 }
