@@ -1,5 +1,5 @@
 <p align="center">
-    <img height="256px" width="246px" src="https://plotsquared.com/assets/img/LogoMoonv2.png">
+    <img height="256px" width="246px" src="https://plotsquared.com/assets/img/hyperverse.png">
 </p>
 
 **Hyperverse is W.I.P!**
