@@ -122,13 +122,23 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
                 new TaskChainModule(this));
         } catch (final Exception e) {
             e.printStackTrace();
+            getLogger().severe("Failed to creator the Guice injector. Disabling.");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
         }
 
         // Setup services, load in default implementations.
-        loadServices();
+        if (!loadServices()) {
+            getLogger().severe("Failed to load internal services. Disabling.");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         // Load plugin features.
-        loadFeatures();
+        if (!loadFeatures()) {
+            getLogger().warning("Failed to load external plugin features.");
+            return;
+        }
 
         if (!this.loadConfiguration()) {
             getLogger().severe("Failed to load configuration file. Disabling!");
