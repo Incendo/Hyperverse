@@ -185,6 +185,14 @@ public interface HyperWorld {
     @NotNull String getDisplayName();
 
     /**
+     * Whether or not the spawn for this world
+     * should be kept loaded
+     *
+     * @return {@code true} if the world spawn should be kept loaded
+     */
+    boolean shouldKeepSpawnLoaded();
+
+    /**
      * Result of unloading or deleting a world
      */
     enum WorldUnloadResult {

@@ -57,9 +57,7 @@ public class WorldListener implements Listener {
             if (hyperWorld.getBukkitWorld() != null) {
                 hyperWorld.setBukkitWorld(world);
             }
-            if (hyperConfiguration.shouldKeepSpawnLoaded()) {
-                world.setKeepSpawnInMemory(true);
-            }
+            world.setKeepSpawnInMemory(hyperWorld.shouldKeepSpawnLoaded());
         } else if (hyperConfiguration.shouldImportAutomatically()) {
             // Assume it's a non-vanilla world, but don't guess the generator
             // This can be done because if it's the default level, we don't have
@@ -73,7 +71,9 @@ public class WorldListener implements Listener {
                         "%world%", world.getName(), "%generator%",
                         Objects.requireNonNull(this.worldManager.getWorld(world)).getConfiguration()
                             .getGenerator());
-                if (hyperConfiguration.shouldKeepSpawnLoaded()) {
+                if ((hyperWorld = this.worldManager.getWorld(world)) != null) {
+                    world.setKeepSpawnInMemory(hyperWorld.shouldKeepSpawnLoaded());
+                } else if (hyperConfiguration.shouldKeepSpawnLoaded()) {
                     world.setKeepSpawnInMemory(true);
                 }
             } else {

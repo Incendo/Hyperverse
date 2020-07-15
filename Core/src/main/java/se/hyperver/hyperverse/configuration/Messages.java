@@ -218,6 +218,8 @@ public class Messages {
         "Forces players to respawn at the world spawn location rather than their bed spawns");
     public static final Message flagDescriptionAlias = createMessage("flags.alias",
         "Name of the world as shown in lists, placeholders, etc");
+    public static final Message flagDescriptionUnloadSpawn = createMessage("flags.unload-spawn",
+                   "Force the world spawn to be unloaded");
 
     // Command Descriptions
     public static final Message commandDescriptionCreate = createMessage("command.create",

@@ -18,7 +18,7 @@ Current Features:
 - World loading/unloading
 - World teleportation
 - World flags (gamemode, local-spawn, force-spawn, 
-pve, pvp, world-permission, nether, end, profile-group, difficulty, creature-spawn, mob-spawn, respawn-world, ignore-beds, alias)
+pve, pvp, world-permission, nether, end, profile-group, difficulty, creature-spawn, mob-spawn, respawn-world, ignore-beds, alias, unload-spawn)
 - World game rules
 - Tab completed commands
 - Persistent world locations

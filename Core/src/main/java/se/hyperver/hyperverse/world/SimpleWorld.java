@@ -21,6 +21,7 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -42,6 +43,7 @@ import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.flags.implementation.AliasFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
+import se.hyperver.hyperverse.flags.implementation.UnloadSpawnFlag;
 import se.hyperver.hyperverse.modules.FlagContainerFactory;
 import se.hyperver.hyperverse.modules.HyperWorldCreatorFactory;
 import se.hyperver.hyperverse.modules.TeleportationManagerFactory;
@@ -127,6 +129,8 @@ public class SimpleWorld implements HyperWorld {
             throw new IllegalStateException("Cannot replace bukkit world");
         }
         this.bukkitWorld = world;
+        this.refreshFlags();
+        this.unloadChunks();
     }
 
     @Override public void saveConfiguration() {
@@ -220,6 +224,14 @@ public class SimpleWorld implements HyperWorld {
         MessageUtil
             .sendMessage(sender, Messages.messageWorldProperty, "%property%", "generator arg",
                 "%value%", configuration.getGeneratorArg());
+        String loadedChunks;
+        try {
+            loadedChunks = String.format("%d (%d)", this.bukkitWorld.getLoadedChunks().length, this.bukkitWorld.getForceLoadedChunks().size());
+        } catch (final Exception ignored) {
+            loadedChunks = "unknown";
+        }
+        MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "loaded chunks",
+                "%value%", loadedChunks);
         // Flags
         final StringBuilder flagStringBuilder = new StringBuilder();
         final Iterator<Map.Entry<String, String>> flagIterator =
@@ -253,6 +265,20 @@ public class SimpleWorld implements HyperWorld {
         }
     }
 
+    private void unloadChunks() {
+        if (this.bukkitWorld == null || this.shouldKeepSpawnLoaded()) {
+            return;
+        }
+        try {
+            for (final Chunk chunk : this.bukkitWorld.getLoadedChunks()) {
+                if (chunk.isForceLoaded() || chunk.getInhabitedTime() > 0) {
+                    continue;
+                }
+                chunk.unload(true);
+            }
+        } catch (final Exception ignored) {}
+    }
+
     @Override public void createBukkitWorld() throws HyperWorldValidationException {
         if (this.bukkitWorld != null) {
             throw new IllegalStateException("A bukkit world already exist");
@@ -262,6 +288,7 @@ public class SimpleWorld implements HyperWorld {
         if (world != null) {
             this.bukkitWorld = world;
             this.refreshFlags();
+            this.unloadChunks();
             return;
         }
         // Otherwise we need to create the world
@@ -276,10 +303,8 @@ public class SimpleWorld implements HyperWorld {
             throw new IllegalStateException("Failed to create the world");
         }
         this.bukkitWorld = world;
-        if (hyperConfiguration.shouldKeepSpawnLoaded()) {
-            this.bukkitWorld.setKeepSpawnInMemory(true);
-        }
         this.refreshFlags();
+        this.unloadChunks();
     }
 
     @Override public void teleportPlayer(@NotNull final Player player) {
@@ -388,6 +413,7 @@ public class SimpleWorld implements HyperWorld {
     @Override public void refreshFlags() {
         if (this.bukkitWorld != null) {
             this.bukkitWorld.setDifficulty(this.getFlag(DifficultyFlag.class));
+            this.bukkitWorld.setKeepSpawnInMemory(this.shouldKeepSpawnLoaded());
         }
     }
 
@@ -406,6 +432,13 @@ public class SimpleWorld implements HyperWorld {
             displayName = this.getConfiguration().getName();
         }
         return displayName;
+    }
+
+    @Override public boolean shouldKeepSpawnLoaded() {
+        if (this.getFlag(UnloadSpawnFlag.class)) {
+            return false;
+        }
+        return this.hyperConfiguration.shouldKeepSpawnLoaded();
     }
 
 }
