@@ -53,9 +53,10 @@ import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskChainModule;
+import se.hyperver.hyperverse.service.ServiceManager;
 import se.hyperver.hyperverse.util.MessageUtil;
-import se.hyperver.hyperverse.util.SafeTeleportService;
-import se.hyperver.hyperverse.util.Service;
+import se.hyperver.hyperverse.service.internal.SafeTeleportService;
+import se.hyperver.hyperverse.service.Service;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.WorldConfiguration;
@@ -88,6 +89,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
     private HyperDatabase hyperDatabase;
     private HyperConfiguration hyperConfiguration;
     private HyperWorldFactory worldFactory;
+    private ServiceManager serviceManager;
 
     /**
      * Get the (singleton) implementation of
@@ -101,10 +103,6 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     @Override public void onLoad() {
         instance = this;
-        // Register default plugin features
-        this.pluginFeatureManager.registerFeature("PlaceholderAPI", PlaceholderAPIFeature.class);
-        this.pluginFeatureManager.registerFeature("EssentialsX", EssentialsFeature.class);
-        this.registerService(SafeTeleportService.class, SafeTeleportService.defaultService());
     }
 
     @Override public void onEnable() {
@@ -125,6 +123,12 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         } catch (final Exception e) {
             e.printStackTrace();
         }
+
+        // Setup services, load in default implementations.
+        loadServices();
+
+        // Load plugin features.
+        loadFeatures();
 
         if (!this.loadConfiguration()) {
             getLogger().severe("Failed to load configuration file. Disabling!");
@@ -229,6 +233,29 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             this.worldManager = injector.getInstance(WorldManager.class);
             this.worldManager.loadWorlds();
         } catch (final Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean loadServices() {
+        try {
+            serviceManager = injector.getInstance(ServiceManager.class);
+            this.registerService(SafeTeleportService.class, SafeTeleportService.defaultService());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean loadFeatures() {
+        // Register default plugin features
+        try {
+            this.pluginFeatureManager.registerFeature("PlaceholderAPI", PlaceholderAPIFeature.class);
+            this.pluginFeatureManager.registerFeature("EssentialsX", EssentialsFeature.class);
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -393,17 +420,12 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     @Override public <T extends Service> void registerService(@NotNull final Class<T> clazz,
         @NotNull final T implementation) {
-        this.serviceMap.put(clazz, implementation);
+        serviceManager.registerService(clazz, implementation);
     }
 
-    @Override @NotNull @SuppressWarnings("ALL") public <T extends Service> T getService(
+    @Override @NotNull public <T extends Service> T getService(
         @NotNull final Class<T> clazz) {
-        final Service service = this.serviceMap.get(clazz);
-        if (service == null) {
-            throw new IllegalArgumentException(
-                String.format("No service registered for '%s'", clazz.getCanonicalName()));
-        }
-        return (T) service;
+       return serviceManager.getService(clazz);
     }
 
 }

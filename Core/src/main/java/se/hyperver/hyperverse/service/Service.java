@@ -15,10 +15,11 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.util;
+package se.hyperver.hyperverse.service;
 
 /**
  * A service that can be used by Hyperverse
+ * @see ServiceManager
  */
 public interface Service {
 }

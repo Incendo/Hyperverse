@@ -37,7 +37,7 @@ import se.hyperver.hyperverse.flags.implementation.IgnoreBedsFlag;
 import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
 import se.hyperver.hyperverse.util.NMS;
-import se.hyperver.hyperverse.util.SafeTeleportService;
+import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldManager;
 import se.hyperver.hyperverse.world.WorldType;

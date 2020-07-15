@@ -15,13 +15,14 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.util;
+package se.hyperver.hyperverse.service.internal;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.jetbrains.annotations.NotNull;
+import se.hyperver.hyperverse.service.Service;
 
 /**
  * A {@link Service} used to find safe teleportation locations

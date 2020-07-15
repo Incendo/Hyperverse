@@ -26,6 +26,8 @@ import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlagContainer;
+import se.hyperver.hyperverse.service.ServiceManager;
+import se.hyperver.hyperverse.service.internal.HyperServiceManager;
 import se.hyperver.hyperverse.teleportation.SimpleTeleportationManager;
 import se.hyperver.hyperverse.teleportation.TeleportationManager;
 import se.hyperver.hyperverse.util.NMS;
@@ -50,6 +52,7 @@ public class HyperverseModule extends AbstractModule {
         bind(HyperConfiguration.class).to(FileHyperConfiguration.class).in(Singleton.class);
         bind(WorldManager.class).to(SimpleWorldManager.class).in(Singleton.class);
         bind(GlobalWorldFlagContainer.class).toInstance(new GlobalWorldFlagContainer());
+        bind(ServiceManager.class).to(HyperServiceManager.class).in(Singleton.class);
         install(new FactoryModuleBuilder().implement(WorldCreator.class, HyperWorldCreator.class)
             .build(HyperWorldCreatorFactory.class));
         install(new FactoryModuleBuilder().implement(HyperWorld.class, SimpleWorld.class)

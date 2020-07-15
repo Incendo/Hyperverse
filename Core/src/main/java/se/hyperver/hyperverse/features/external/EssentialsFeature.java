@@ -22,7 +22,7 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.features.PluginFeature;
-import se.hyperver.hyperverse.util.SafeTeleportService;
+import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 
 /**
  * Feature hooking into Essentials

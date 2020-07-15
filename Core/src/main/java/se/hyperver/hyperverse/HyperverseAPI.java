@@ -24,7 +24,7 @@ import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.exception.HyperWorldCreationException;
 import se.hyperver.hyperverse.features.PluginFeatureManager;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
-import se.hyperver.hyperverse.util.Service;
+import se.hyperver.hyperverse.service.Service;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
