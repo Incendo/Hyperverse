@@ -27,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.boss.DragonBattle;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boss;
@@ -348,6 +349,15 @@ public class EventListener implements Listener {
                 .netherDestination(event.getPlayer(), event.getFrom());
             isNether = true;
         } else if (event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
+            Location portalLocation;
+            final Location current = event.getFrom();
+            final DragonBattle battle = current.getWorld().getEnderDragonBattle();
+            if (battle != null && (portalLocation = battle.getEndPortalLocation()) != null) {
+                current.clone().setY(portalLocation.getY());
+                if (portalLocation.distanceSquared(current) > 9) {
+                    return;
+                }
+            }
             destination = hyperWorld.getTeleportationManager().endDestination(event.getPlayer());
             isNether = false;
         } else {
@@ -416,6 +426,15 @@ public class EventListener implements Listener {
             }
         } else if (event.getLocation().getBlock().getType() == Material.END_PORTAL && !hyperWorld
             .getFlag(EndFlag.class).isEmpty()) {
+            Location portalLocation;
+            final Location current = event.getLocation();
+            final DragonBattle battle = current.getWorld().getEnderDragonBattle();
+            if (battle != null && (portalLocation = battle.getEndPortalLocation()) != null) {
+                current.clone().setY(portalLocation.getY());
+                if (portalLocation.distanceSquared(current) > 9) {
+                    return;
+                }
+            }
             final Location destination =
                 hyperWorld.getTeleportationManager().endDestination(event.getEntity());
             if (destination != null) {
