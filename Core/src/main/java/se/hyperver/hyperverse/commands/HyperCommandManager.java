@@ -43,6 +43,8 @@ import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlag;
+import se.hyperver.hyperverse.flags.implementation.EndFlag;
+import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.*;
@@ -733,7 +735,37 @@ public class HyperCommandManager extends BaseCommand {
 
     @Category("Management") @Subcommand("flag reset") @CommandPermission("hyperverse.flag.set") @CommandCompletion("@flags|@hyperworlds @flags") @SuppressWarnings("unchecked")
     public void doFlagReset(final CommandSender sender, final HyperWorld hyperWorld, final WorldFlag<?,?> flag) {
-        hyperWorld.setFlagInstance(globalFlagContainer.getFlag(flag.getClass()));
+        final WorldFlag<?, ?> toSet;
+        if (flag.getClass() == EndFlag.class) {
+            final World bukkitWorld = hyperWorld.getBukkitWorld();
+            if (bukkitWorld == null) {
+                toSet = globalFlagContainer.getFlag(flag.getClass());
+            } else {
+                WorldFlag<?, ?> temp;
+                try {
+                    temp = EndFlag.END_FLAG_DEFAULT.parse(bukkitWorld.getName() + "_the_end");
+                } catch (FlagParseException ignored) {
+                    temp = globalFlagContainer.getFlag(flag.getClass());
+                }
+                toSet = temp;
+            }
+        } else if (flag.getClass() == NetherFlag.class) {
+            final World bukkitWorld = hyperWorld.getBukkitWorld();
+            if (bukkitWorld == null) {
+                toSet = globalFlagContainer.getFlag(flag.getClass());
+            } else {
+                WorldFlag<?, ?> temp;
+                try {
+                    temp = NetherFlag.NETHER_FLAG_DEFAULT.parse(bukkitWorld.getName() + "_nether");
+                } catch (FlagParseException ignored) {
+                    temp = globalFlagContainer.getFlag(flag.getClass());
+                }
+                toSet = temp;
+            }
+        } else {
+            toSet = globalFlagContainer.getFlag(flag.getClass());
+        }
+        hyperWorld.setFlagInstance(toSet);
         MessageUtil.sendMessage(sender, Messages.messageFlagSet);
     }
 
