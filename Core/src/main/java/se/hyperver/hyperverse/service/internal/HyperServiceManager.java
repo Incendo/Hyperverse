@@ -58,6 +58,10 @@ public class HyperServiceManager implements ServiceManager {
         return new HashSet<>(serviceImplMap.values());
     }
 
+    @Override public @NotNull Map<Class<? extends Service>, Service> toMap() {
+        return new HashMap<>(serviceImplMap);
+    }
+
     @SuppressWarnings("unchecked")
     private static <T extends Service> T castUnsafe(@NotNull final Service service) {
         return (T) service;

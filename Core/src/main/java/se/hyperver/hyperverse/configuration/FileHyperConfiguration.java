@@ -108,4 +108,7 @@ public class FileHyperConfiguration implements HyperConfiguration {
         return this.fileConfigurationObject.shouldSafeTeleport();
     }
 
+    @Override public boolean shouldHookEssentials() {
+        return this.fileConfigurationObject.shouldHookEssentials();
+    }
 }

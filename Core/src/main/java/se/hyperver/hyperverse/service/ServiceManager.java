@@ -17,10 +17,10 @@
 
 package se.hyperver.hyperverse.service;
 
-import com.google.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Represents a service manager for services which Hyperverse will use internally.
@@ -55,5 +55,15 @@ public interface ServiceManager {
      * been registered to this manager.
      */
     @NotNull Collection<Service> getRegisteredServices();
+
+    /**
+     * Get a representation of the internal state of this manager as
+     * a {@link Map} with the service {@link Class} as the key and a
+     * {@link Service} instance as the value.
+     *
+     * @return Returns a map which represents the internal state of this manager,
+     * changes to this map will NOT be reflected in this manager.
+     */
+    @NotNull Map<Class<? extends Service>, Service> toMap();
 
 }

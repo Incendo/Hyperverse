@@ -26,6 +26,7 @@ import se.hyperver.hyperverse.util.MessageUtil;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -106,6 +107,10 @@ public class PluginFeatureManager {
             throw new IllegalStateException("Cannot initialize plugin feature", e);
         }
         this.loadedFeatures.add(name);
+    }
+
+    @NotNull public Collection<String> getRegisteredFeatures() {
+        return new HashSet<>(registeredFeatures.keySet());
     }
 
 }

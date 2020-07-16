@@ -30,6 +30,7 @@ import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 public class EssentialsFeature extends PluginFeature {
 
     @Override public void initializeFeature() {
+        Hyperverse.getPlugin(Hyperverse.class).getLogger().info("§8[§6Hyperverse§8] Using Essentials to provide safe-teleportation lookup.");
         Hyperverse.getApi().registerService(SafeTeleportService.class, new EssentialsSafeTeleportService());
     }
 

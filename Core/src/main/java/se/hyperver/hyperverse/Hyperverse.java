@@ -53,10 +53,10 @@ import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskChainModule;
-import se.hyperver.hyperverse.service.ServiceManager;
-import se.hyperver.hyperverse.util.MessageUtil;
-import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 import se.hyperver.hyperverse.service.Service;
+import se.hyperver.hyperverse.service.ServiceManager;
+import se.hyperver.hyperverse.service.internal.SafeTeleportService;
+import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.WorldConfiguration;
@@ -67,9 +67,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Plugin main class
@@ -82,7 +82,6 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     private static HyperverseAPI instance;
     private final PluginFeatureManager pluginFeatureManager = new PluginFeatureManager();
-    private final Map<Class<? extends Service>, Service> serviceMap = new HashMap<>();
 
     private WorldManager worldManager;
     private Injector injector;
@@ -127,6 +126,13 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             return;
         }
 
+        // Load configuration first
+        if (!this.loadConfiguration()) {
+            getLogger().severe("Failed to load configuration file. Disabling!");
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         // Setup services, load in default implementations.
         if (!loadServices()) {
             getLogger().severe("Failed to load internal services. Disabling.");
@@ -135,14 +141,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         }
 
         // Load plugin features.
-        if (!loadFeatures()) {
+        if (!registerDefaultFeatures()) {
             getLogger().warning("Failed to load external plugin features.");
-            return;
-        }
-
-        if (!this.loadConfiguration()) {
-            getLogger().severe("Failed to load configuration file. Disabling!");
-            this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
@@ -212,6 +212,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
         // Add paper suggestion
         PaperLib.suggestPaper(this);
+
     }
 
     @Override public void onDisable() {
@@ -260,11 +261,30 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         return true;
     }
 
-    private boolean loadFeatures() {
+    private void logHookInformation() {
+        final Logger logger = getLogger();
+        logger.info("§6Hyperverse Plugin Hooks (Registered)");
+        if (!pluginFeatureManager.getRegisteredFeatures().isEmpty()) {
+            for (String feature : pluginFeatureManager.getRegisteredFeatures()) {
+                logger.info("- " + feature);
+            }
+        } else {
+            logger.info( "- No Hooks Detected");
+        }
+        logger.info("§6Hyperverse Services (Internal) ");
+        for (Map.Entry<Class<? extends Service>, Service> entry : serviceManager.toMap().entrySet()) {
+            logger.info("- " + entry.getKey().getSimpleName() + " : " + entry.getValue().getClass()
+                .getSimpleName());
+        }
+    }
+
+    private boolean registerDefaultFeatures() {
         // Register default plugin features
         try {
             this.pluginFeatureManager.registerFeature("PlaceholderAPI", PlaceholderAPIFeature.class);
-            this.pluginFeatureManager.registerFeature("EssentialsX", EssentialsFeature.class);
+            if (hyperConfiguration.shouldHookEssentials()) {
+                this.pluginFeatureManager.registerFeature("EssentialsX", EssentialsFeature.class);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -426,6 +446,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     @EventHandler public void onServerLoaded(final ServerLoadEvent event) {
         this.pluginFeatureManager.loadFeatures();
+        logHookInformation();
     }
 
     @Override public <T extends Service> void registerService(@NotNull final Class<T> clazz,
