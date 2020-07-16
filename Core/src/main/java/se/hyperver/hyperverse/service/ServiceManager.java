@@ -26,7 +26,6 @@ import java.util.Collection;
  * Represents a service manager for services which Hyperverse will use internally.
  * @see Service
  */
-@Singleton
 public interface ServiceManager {
 
     /**
