@@ -19,27 +19,14 @@ package se.hyperver.hyperverse;
 
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
-import org.bukkit.Bukkit;
-import se.hyperver.hyperverse.configuration.HyperConfiguration;
-import se.hyperver.hyperverse.util.NMS;
 import io.papermc.lib.PaperLib;
-import net.minecraft.server.v1_16_R1.BlockPosition;
-import net.minecraft.server.v1_16_R1.DimensionManager;
-import net.minecraft.server.v1_16_R1.EntityHuman;
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.EnumDirection;
-import net.minecraft.server.v1_16_R1.NBTCompressedStreamTools;
-import net.minecraft.server.v1_16_R1.NBTTagCompound;
-import net.minecraft.server.v1_16_R1.NBTTagDouble;
-import net.minecraft.server.v1_16_R1.NBTTagList;
-import net.minecraft.server.v1_16_R1.PortalTravelAgent;
-import net.minecraft.server.v1_16_R1.ShapeDetector;
-import net.minecraft.server.v1_16_R1.Vec3D;
-import net.minecraft.server.v1_16_R1.WorldServer;
+import net.minecraft.server.v1_16_R1.*;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.RegexFilter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
@@ -47,6 +34,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import se.hyperver.hyperverse.configuration.HyperConfiguration;
+import se.hyperver.hyperverse.util.NMS;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -121,10 +110,9 @@ public class NMSImpl implements NMS {
     }
 
     @Override @Nullable public Location getDimensionSpawn(@NotNull final Location origin) {
-        final WorldServer worldServer = ((CraftWorld) origin.getWorld()).getHandle();
-        final BlockPosition dimensionSpawn = worldServer.getSpawn();
-        if (dimensionSpawn != null) {
-            return new Location(origin.getWorld(), dimensionSpawn.getX(), dimensionSpawn.getY(), dimensionSpawn.getZ());
+        if (Objects.requireNonNull(origin.getWorld()).getEnvironment()
+            == World.Environment.THE_END) {
+            return new Location(origin.getWorld(), 100, 50, 0);
         }
         return origin.getWorld().getSpawnLocation();
     }
