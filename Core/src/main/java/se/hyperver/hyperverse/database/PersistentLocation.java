@@ -17,8 +17,6 @@
 
 package se.hyperver.hyperverse.database;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
@@ -26,31 +24,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.UUID;
 
-@DatabaseTable(tableName = "locations")
 public final class PersistentLocation {
 
-    @DatabaseField(generatedId = true)
-    private int id;
-    @DatabaseField(uniqueCombo = true)
-    private String uuid;
-    @DatabaseField(uniqueCombo = true)
-    private String world;
-    @DatabaseField
-    private double x;
-    @DatabaseField
-    private double y;
-    @DatabaseField
-    private double z;
-    @DatabaseField(uniqueCombo = true)
-    private LocationType locationType;
-
-    public PersistentLocation() {
-    }
-
-    public PersistentLocation(@NotNull final String uuid, @NotNull final String world,
-        final double x, final double y, final double z) {
-        this(uuid, world, x, y, z, LocationType.PLAYER_LOCATION);
-    }
+    private final String uuid;
+    private final String world;
+    private final double x;
+    private final double y;
+    private final double z;
+    private final LocationType locationType;
 
     public PersistentLocation(@NotNull final String uuid, @NotNull final String world,
         final double x, final double y, final double z, @NotNull final LocationType locationType) {
@@ -88,30 +69,7 @@ public final class PersistentLocation {
         return this.z;
     }
 
-    void setWorld(final String world) {
-        this.world = world;
-    }
-
-    void setUuid(final String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setLocationType(final LocationType locationType) {
-        this.locationType = locationType;
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
     public LocationType getLocationType() {
-        if (this.locationType == null) {
-            return LocationType.PLAYER_LOCATION;
-        }
         return this.locationType;
     }
 
