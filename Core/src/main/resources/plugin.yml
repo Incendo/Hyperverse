@@ -5,6 +5,7 @@ api-version: "1.14"
 authors: [Citymonstret, andrewandy]
 description: A minecraft world management plugin
 softdepend:
+  - Essentials
   - Multiverse
   - MyWorlds
 permissions:
