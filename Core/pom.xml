@@ -144,7 +144,7 @@
         <dependency>
             <groupId>me.minidigger</groupId>
             <artifactId>minimessage-bungee</artifactId>
-            <version>2.0.4</version>
+            <version>2.1.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
