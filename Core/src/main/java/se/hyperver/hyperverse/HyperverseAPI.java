@@ -18,13 +18,13 @@
 package se.hyperver.hyperverse;
 
 import com.google.inject.Injector;
+import com.intellectualsites.services.ServicePipeline;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.exception.HyperWorldCreationException;
 import se.hyperver.hyperverse.features.PluginFeatureManager;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
-import se.hyperver.hyperverse.service.Service;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
@@ -101,21 +101,10 @@ public interface HyperverseAPI {
     @NotNull PluginFeatureManager getPluginFeatureManager();
 
     /**
-     * Register a {@link Service} implementation
+     * Get the service pipeline implementation used by Hyperverse.
      *
-     * @param clazz          Service class
-     * @param implementation Service implementation
-     * @param <T>            Service type
+     * @return Service pipeline
      */
-    <T extends Service> void registerService(@NotNull Class<T> clazz, @NotNull T implementation);
-
-    /**
-     * Get the {@link Service} implementation for a service class
-     *
-     * @param clazz Service class
-     * @param <T>   Service type
-     * @return Service implementation
-     */
-    @NotNull <T extends Service> T getService(@NotNull Class<T> clazz);
+    @NotNull ServicePipeline getServicePipeline();
 
 }

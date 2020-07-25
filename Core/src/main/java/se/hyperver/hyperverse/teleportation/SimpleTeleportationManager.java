@@ -92,7 +92,8 @@ public final class SimpleTeleportationManager implements TeleportationManager {
     @Override @NotNull public CompletableFuture<Location> findSafe(@NotNull Location location) {
         if (this.configuration.shouldSafeTeleport()) {
             return PaperLib.getChunkAtAsync(location).thenApply(chunk ->
-                this.hyperverse.getService(SafeTeleportService.class).findSafeLocation(location));
+                this.hyperverse.getServicePipeline().pump(location).through(SafeTeleportService.class)
+                    .getResult());
         } else {
             return PaperLib.getChunkAtAsync(location).thenApply(c -> location);
         }
