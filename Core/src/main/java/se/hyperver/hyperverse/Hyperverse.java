@@ -284,7 +284,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         try {
             this.pluginFeatureManager.registerFeature("PlaceholderAPI", PlaceholderAPIFeature.class);
             if (hyperConfiguration.shouldHookEssentials()) {
-                this.pluginFeatureManager.registerFeature("EssentialsX", EssentialsFeature.class);
+                this.pluginFeatureManager.registerFeature("Essentials", EssentialsFeature.class);
             }
         } catch (Exception e) {
             e.printStackTrace();

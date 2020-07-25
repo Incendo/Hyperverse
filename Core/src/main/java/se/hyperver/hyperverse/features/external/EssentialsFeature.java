@@ -33,7 +33,7 @@ import java.util.Collections;
 public class EssentialsFeature extends PluginFeature {
 
     @Override public void initializeFeature() {
-        Hyperverse.getPlugin(Hyperverse.class).getLogger().info("§8[§6Hyperverse§8] Using Essentials to provide safe-teleportation lookup.");
+        Hyperverse.getPlugin(Hyperverse.class).getLogger().info("Using Essentials to provide safe-teleportation lookup.");
         Hyperverse.getApi().getServicePipeline().registerServiceImplementation(SafeTeleportService.class,
             new EssentialsSafeTeleportService(), Collections.emptyList());
     }
