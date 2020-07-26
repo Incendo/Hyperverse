@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.intellectualsites.services.ServicePipeline;
+import com.intellectualsites.services.types.Service;
 import com.typesafe.config.ConfigParseOptions;
 import com.typesafe.config.ConfigRenderOptions;
 import io.papermc.lib.PaperLib;
@@ -270,13 +271,14 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         } else {
             logger.info( "- No Hooks Detected");
         }
-        /* TODO: Re-introduce this. This will need some tweaks to the pipeline library though...
-        logger.info("§6Hyperverse Services (Internal) ");
-        for (Map.Entry<Class<? extends Service>, Service> entry : serviceManager.toMap().entrySet()) {
-            logger.info("- " + entry.getKey().getSimpleName() + " : " + entry.getValue().getClass()
-                .getSimpleName());
+        for (TypeToken<?> typeToken : this.servicePipeline.getRecognizedTypes()) {
+            logger.info("- " + typeToken.getRawType().getSimpleName() + ":");
+            logger.info("    Implementations: ");
+            TypeToken<? extends Service> token = ((TypeToken<? extends Service>) typeToken);
+            for (Object implToken : this.servicePipeline.getImplementations(token)) {
+                logger.info("        - " + ((TypeToken<?>)  implToken).getRawType().getSimpleName());
+            }
         }
-         */
     }
 
     private boolean registerDefaultFeatures() {
