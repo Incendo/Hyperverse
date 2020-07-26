@@ -271,12 +271,13 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         } else {
             logger.info( "- No Hooks Detected");
         }
-        for (TypeToken<?> typeToken : this.servicePipeline.getRecognizedTypes()) {
+        logger.info("§6Hyperverse Services (Internal) ");
+        for (TypeToken<? extends Service<?, ?>> typeToken : this.servicePipeline.getRecognizedTypes()) {
             logger.info("- " + typeToken.getRawType().getSimpleName() + ":");
             logger.info("    Implementations: ");
-            TypeToken<? extends Service> token = ((TypeToken<? extends Service>) typeToken);
+            TypeToken token = typeToken;
             for (Object implToken : this.servicePipeline.getImplementations(token)) {
-                logger.info("        - " + ((TypeToken<?>)  implToken).getRawType().getSimpleName());
+                logger.info("        - " + ((TypeToken<?>) implToken).getRawType().getSimpleName());
             }
         }
     }
