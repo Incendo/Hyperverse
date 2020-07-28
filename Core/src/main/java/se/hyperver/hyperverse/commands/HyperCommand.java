@@ -84,6 +84,7 @@ public class HyperCommand extends BaseCommand {
 
         // Create the command manager
         BukkitCommandManager bukkitCommandManager = new PaperCommandManager(hyperverse);
+        // Register our completions etc
         HyperCommandUtil.setupCommandManager(bukkitCommandManager, worldManager, globalFlagContainer);
         bukkitCommandManager.registerCommand(this);
     }

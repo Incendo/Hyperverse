@@ -40,10 +40,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Internal utility class used to setup Hyperverse's command manager.
+ * @see HyperCommand
+ */
 final class HyperCommandUtil {
 
-
-
+    /**
+     * Utility method, used to register locales, formats, completions and contexts to
+     * the command manager.
+     * @param bukkitCommandManager The command manager instance to register contexts to.
+     * @param worldManager The world manager object (DI)
+     * @param globalFlagContainer The glag container object (DI)
+     */
     public static void setupCommandManager(final BukkitCommandManager bukkitCommandManager,
         final WorldManager worldManager, final GlobalWorldFlagContainer globalFlagContainer) {
 
@@ -350,6 +359,5 @@ final class HyperCommandUtil {
             return Collections.emptyList();
         });
     }
-
-
+    
 }
