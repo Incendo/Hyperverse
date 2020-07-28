@@ -42,48 +42,48 @@ import java.util.stream.Stream;
 
 final class HyperCommandUtil {
 
-    private final BukkitCommandManager bukkitCommandManager;
-    private final WorldManager worldManager;
-    private final GlobalWorldFlagContainer globalFlagContainer;
 
 
-    HyperCommandUtil(final WorldManager worldManager, final GlobalWorldFlagContainer
-        globalFlagContainer, final BukkitCommandManager bukkitCommandManager) {
-        this.bukkitCommandManager = bukkitCommandManager;
-        this.worldManager = Objects.requireNonNull(worldManager);
-        this.globalFlagContainer = Objects.requireNonNull(globalFlagContainer);
+    public static void setupCommandManager(final BukkitCommandManager bukkitCommandManager,
+        final WorldManager worldManager, final GlobalWorldFlagContainer globalFlagContainer) {
 
-        this.bukkitCommandManager.usePerIssuerLocale(true, true);
-        this.bukkitCommandManager.getLocales().addMessages(Locale.ENGLISH, Messages.getMessages());
+        bukkitCommandManager.usePerIssuerLocale(true, true);
+        bukkitCommandManager.getLocales().addMessages(Locale.ENGLISH, Messages.getMessages());
 
-        setFormats();
-        registerCompletions();
-        registerAsyncCompletions();
-        registerContexts();
+        setupLocales(bukkitCommandManager);
+        setFormats(bukkitCommandManager);
+        registerCompletions(bukkitCommandManager, worldManager);
+        registerAsyncCompletions(bukkitCommandManager, worldManager, globalFlagContainer);
+        registerContexts(bukkitCommandManager, worldManager, globalFlagContainer);
+    }
+
+    private static void setupLocales(final BukkitCommandManager bukkitCommandManager) {
+        bukkitCommandManager.usePerIssuerLocale(true, true);
+        bukkitCommandManager.getLocales().addMessages(Locale.ENGLISH, Messages.getMessages());
     }
 
 
-    private void setFormats() {
-        this.bukkitCommandManager.setDefaultFormatter(new BukkitMessageFormatter(ChatColor.GRAY) {
+    private static void setFormats(final BukkitCommandManager bukkitCommandManager) {
+        bukkitCommandManager.setDefaultFormatter(new BukkitMessageFormatter(ChatColor.GRAY) {
             @Override public String format(@NotNull final String message) {
                 return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
                     + super.format(message);
             }
         });
-        this.bukkitCommandManager.setFormat(
+        bukkitCommandManager.setFormat(
             MessageType.ERROR, new BukkitMessageFormatter(ChatColor.RED, ChatColor.GOLD, ChatColor.WHITE) {
                 @Override public String format(final String message) {
                     return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
                         + ChatColor.RED + super.format(message);
                 }
             });
-        this.bukkitCommandManager.setFormat(MessageType.SYNTAX, new BukkitMessageFormatter(ChatColor.GRAY, ChatColor.GOLD, ChatColor.WHITE) {
+        bukkitCommandManager.setFormat(MessageType.SYNTAX, new BukkitMessageFormatter(ChatColor.GRAY, ChatColor.GOLD, ChatColor.WHITE) {
             @Override public String format(final String message) {
                 return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
                     + ChatColor.GRAY + super.format(message);
             }
         });
-        this.bukkitCommandManager.setFormat(MessageType.HELP, new BukkitMessageFormatter(ChatColor.GRAY, ChatColor.GOLD, ChatColor.WHITE) {
+        bukkitCommandManager.setFormat(MessageType.HELP, new BukkitMessageFormatter(ChatColor.GRAY, ChatColor.GOLD, ChatColor.WHITE) {
             @Override public String format(final String message) {
                 return ChatColor.translateAlternateColorCodes('&', Messages.messagePrefix.toString())
                     + ChatColor.GRAY + super.format(message);
@@ -91,7 +91,8 @@ final class HyperCommandUtil {
         });
     }
 
-    private void registerContexts() {
+    private static void registerContexts(final BukkitCommandManager bukkitCommandManager,
+        final WorldManager worldManager, final GlobalWorldFlagContainer globalFlagContainer) {
          /*bukkitCommandManager.getCommandContexts().registerContext(Player[].class, context -> {
             final List<String> args = context.getArgs();
             final Player[] arr = new Player[args.size()];
@@ -143,7 +144,8 @@ final class HyperCommandUtil {
         bukkitCommandManager.enableUnstableAPI("help");
     }
 
-    private void registerCompletions() {
+    private static void registerCompletions(final BukkitCommandManager bukkitCommandManager,
+        final WorldManager worldManager) {
         bukkitCommandManager.getCommandCompletions().registerCompletion("null", context ->
             Collections.emptyList());
         bukkitCommandManager.getCommandCompletions()
@@ -251,8 +253,9 @@ final class HyperCommandUtil {
         });
     }
 
-    private void registerAsyncCompletions() {
-        this.bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
+    private static void registerAsyncCompletions(final BukkitCommandManager bukkitCommandManager,
+        final WorldManager worldManager, final GlobalWorldFlagContainer globalFlagContainer) {
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("hyperworlds",
             context -> worldManager.getWorlds().stream().filter(hyperWorld -> {
                 final String stateSel = context.getConfig("state", "").toLowerCase();
                 final String playerSel = context.getConfig("players", "").toLowerCase();
@@ -263,17 +266,21 @@ final class HyperCommandUtil {
                 boolean ret = true;
                 switch (stateSel) {
                     case "loaded":
-                        ret = hyperWorld.isLoaded(); break;
+                        ret = hyperWorld.isLoaded();
+                        break;
                     case "not_loaded":
-                        ret = !hyperWorld.isLoaded(); break;
+                        ret = !hyperWorld.isLoaded();
+                        break;
                     default:
                         break;
                 }
                 switch (playerSel) {
                     case "no_players":
-                        ret = ret && hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
+                        ret = ret && hyperWorld.getBukkitWorld().getPlayers().isEmpty();
+                        break;
                     case "has_players":
-                        ret = ret && !hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
+                        ret = ret && !hyperWorld.getBukkitWorld().getPlayers().isEmpty();
+                        break;
                     default:
                         break;
                 }
@@ -293,7 +300,7 @@ final class HyperCommandUtil {
                             return true;
                     }
                 }).collect(Collectors.toList()));
-        this.bukkitCommandManager.getCommandCompletions()
+        bukkitCommandManager.getCommandCompletions()
             .registerAsyncCompletion("import-candidates", context -> {
                 final File baseDirectory = Bukkit.getWorldContainer();
                 try {
@@ -307,33 +314,33 @@ final class HyperCommandUtil {
                     return Collections.emptyList();
                 }
             });
-        this.bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("worldtypes", context -> {
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("worldtypes", context -> {
             if (context.getInput().contains(" ")) {
                 return Collections.emptyList();
             }
             return Arrays.stream(WorldType.values()).map(WorldType::name).map(String::toLowerCase)
                 .collect(Collectors.toList());
         });
-        this.bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("worldfeatures", context -> {
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("worldfeatures", context -> {
             if (context.getInput().contains(" ")) {
                 return Collections.emptyList();
             }
             return Arrays.stream(WorldFeatures.values()).map(WorldFeatures::name).map(String::toLowerCase)
                 .collect(Collectors.toList());
         });
-        this.bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("flags", context ->
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("flags", context ->
             globalFlagContainer.getFlagMap().values().stream().map(WorldFlag::getName).collect(
                 Collectors.toList()));
-        this.bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("gamerules", context ->
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("gamerules", context ->
             Arrays.stream(GameRule.values()).map(GameRule::getName).collect(Collectors.toList()));
-        this.bukkitCommandManager.getCommandCompletions().registerCompletion("flag", context -> {
+        bukkitCommandManager.getCommandCompletions().registerCompletion("flag", context -> {
             final WorldFlag<?, ?> flag = context.getContextValue(WorldFlag.class);
             if (flag != null) {
                 return flag.getTabCompletions();
             }
             return Collections.emptyList();
         });
-        this.bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("gamerule", context -> {
+        bukkitCommandManager.getCommandCompletions().registerAsyncCompletion("gamerule", context -> {
             final GameRule<?> gameRule = context.getContextValue(GameRule.class);
             if (gameRule != null) {
                 if (gameRule.getType() == Boolean.class) {
