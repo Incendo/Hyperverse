@@ -38,7 +38,6 @@ import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
-import se.hyperver.hyperverse.database.PersistentLocation;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
@@ -59,7 +58,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -577,7 +575,7 @@ public class HyperCommandManager extends BaseCommand {
         }
     }
 
-    @Category("Misc") @Subcommand("teleportgroup|tpgroup") @CommandAlias("hvtpgroup")
+    /*@Category("Misc") @Subcommand("teleportgroup|tpgroup") @CommandAlias("hvtpgroup")
     @CommandPermission("hyperverse.teleportgroup")
     @CommandCompletion("@profile_groups:has_perms=true") @Description("{@command.teleportgroup}")
     public void doGroupedTeleport(final Player sender, final String profileGroup) {
@@ -606,7 +604,7 @@ public class HyperCommandManager extends BaseCommand {
             assert hyperWorld != null;
             doTeleport(sender, hyperWorld);
         });
-    }
+    }*/
 
     @Category("Informational") @Subcommand("info|i") @CommandAlias("hvi")
     @CommandPermission("hyperverse.info") @CommandCompletion("@hyperworlds") @Description("View world info")

@@ -20,15 +20,10 @@ package se.hyperver.hyperverse.database;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.google.inject.Inject;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -41,7 +36,6 @@ public abstract class HyperDatabase {
     private final Hyperverse hyperverse;
     private final EnumMap<LocationType, Table<UUID, String, PersistentLocation>> locations;
 
-    @Inject
     protected HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
         this.taskChainFactory = taskChainFactory;
         this.hyperverse = hyperverse;
