@@ -70,52 +70,8 @@ public abstract class HyperDatabase {
      * @param updateTable        Whether or not the internal table should be updated
      * @param clear              Whether or not the internal table should be cleared
      */
-    public void storeLocation(@NotNull final PersistentLocation persistentLocation,
-        final boolean updateTable, final boolean clear) {
-
-        /*
-        final PersistentLocation storedLocation =
-            this.locations.get(persistentLocation.getLocationType())
-                .get(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld());
-        if (storedLocation != null) {
-            persistentLocation.setId(storedLocation.getId());
-        }
-
-        if (updateTable) {
-            this.locations.get(persistentLocation.getLocationType())
-                .put(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld(),
-                    persistentLocation);
-        }
-
-        taskChainFactory.newChain().async(() -> {
-            try {
-                final PersistentLocation matchLocation = new PersistentLocation();
-                matchLocation.setUuid(persistentLocation.getUuid());
-                matchLocation.setWorld(persistentLocation.getWorld());
-                matchLocation.setLocationType(persistentLocation.getLocationType());
-                final List<PersistentLocation> violatingLocation =
-                    this.locationDao.queryForMatchingArgs(matchLocation);
-                if (!violatingLocation.isEmpty()) {
-                    persistentLocation.setId(violatingLocation.get(0).getId());
-                    this.locationDao.update(persistentLocation);
-                    return;
-                }
-            } catch (final SQLException throwable) {
-                throwable.printStackTrace();
-            }
-
-            try {
-                this.locationDao.create(persistentLocation);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }).syncLast(in -> {
-            if (clear) {
-                clearLocations(UUID.fromString(persistentLocation.getUuid()));
-            }
-        }).execute();
-         */
-    }
+    public abstract void storeLocation(@NotNull final PersistentLocation persistentLocation,
+        final boolean updateTable, final boolean clear);
 
     /**
      * Remove all stored locations for a specific UUID
@@ -127,7 +83,7 @@ public abstract class HyperDatabase {
             final Collection<String> keys =
                 new HashSet<>(this.locations.get(locationType).columnKeySet());
             for (final String key : keys) {
-                this.locations.remove(uuid, key);
+                this.locations.get(locationType).remove(uuid, key);
             }
         }
     }

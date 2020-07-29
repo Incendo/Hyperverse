@@ -68,6 +68,34 @@ public class SQLiteDatabase extends HyperDatabase {
         }
     }
 
+    @Override
+    public void storeLocation(@NotNull final PersistentLocation persistentLocation, final boolean updateTable,
+        final boolean clear) {
+        if (updateTable) {
+            this.getLocations().get(persistentLocation.getLocationType())
+                    .put(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld(),
+                            persistentLocation);
+        }
+
+        this.getTaskChainFactory().newChain().async(() -> {
+            try (final PreparedStatement statement = this.connection.prepareStatement("INSERT OR REPLACE INTO `locations` (`uuid`, `world`, `x`, `y`, `z`, `locationType`) VALUES(?, ?, ?, ?, ?, ?)")) {
+                statement.setString(1, persistentLocation.getUuid());
+                statement.setString(2, persistentLocation.getWorld());
+                statement.setDouble(3, persistentLocation.getX());
+                statement.setDouble(4, persistentLocation.getY());
+                statement.setDouble(5, persistentLocation.getZ());
+                statement.setString(6, persistentLocation.getLocationType().name());
+                statement.executeUpdate();
+            } catch (final SQLException e) {
+                e.printStackTrace();
+            }
+        }).syncLast(in -> {
+            if (clear) {
+                this.clearLocations(UUID.fromString(persistentLocation.getUuid()));
+            }
+        }).execute();
+    }
+
     @Override public CompletableFuture<Collection<PersistentLocation>> getLocations(@NotNull final UUID uuid) {
         final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
         this.getTaskChainFactory().newChain().async(() -> {
