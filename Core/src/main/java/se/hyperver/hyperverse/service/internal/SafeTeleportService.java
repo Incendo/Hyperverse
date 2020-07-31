@@ -17,25 +17,18 @@
 
 package se.hyperver.hyperverse.service.internal;
 
+import com.intellectualsites.services.types.Service;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.jetbrains.annotations.NotNull;
-import se.hyperver.hyperverse.service.Service;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A {@link Service} used to find safe teleportation locations
  */
-public interface SafeTeleportService extends Service {
-
-    /**
-     * Find a safe target location. Assumes the location chunk is loaded
-     *
-     * @param target Target location
-     * @return Safe teleportation location
-     */
-    @NotNull Location findSafeLocation(@NotNull Location target);
+public interface SafeTeleportService extends Service<Location, Location> {
 
     /**
      * Get the default service implementation
@@ -52,7 +45,7 @@ public interface SafeTeleportService extends Service {
      */
     class DefaultSafeTeleportService implements SafeTeleportService {
 
-        @Override @NotNull public Location findSafeLocation(@NotNull final Location location) {
+        @Nullable @Override public Location handle(@NotNull final Location location) {
             Block locationBlock = location.getBlock();
             do {
                 if (locationBlock.getRelative(BlockFace.DOWN).getType().isSolid()) {
