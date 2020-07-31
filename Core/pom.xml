@@ -208,6 +208,18 @@
             <version>2.17.2</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.intellectualsites</groupId>
+            <artifactId>Pipeline</artifactId>
+            <version>1.4.1-SNAPSHOT</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>

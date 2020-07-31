@@ -17,10 +17,13 @@
 
 package se.hyperver.hyperverse;
 
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
+import com.intellectualsites.services.ServicePipeline;
+import com.intellectualsites.services.types.Service;
 import com.typesafe.config.ConfigParseOptions;
 import com.typesafe.config.ConfigRenderOptions;
 import io.papermc.lib.PaperLib;
@@ -53,8 +56,6 @@ import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskChainModule;
-import se.hyperver.hyperverse.service.Service;
-import se.hyperver.hyperverse.service.ServiceManager;
 import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -83,12 +84,12 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
     private static HyperverseAPI instance;
     private final PluginFeatureManager pluginFeatureManager = new PluginFeatureManager();
 
+    private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private WorldManager worldManager;
     private Injector injector;
     private HyperDatabase hyperDatabase;
     private HyperConfiguration hyperConfiguration;
     private HyperWorldFactory worldFactory;
-    private ServiceManager serviceManager;
 
     /**
      * Get the (singleton) implementation of
@@ -252,8 +253,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     private boolean loadServices() {
         try {
-            serviceManager = injector.getInstance(ServiceManager.class);
-            this.registerService(SafeTeleportService.class, SafeTeleportService.defaultService());
+            this.servicePipeline.registerServiceType(TypeToken.of(SafeTeleportService.class), SafeTeleportService.defaultService());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -272,9 +272,13 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             logger.info( "- No Hooks Detected");
         }
         logger.info("§6Hyperverse Services (Internal) ");
-        for (Map.Entry<Class<? extends Service>, Service> entry : serviceManager.toMap().entrySet()) {
-            logger.info("- " + entry.getKey().getSimpleName() + " : " + entry.getValue().getClass()
-                .getSimpleName());
+        for (TypeToken<? extends Service<?, ?>> typeToken : this.servicePipeline.getRecognizedTypes()) {
+            logger.info("- " + typeToken.getRawType().getSimpleName() + ":");
+            logger.info("    Implementations: ");
+            TypeToken token = typeToken;
+            for (Object implToken : this.servicePipeline.getImplementations(token)) {
+                logger.info("        - " + ((TypeToken<?>) implToken).getRawType().getSimpleName());
+            }
         }
     }
 
@@ -449,14 +453,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         logHookInformation();
     }
 
-    @Override public <T extends Service> void registerService(@NotNull final Class<T> clazz,
-        @NotNull final T implementation) {
-        serviceManager.registerService(clazz, implementation);
-    }
-
-    @Override @NotNull public <T extends Service> T getService(
-        @NotNull final Class<T> clazz) {
-       return serviceManager.getService(clazz);
+    @NotNull @Override public ServicePipeline getServicePipeline() {
+        return this.servicePipeline;
     }
 
 }
