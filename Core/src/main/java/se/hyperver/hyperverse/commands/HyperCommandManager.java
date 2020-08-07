@@ -577,7 +577,7 @@ public class HyperCommandManager extends BaseCommand {
 
     /*@Category("Misc") @Subcommand("teleportgroup|tpgroup") @CommandAlias("hvtpgroup")
     @CommandPermission("hyperverse.teleportgroup")
-    @CommandCompletion("@profile_groups:has_perms=true") @Description("{@command.teleportgroup}")
+    @CommandCompletion("@profile_groups:has_perms=true") @Description("{@@command.teleportgroup}")
     public void doGroupedTeleport(final Player sender, final String profileGroup) {
         final CompletableFuture<Collection<PersistentLocation>> future =
             (CompletableFuture<Collection<PersistentLocation>>) Hyperverse
@@ -617,8 +617,9 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Category("Management") @Subcommand("unload") @CommandPermission("hyperverse.unload")
-    @CommandCompletion("@hyperworlds:state=loaded") @Description("{@@command.unload}")
-    public void doUnload(final CommandSender sender, final HyperWorld world) {
+    @CommandCompletion("@hyperworlds:state=loaded true|false") @Description("{@@command.unload}")
+    public void doUnload(final CommandSender sender, final HyperWorld world,
+                         @Default("true") final boolean saveWorld) {
         if (world == null) {
             return;
         }
@@ -626,7 +627,7 @@ public class HyperCommandManager extends BaseCommand {
             MessageUtil.sendMessage(sender, Messages.messageWorldNotLoaded);
             return;
         }
-        final HyperWorld.WorldUnloadResult worldUnloadResult = world.unloadWorld();
+        final HyperWorld.WorldUnloadResult worldUnloadResult = world.unloadWorld(saveWorld);
         if (worldUnloadResult == HyperWorld.WorldUnloadResult.SUCCESS) {
             MessageUtil.sendMessage(sender, Messages.messageWorldUnloaded);
         } else {

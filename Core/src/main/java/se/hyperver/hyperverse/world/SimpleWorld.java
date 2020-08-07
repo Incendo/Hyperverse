@@ -179,6 +179,10 @@ public class SimpleWorld implements HyperWorld {
     }
 
     @Override @NotNull public WorldUnloadResult unloadWorld() {
+        return unloadWorld(true);
+    }
+
+    @Override @NotNull public WorldUnloadResult unloadWorld(final boolean saveWorld) {
         if (!this.isLoaded()) {
             return WorldUnloadResult.SUCCESS;
         }
@@ -188,7 +192,7 @@ public class SimpleWorld implements HyperWorld {
         if (!this.bukkitWorld.getPlayers().isEmpty()) {
             return WorldUnloadResult.FAILURE_HAS_PLAYERS;
         }
-        if (!Bukkit.unloadWorld(this.bukkitWorld, true)) {
+        if (!Bukkit.unloadWorld(this.bukkitWorld, saveWorld)) {
             return WorldUnloadResult.FAILURE_OTHER;
         }
 
