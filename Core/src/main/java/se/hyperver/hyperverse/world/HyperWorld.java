@@ -114,11 +114,19 @@ public interface HyperWorld {
     void deleteWorld(@NotNull final Consumer<WorldUnloadResult> result);
 
     /**
-     * Attempt to unload the world
+     * Attempt to unload the world and save it to disk.
      *
      * @return Result of unloading
      */
     @NotNull WorldUnloadResult unloadWorld();
+
+    /**
+     * Attempt to unload the world.
+     *
+     * @param saveWorld True if the world should be saved to disk.
+     * @return Result of unloading
+     */
+    @NotNull WorldUnloadResult unloadWorld(final boolean saveWorld);
 
     /**
      * Get the value of a flag
