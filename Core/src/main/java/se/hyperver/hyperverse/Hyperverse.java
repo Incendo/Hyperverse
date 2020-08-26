@@ -41,7 +41,7 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import se.hyperver.hyperverse.commands.HyperCommandManager;
+import se.hyperver.hyperverse.commands.HyperCommand;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
@@ -196,7 +196,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
         // Create the command manager instance
         try {
-            injector.getInstance(HyperCommandManager.class);
+            injector.getInstance(HyperCommand.class);
         } catch (final Exception e) {
             e.printStackTrace();
         }
