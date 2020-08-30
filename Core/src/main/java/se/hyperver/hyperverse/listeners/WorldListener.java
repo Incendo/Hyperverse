@@ -18,8 +18,10 @@
 package se.hyperver.hyperverse.listeners;
 
 import com.google.inject.Inject;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
+import se.hyperver.hyperverse.flags.implementation.SaveWorldFlag;
 import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.SimpleWorldManager;
@@ -81,6 +83,14 @@ public class WorldListener implements Listener {
                     .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
                         "%world%", world.getName(), "%result%", result.getDescription());
             }
+        }
+    }
+
+    @EventHandler public void onChunkUnload(final ChunkUnloadEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getWorld());
+
+        if (hyperWorld != null) {
+            event.setSaveChunk(hyperWorld.getFlag(SaveWorldFlag.class));
         }
     }
 
