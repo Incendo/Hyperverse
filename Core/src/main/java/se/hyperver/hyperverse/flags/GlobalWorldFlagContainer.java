@@ -53,6 +53,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(IgnoreBedsFlag.IGNORE_BEDS_FALSE);
         this.addFlag(AliasFlag.ALIAS_NONE);
         this.addFlag(UnloadSpawnFlag.UNLOAD_SPAWN_FALSE);
+        this.addFlag(SaveWorldFlag.SAVE_WORLD_TRUE);
     }
 
     @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {

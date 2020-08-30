@@ -51,6 +51,7 @@ import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.features.PluginFeatureManager;
 import se.hyperver.hyperverse.features.external.EssentialsFeature;
 import se.hyperver.hyperverse.features.external.PlaceholderAPIFeature;
+import se.hyperver.hyperverse.flags.implementation.SaveWorldFlag;
 import se.hyperver.hyperverse.listeners.EventListener;
 import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
@@ -217,6 +218,20 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
     }
 
     @Override public void onDisable() {
+        // Unload the worlds with save-world=false without saving before the server does it.
+        // Also kick everyone from there showing the shutdown message.
+        // This will only make sense if this isn't a /reload or an unloadplugin/disableplugin. If it is, I feel really, really sorry for the server.
+        worldManager.getWorlds().forEach(hyperWorld -> {
+            if (hyperWorld.isLoaded() && !hyperWorld.getFlag(SaveWorldFlag.class)) {
+                hyperWorld.getBukkitWorld().getPlayers().forEach(player -> player.kickPlayer(Bukkit.getShutdownMessage()));
+                hyperWorld.unloadWorld(false);
+
+                // setLoaded(true) because it was loaded before, so it loads again on startup.
+                hyperWorld.getConfiguration().setLoaded(true);
+                hyperWorld.saveConfiguration();
+            }
+        });
+
         this.hyperDatabase.attemptClose();
     }
 

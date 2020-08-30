@@ -117,10 +117,12 @@ public class HyperCommandManager extends BaseCommand {
             context -> worldManager.getWorlds().stream().filter(hyperWorld -> {
                 final String stateSel = context.getConfig("state", "").toLowerCase();
                 final String playerSel = context.getConfig("players", "").toLowerCase();
-                if (!hyperWorld.isLoaded()) {
+
+                // Don't check if the world is loaded, so it lists unloaded worlds when completing /hv load
+                /*if (!hyperWorld.isLoaded()) {
                     return false;
                 }
-                assert hyperWorld.getBukkitWorld() != null;
+                assert hyperWorld.getBukkitWorld() != null;*/
                 boolean ret = true;
                 switch (stateSel) {
                     case "loaded":
@@ -130,11 +132,13 @@ public class HyperCommandManager extends BaseCommand {
                     default:
                         break;
                 }
+
+                // In here do check if the world is loaded.
                 switch (playerSel) {
                     case "no_players":
-                        ret = ret && hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
+                        ret = ret && hyperWorld.isLoaded() && hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
                     case "has_players":
-                        ret = ret && !hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
+                        ret = ret && hyperWorld.isLoaded() && !hyperWorld.getBukkitWorld().getPlayers().isEmpty(); break;
                     default:
                         break;
                 }
@@ -639,7 +643,7 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Category("Management") @Subcommand("load") @CommandPermission("hyperverse.load")
-    @CommandCompletion("@hyperworlds:state=unloaded") @Description("{@@command.load}")
+    @CommandCompletion("@hyperworlds:state=not_loaded") @Description("{@@command.load}")
     public void doLoad(final CommandSender sender, final HyperWorld world) {
         if (world == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
