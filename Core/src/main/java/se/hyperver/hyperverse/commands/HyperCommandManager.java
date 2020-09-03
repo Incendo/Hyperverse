@@ -67,6 +67,8 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused")
 public class HyperCommandManager extends BaseCommand {
 
+    private static final int WORLDS_PER_PAGE = 10;
+
     private final BukkitCommandManager bukkitCommandManager;
     private final WorldManager worldManager;
     private final FileHyperConfiguration fileHyperConfiguration;
@@ -475,9 +477,19 @@ public class HyperCommandManager extends BaseCommand {
     }
 
     @Category("Informational") @Subcommand("list|l|worlds") @CommandPermission("hyperverse.list")
-    @CommandAlias("hvl") @Description("{@@command.list}") public void doList(final CommandSender sender) {
-        MessageUtil.sendMessage(sender, Messages.messageListHeader);
-        Stream<HyperWorld> stream = this.worldManager.getWorlds().stream().sorted(Comparator.comparing(world -> world.getConfiguration().getName()));
+    @CommandAlias("hvl") @CommandCompletion("@range:1-10")@Description("{@@command.list}")
+    public void doList(final CommandSender sender, @Default("1") final int page) {
+        final List<HyperWorld> worlds = new ArrayList<>(this.worldManager.getWorlds());
+        worlds.sort(Comparator.comparing(world -> world.getConfiguration().getName()));
+
+        final int pages = 1 + (int)((double) worlds.size() / WORLDS_PER_PAGE);
+        final int clampedPage = Math.max(1, Math.min(pages, page));
+        final int min = WORLDS_PER_PAGE * (clampedPage - 1);
+        final int max = Math.min(worlds.size(), WORLDS_PER_PAGE * clampedPage);
+
+        MessageUtil.sendMessage(sender, Messages.messageListHeader, "%page%", Integer.toString(clampedPage), "%max%", Integer.toString(pages));
+
+        Stream<HyperWorld> stream = worlds.subList(min, max).stream().sorted(Comparator.comparing(world -> world.getConfiguration().getName()));
         if (sender instanceof Entity) {
             stream = stream.sorted(Comparator
                 .comparing(world -> !((Entity) sender).getWorld().equals(world.getBukkitWorld())));
