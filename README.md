@@ -64,20 +64,20 @@ guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hype
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.6.0-SNAPSHOT</version>
+      <version>0.9.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.6.0-SNAPSHOT</version>
+      <version>0.9.0-SNAPSHOT</version>
       <classifier>javadoc</classifier>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.6.0-SNAPSHOT</version>
+      <version>0.9.0-SNAPSHOT</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
     </dependency>
