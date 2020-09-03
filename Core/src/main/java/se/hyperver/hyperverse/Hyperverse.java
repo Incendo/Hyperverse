@@ -307,6 +307,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             e.printStackTrace();
             return false;
         }
+        getLogger().info("Successfully connected to the database!");
         return true;
     }
 

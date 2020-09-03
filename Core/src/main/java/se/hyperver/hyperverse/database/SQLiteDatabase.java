@@ -8,12 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,11 +43,18 @@ public class SQLiteDatabase extends HyperDatabase {
                 }
             }
 
-            this.connection = DriverManager.getConnection("jdbc:sqlite:./plugins/Hyperverse/storage.db");
+            final String url = String.format("jdbc:sqlite:%s", file.getAbsolutePath());
+            this.getHyperverse().getLogger().info(String.format("Connecting to SQLite database: %s", url));
+            this.connection = DriverManager.getConnection(url);
 
-            if (this.connection == null) {
+            if (this.connection != null) {
                 this.executeUpdate(TABLE_LOCATIONS);
+            } else {
+                this.getHyperverse().getLogger().severe("No connection was established. The location table will not not be created.");
+                return false;
             }
+
+            this.getHyperverse().getLogger().info("The database has been completely setup.");
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -99,23 +101,28 @@ public class SQLiteDatabase extends HyperDatabase {
     @Override public CompletableFuture<Collection<PersistentLocation>> getLocations(@NotNull final UUID uuid) {
         final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
         this.getTaskChainFactory().newChain().async(() -> {
-            try (final PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM `location` WHERE `uuid` = ?")) {
+            try (final PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM `locations` WHERE `uuid` = ?")) {
                 statement.setString(1, uuid.toString());
                 final List<PersistentLocation> locationList = new ArrayList<>();
                 try (final ResultSet resultSet = statement.executeQuery()) {
-                    locationList.add(new PersistentLocation(uuid.toString(), resultSet.getString("world"),
-                        resultSet.getDouble("x"), resultSet.getDouble("y"), resultSet.getDouble("z"),
-                        LocationType.valueOf(resultSet.getString("locationType"))));
+                    while (resultSet.next()) {
+                        final PersistentLocation persistentLocation = new PersistentLocation(uuid.toString(), resultSet.getString("world"),
+                                resultSet.getDouble("x"), resultSet.getDouble("y"), resultSet.getDouble("z"),
+                                LocationType.valueOf(resultSet.getString("locationType")));
+                        locationList.add(persistentLocation);
+                        this.getLocations().get(persistentLocation.getLocationType())
+                                .put(uuid, persistentLocation.getWorld(), persistentLocation);
+                    }
                 }
-                for (final PersistentLocation persistentLocation : locationList) {
-                    this.getLocations().get(persistentLocation.getLocationType())
-                        .put(uuid, persistentLocation.getWorld(), persistentLocation);
+                if (this.getHyperverse().getConfiguration().shouldPrintDebug()) {
+                    this.getHyperverse().getLogger().info(String.format("(Debug) Loaded %s persistent locations for player %s",
+                            locationList.size(), uuid));
                 }
                 future.complete(locationList);
             } catch (final Exception e) {
                 future.completeExceptionally(e);
             }
-        });
+        }).execute();
         return future;
     }
 

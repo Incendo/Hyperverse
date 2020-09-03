@@ -45,6 +45,8 @@ public class FileConfigurationObject {
     private boolean safeTeleport = true;
     @Setting(value = "hook-essentials", comment = "Whether or not Hyperverse should attempt to utilize Essentials' specific features.")
     private boolean hookEssentials = true;
+    @Setting(value = "debug", comment = "Whether or not Hyperverse should print verbose debugging messages")
+    private boolean debug = false;
 
     public boolean isImportAutomatically() {
         return this.importAutomatically;
@@ -72,6 +74,10 @@ public class FileConfigurationObject {
 
     public boolean shouldHookEssentials() {
         return this.hookEssentials;
+    }
+
+    public boolean shouldPrintDebug() {
+        return this.debug;
     }
 
 }
