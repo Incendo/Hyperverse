@@ -82,8 +82,6 @@ public class Messages {
             + " The world will be created as soon as the generator is available.");
     public static final Message messageGeneratorAvailable = createMessage("generator.available",
         "&7The generator for world '%world%' is now available. The world will be created.");
-    public static final Message messageListHeader = createMessage("list.header",
-        "&7Available Worlds: ");
     public static final Message messageListEntry = createMessage("list.world-entry",
         "<dark_gray>-</dark_gray> <hover:show_text:\"<gray>Click to teleport to the world</gray>\"><click:run_command:/hvtp %name%>"
             + "<gray>%display-name%</gray></click></hover> <dark_gray>(<gray>%generator%</gray>: <gray>%type%</gray>) - %load_status%");
@@ -163,6 +161,8 @@ public class Messages {
         "&cThe respawn world linked to this world does not exist");
     public static final Message messageGameModeOverride = createMessage("override.gamemode",
         "<gray>The world has the game mode '<gold>%mode%</gold>' but your permission level prevented this from applying.</gray>");
+    public static final Message messageListHeader = createMessage("list.paginated-header",
+            "<gold>World List <dark_gray>(</dark_gray><gray>%page%</gray>/<gray>%max%</gray><dark_gray>)</dark_gray>");
 
     // Foreign plugin importer messages
     public static final Message messageImportPluginMissing = createMessage("importer.missing",
