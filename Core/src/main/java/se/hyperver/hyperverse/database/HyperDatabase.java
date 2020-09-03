@@ -20,45 +20,23 @@ package se.hyperver.hyperverse.database;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.support.ConnectionSource;
-import com.j256.ormlite.table.TableUtils;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 
-import java.io.File;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 /**
  * Class containing the database connection that
  * is used throughout the plugin
  */
-@Singleton
-public class HyperDatabase {
+public abstract class HyperDatabase {
 
-    private Dao<PersistentLocation, Integer> locationDao;
-    private ConnectionSource connectionSource;
-    private TaskChainFactory taskChainFactory;
+    private final TaskChainFactory taskChainFactory;
     private final Hyperverse hyperverse;
     private final EnumMap<LocationType, Table<UUID, String, PersistentLocation>> locations;
 
-    @Inject
-    public HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
+    protected HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
         this.taskChainFactory = taskChainFactory;
         this.hyperverse = hyperverse;
         this.locations = new EnumMap<>(LocationType.class);
@@ -72,51 +50,12 @@ public class HyperDatabase {
      *
      * @return True if the connection was successful, false if not
      */
-    public boolean attemptConnect() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-
-            final File file = new File(this.hyperverse.getDataFolder(), "storage.db");
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    new RuntimeException("Could not create storage.db").printStackTrace();
-                    return false;
-                }
-            }
-
-            this.connectionSource = new JdbcConnectionSource("jdbc:sqlite:./plugins/Hyperverse/storage.db");
-            // Setup DAOs
-            this.locationDao = DaoManager.createDao(connectionSource, PersistentLocation.class);
-            TableUtils.createTableIfNotExists(connectionSource, PersistentLocation.class);
-
-            final Dao<LegacyLocation, Integer> legacyLocationDao = DaoManager.createDao(connectionSource, LegacyLocation.class);
-            try {
-                if (legacyLocationDao.isTableExists()) {
-                    locationDao.create(legacyLocationDao.queryForAll().stream().map(legacyLocation ->
-                        new PersistentLocation(legacyLocation.getUuid(), legacyLocation.getWorld(), legacyLocation.getX(),
-                            legacyLocation.getY(), legacyLocation.getZ(), LocationType.PLAYER_LOCATION)).collect(
-                        Collectors.toList()));
-                    TableUtils.dropTable(legacyLocationDao, false);
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
+    public abstract boolean attemptConnect();
 
     /**
      * Attempt to close the connection
      */
-    public void attemptClose() {
-        if (this.connectionSource == null) {
-            return;
-        }
-        this.connectionSource.closeQuietly();
-    }
+    public abstract void attemptClose();
 
     /**
      * Store the location in the database
@@ -125,50 +64,8 @@ public class HyperDatabase {
      * @param updateTable        Whether or not the internal table should be updated
      * @param clear              Whether or not the internal table should be cleared
      */
-    public void storeLocation(@NotNull final PersistentLocation persistentLocation,
-        final boolean updateTable, final boolean clear) {
-
-        final PersistentLocation storedLocation =
-            this.locations.get(persistentLocation.getLocationType())
-                .get(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld());
-        if (storedLocation != null) {
-            persistentLocation.setId(storedLocation.getId());
-        }
-
-        if (updateTable) {
-            this.locations.get(persistentLocation.getLocationType())
-                .put(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld(),
-                    persistentLocation);
-        }
-
-        taskChainFactory.newChain().async(() -> {
-            try {
-                final PersistentLocation matchLocation = new PersistentLocation();
-                matchLocation.setUuid(persistentLocation.getUuid());
-                matchLocation.setWorld(persistentLocation.getWorld());
-                matchLocation.setLocationType(persistentLocation.getLocationType());
-                final List<PersistentLocation> violatingLocation =
-                    this.locationDao.queryForMatchingArgs(matchLocation);
-                if (!violatingLocation.isEmpty()) {
-                    persistentLocation.setId(violatingLocation.get(0).getId());
-                    this.locationDao.update(persistentLocation);
-                    return;
-                }
-            } catch (final SQLException throwable) {
-                throwable.printStackTrace();
-            }
-
-            try {
-                this.locationDao.create(persistentLocation);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }).syncLast(in -> {
-            if (clear) {
-                clearLocations(UUID.fromString(persistentLocation.getUuid()));
-            }
-        }).execute();
-    }
+    public abstract void storeLocation(@NotNull final PersistentLocation persistentLocation,
+        final boolean updateTable, final boolean clear);
 
     /**
      * Remove all stored locations for a specific UUID
@@ -180,7 +77,7 @@ public class HyperDatabase {
             final Collection<String> keys =
                 new HashSet<>(this.locations.get(locationType).columnKeySet());
             for (final String key : keys) {
-                this.locations.remove(uuid, key);
+                this.locations.get(locationType).remove(uuid, key);
             }
         }
     }
@@ -191,24 +88,7 @@ public class HyperDatabase {
      * @param uuid Player UUID
      * @return Future that will complete with the locations
      */
-    public Future<Collection<PersistentLocation>> getLocations(@NotNull final UUID uuid) {
-        final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
-        taskChainFactory.newChain().async(() -> {
-            try {
-                final Collection<PersistentLocation> locations =
-                    this.locationDao.queryForEq("uuid", Objects.requireNonNull(uuid).toString());
-                for (final PersistentLocation persistentLocation : locations) {
-                    this.locations.get(persistentLocation.getLocationType()).
-                        put(uuid, persistentLocation.getWorld(), persistentLocation);
-                }
-                future.complete(locations);
-            } catch (SQLException e) {
-                e.printStackTrace(); // In case the caller swallows it
-                future.completeExceptionally(e);
-            }
-        }).execute();
-        return future;
-    }
+    public abstract CompletableFuture<Collection<PersistentLocation>> getLocations(@NotNull final UUID uuid);
 
     /**
      * Get a stored persistent location for a given UUID
@@ -229,17 +109,17 @@ public class HyperDatabase {
      *
      * @param worldName World to remove
      */
-    public void clearWorld(@NotNull final String worldName) {
-        taskChainFactory.newChain().async(() -> {
-            try {
-                final DeleteBuilder<PersistentLocation, Integer> deleteBuilder =
-                    this.locationDao.deleteBuilder();
-                deleteBuilder.where().eq("world", worldName);
-                deleteBuilder.delete();
-            } catch (final SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }).execute();
+    public abstract void clearWorld(@NotNull final String worldName);
+
+    @NotNull protected TaskChainFactory getTaskChainFactory() {
+        return this.taskChainFactory;
     }
 
+    @NotNull protected Hyperverse getHyperverse() {
+        return this.hyperverse;
+    }
+
+    @NotNull protected EnumMap<LocationType, Table<UUID, String, PersistentLocation>> getLocations() {
+        return this.locations;
+    }
 }
