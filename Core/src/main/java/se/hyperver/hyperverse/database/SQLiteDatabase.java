@@ -127,7 +127,14 @@ public class SQLiteDatabase extends HyperDatabase {
     }
 
     @Override public void clearWorld(@NotNull String worldName) {
-
+        this.getTaskChainFactory().newChain().async(() -> {
+            try (final PreparedStatement statement = this.connection.prepareStatement("DELETE FROM `locations` WHERE `world` = ?")) {
+                statement.setString(1, worldName);
+                statement.executeUpdate();
+            } catch (final SQLException e) {
+                e.printStackTrace();
+            }
+        }).execute();
     }
 
     private void executeUpdate(@NonNull final String sql) {
