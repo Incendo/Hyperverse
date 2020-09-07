@@ -173,7 +173,7 @@
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-core</artifactId>
-            <version>3.6.1</version>
+            <version>3.7.1</version>
             <classifier>sources</classifier>
             <scope>provided</scope>
         </dependency>
