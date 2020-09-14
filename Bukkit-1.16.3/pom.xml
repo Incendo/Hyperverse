@@ -10,13 +10,13 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <name>Bukkit 1.16.2</name>
+    <name>Bukkit 1.16.3</name>
     <licenses>
         <license>
             <name>GNU General Public License Version 3</name>
             <url>https://raw.githubusercontent.com/Sauilitired/Hyperverse/master/LICENSE</url>
         </license>
-    </licenses><artifactId>Bukkit-1.16.2</artifactId>
+    </licenses><artifactId>Bukkit-1.16.3</artifactId>
 
     <build>
         <defaultGoal>clean package</defaultGoal>
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.16.2-R0.1-SNAPSHOT</version>
+            <version>1.16.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
