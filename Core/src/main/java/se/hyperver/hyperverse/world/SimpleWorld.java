@@ -43,6 +43,7 @@ import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.flags.implementation.AliasFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
+import se.hyperver.hyperverse.flags.implementation.SaveWorldFlag;
 import se.hyperver.hyperverse.flags.implementation.UnloadSpawnFlag;
 import se.hyperver.hyperverse.modules.FlagContainerFactory;
 import se.hyperver.hyperverse.modules.HyperWorldCreatorFactory;
@@ -418,6 +419,7 @@ public class SimpleWorld implements HyperWorld {
         if (this.bukkitWorld != null) {
             this.bukkitWorld.setDifficulty(this.getFlag(DifficultyFlag.class));
             this.bukkitWorld.setKeepSpawnInMemory(this.shouldKeepSpawnLoaded());
+            this.bukkitWorld.setAutoSave(this.getFlag(SaveWorldFlag.class));
         }
     }
 
