@@ -68,6 +68,18 @@
                             <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>com.google.inject</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.google.inject</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.intellectualsites.services</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.intellectualsites.services</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.typesafe.config</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.typesafe.config</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>co.aikar.commands</pattern>
                             <shadedPattern>se.hyperver.hyperverse.aikar.commands</shadedPattern>
                         </relocation>
@@ -84,6 +96,10 @@
                             <shadedPattern>se.hyperver.hyperverse.aikar.util</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>javax</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.javax</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>net.jodah.expiringmap</pattern>
                             <shadedPattern>se.hyperver.hyperverse.expiringmap</shadedPattern>
                         </relocation>
@@ -94,6 +110,26 @@
                         <relocation>
                             <pattern>net.kyori</pattern>
                             <shadedPattern>se.hyperver.hyperverse.kyori</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>ninja.leaping.configurate</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.leaping.configurate</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.aopalliance</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aopalliance</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.checkerframework</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.checkerframework</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.intellij</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.intellij</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.jetbrains</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.jetbrains</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
