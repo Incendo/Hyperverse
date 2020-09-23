@@ -23,12 +23,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>AnnotationProcessor</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.16.1-R0.1-SNAPSHOT</version>
@@ -58,39 +52,6 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>20.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-paper</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-paper</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
-            <classifier>sources</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-paper</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
-            <classifier>javadoc</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-core</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
-            <classifier>javadoc</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-core</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
-            <classifier>sources</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -140,12 +101,6 @@
                     <artifactId>guice</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>me.minidigger</groupId>
-            <artifactId>minimessage-bungee</artifactId>
-            <version>2.0.4</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>co.aikar</groupId>
@@ -209,14 +164,34 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>me.lucko</groupId>
+            <artifactId>commodore</artifactId>
+            <version>1.9</version>
+        </dependency>
+        <dependency>
             <groupId>com.intellectualsites</groupId>
-            <artifactId>Pipeline</artifactId>
-            <version>1.4.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <artifactId>cloud-paper</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.intellectualsites</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>4.0.0-SNAPSHOT</groupId>
+                    <artifactId>adventure-platform-viaversion</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -234,9 +209,6 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
-                    <annotationProcessors>
-                        <annotationProcessor>se.hyperver.hyperverse.commands.CommandAnnotationProcessor</annotationProcessor>
-                    </annotationProcessors>
                 </configuration>
             </plugin>
             <plugin>

@@ -155,6 +155,10 @@
             <id>ender.zone</id>
             <url>https://ci.ender.zone/plugin/repository/everything/</url>
         </repository>
+        <repository>
+            <id>viaversion</id>
+            <url>https://repo.viaversion.com/</url>
+        </repository>
     </repositories>
 
 </project>

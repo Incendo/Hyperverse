@@ -68,10 +68,6 @@
                             <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.aikar.commands</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>co.aikar.locales</pattern>
                             <shadedPattern>se.hyperver.hyperverse.aikar.locales</shadedPattern>
                         </relocation>
@@ -94,6 +90,14 @@
                         <relocation>
                             <pattern>net.kyori</pattern>
                             <shadedPattern>se.hyperver.hyperverse.kyori</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.intellectualsites.commands</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.cloud</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.intellectualsites.services</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.cloud.pipeline</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
