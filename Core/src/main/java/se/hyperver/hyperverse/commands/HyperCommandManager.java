@@ -17,21 +17,15 @@
 
 package se.hyperver.hyperverse.commands;
 
-import co.aikar.commands.*;
-import co.aikar.commands.annotation.*;
+import cloud.commandframework.Command;
+import cloud.commandframework.Description;
+import cloud.commandframework.MinecraftHelp;
+import cloud.commandframework.arguments.standard.BooleanArgument;
+import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.paper.PaperCommandManager;
 import co.aikar.taskchain.TaskChainFactory;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.inject.Inject;
-import com.intellectualsites.commands.Command;
-import com.intellectualsites.commands.Description;
-import com.intellectualsites.commands.MinecraftHelp;
-import com.intellectualsites.commands.arguments.standard.BooleanArgument;
-import com.intellectualsites.commands.arguments.standard.StringArgument;
-import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
-import com.intellectualsites.commands.meta.SimpleCommandMeta;
-import com.intellectualsites.commands.paper.PaperCommandManager;
-import me.minidigger.minimessage.bungee.MiniMessageParser;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang.StringUtils;
@@ -59,7 +53,6 @@ import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.util.*;
 import se.hyperver.hyperverse.world.WorldType;
 import se.hyperver.hyperverse.world.*;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,8 +90,10 @@ public class HyperCommandManager {
 
         /* Create the command manager */
         final PaperCommandManager<CommandSender> manager = new PaperCommandManager<>(
-                hyperverse, CommandExecutionCoordinator.simpleCoordinator(),
-                Function.identity(), Function.identity()
+                hyperverse,
+                CommandExecutionCoordinator.simpleCoordinator(),
+                Function.identity(),
+                Function.identity()
         );
 
         /* Register Brigadier support */
@@ -118,14 +113,19 @@ public class HyperCommandManager {
         /* Create the help manager */
         final BukkitAudiences bukkitAudiences = BukkitAudiences.create(hyperverse);
         final MinecraftHelp<CommandSender> minecraftHelp = new MinecraftHelp<>(
-                "/hyperverse", bukkitAudiences::audience, manager
+                "/hyperverse",
+                bukkitAudiences::sender,
+                manager
         );
 
         /* Register the help command */
         manager.command(manager.commandBuilder("hyperverse")
                 .meta("description", "Hyperverse help")
                 .literal("help", Description.of("Hyperverse help"))
-                .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY), Description.of("Search query"))
+                .argument(
+                        StringArgument.optional("query", StringArgument.StringMode.GREEDY),
+                        Description.of("Search query")
+                )
                 .handler(context -> {
                     final String query = context.getOrDefault("query", "");
                     minecraftHelp.queryCommands(query, context.getSender());
@@ -292,19 +292,6 @@ public class HyperCommandManager {
                     .filter(player -> !players.contains(player.toLowerCase()))
                     .sorted(Comparator.naturalOrder()).collect(Collectors.toList());
         });
-        /*bukkitCommandManager.getCommandContexts().registerContext(Player[].class, context -> {
-            final List<String> args = context.getArgs();
-            final Player[] arr = new Player[args.size()];
-            for (int index = 0; index < args.size(); index++) {
-                final Player player = Bukkit.getPlayer(args.get(index));
-                if (player == null) {
-                    throw new InvalidCommandArgument(MessageUtil.format(Messages.messageNoPlayerFound.toString(), "%name%", args.get(index)));
-                }
-                arr[index] = player;
-            }
-            args.clear();
-            return arr;
-        });*/
         bukkitCommandManager.getCommandContexts().registerContext(WorldType.class, context -> {
             final String arg = context.popFirstArg();
             return WorldType.fromString(arg).orElseThrow(() ->
@@ -567,37 +554,6 @@ public class HyperCommandManager {
             world.teleportPlayer(player);
         }
     }
-
-    /*@Category("Misc") @Subcommand("teleportgroup|tpgroup") @CommandAlias("hvtpgroup")
-    @CommandPermission("hyperverse.teleportgroup")
-    @CommandCompletion("@profile_groups:has_perms=true") @Description("{@@command.teleportgroup}")
-    public void doGroupedTeleport(final Player sender, final String profileGroup) {
-        final CompletableFuture<Collection<PersistentLocation>> future =
-            (CompletableFuture<Collection<PersistentLocation>>) Hyperverse
-                .getPlugin(Hyperverse.class).getDatabase().getLocations(sender.getUniqueId());
-
-        future.thenAccept(persistentLocations -> {
-            final java.util.Optional<PersistentLocation> optional =
-                persistentLocations.stream().filter(persistentLocation -> {
-                    final HyperWorld hyperWorld =
-                        worldManager.getWorld(persistentLocation.getWorld());
-                    if (hyperWorld == null) {
-                        return false;
-                    }
-                    return hyperWorld.getFlag(ProfileGroupFlag.class)
-                        .equalsIgnoreCase(profileGroup);
-                }).min(Comparator.comparingInt(PersistentLocation::getId)); //Lowest number is most recent?
-
-            if (!optional.isPresent()) {
-                MessageUtil.sendMessage(sender, Messages.messageInvalidProfileGroup);
-                return;
-            }
-            final PersistentLocation location = optional.get();
-            final HyperWorld hyperWorld = worldManager.getWorld(location.getWorld());
-            assert hyperWorld != null;
-            doTeleport(sender, hyperWorld);
-        });
-    }*/
 
     @Category("Informational")
     @Subcommand("info|i")
@@ -1057,10 +1013,13 @@ public class HyperCommandManager {
         return builder
                 .literal("regenerate", Description.of(Messages.commandDescriptionRegenerate.toString()), "regen")
                 .argument(new HyperWorldArgument(this.worldManager, true, "world"), Description.of("World to regenerate"))
-                .argument(BooleanArgument.optional("randomise", "false"), Description.of("Whether or not to randomise the seed"))
+                .argument(
+                        BooleanArgument.optional("randomise", false),
+                        Description.of("Whether or not to randomise the seed")
+                )
                 .withPermission("hyperverse.regenerate")
                 .handler(context -> {
-                    final HyperWorld world = context.getRequired("world");
+                    final HyperWorld world = context.get("world");
                     final boolean randomiseSeed = context.getOrDefault("regenerate", false);
                     final CommandSender sender = context.getSender();
 
