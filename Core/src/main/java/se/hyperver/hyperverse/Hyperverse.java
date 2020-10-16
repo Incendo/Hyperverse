@@ -17,13 +17,14 @@
 
 package se.hyperver.hyperverse;
 
-import com.google.common.reflect.TypeToken;
+import cloud.commandframework.services.ServicePipeline;
+import cloud.commandframework.services.types.Service;
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
-import com.intellectualsites.services.ServicePipeline;
-import com.intellectualsites.services.types.Service;
 import com.typesafe.config.ConfigParseOptions;
 import com.typesafe.config.ConfigRenderOptions;
 import io.papermc.lib.PaperLib;
@@ -56,7 +57,7 @@ import se.hyperver.hyperverse.listeners.EventListener;
 import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.modules.HyperverseModule;
-import se.hyperver.hyperverse.modules.TaskChainModule;
+import se.hyperver.hyperverse.modules.TaskFactoryModule;
 import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -65,6 +66,7 @@ import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -120,7 +122,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
         try {
             this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(),
-                new TaskChainModule(this));
+                new TaskFactoryModule(this));
         } catch (final Exception e) {
             e.printStackTrace();
             getLogger().severe("Failed to creator the Guice injector. Disabling.");
@@ -268,7 +270,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     private boolean loadServices() {
         try {
-            this.servicePipeline.registerServiceType(TypeToken.of(SafeTeleportService.class), SafeTeleportService.defaultService());
+            this.servicePipeline.registerServiceType(TypeToken.get(SafeTeleportService.class), SafeTeleportService.defaultService());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -287,12 +289,11 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             logger.info( "- No Hooks Detected");
         }
         logger.info("§6Hyperverse Services (Internal) ");
-        for (TypeToken<? extends Service<?, ?>> typeToken : this.servicePipeline.getRecognizedTypes()) {
-            logger.info("- " + typeToken.getRawType().getSimpleName() + ":");
+        for (Type type : this.servicePipeline.getRecognizedTypes()) {
+            logger.info("- " + GenericTypeReflector.erase(type).getSimpleName() + ":");
             logger.info("    Implementations: ");
-            TypeToken token = typeToken;
-            for (Object implToken : this.servicePipeline.getImplementations(token)) {
-                logger.info("        - " + ((TypeToken<?>) implToken).getRawType().getSimpleName());
+            for (Object implToken : this.servicePipeline.getImplementations((TypeToken) TypeToken.get(type))) {
+                logger.info("        - " + GenericTypeReflector.erase(((TypeToken<?>) implToken).getType()).getSimpleName());
             }
         }
     }
