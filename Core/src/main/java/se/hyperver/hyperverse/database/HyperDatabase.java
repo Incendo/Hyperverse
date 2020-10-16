@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.database;
 
-import co.aikar.taskchain.TaskChainFactory;
+import cloud.commandframework.tasks.TaskFactory;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.jetbrains.annotations.NotNull;
@@ -32,12 +32,12 @@ import java.util.concurrent.CompletableFuture;
  */
 public abstract class HyperDatabase {
 
-    private final TaskChainFactory taskChainFactory;
+    private final TaskFactory taskFactory;
     private final Hyperverse hyperverse;
     private final EnumMap<LocationType, Table<UUID, String, PersistentLocation>> locations;
 
-    protected HyperDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
-        this.taskChainFactory = taskChainFactory;
+    protected HyperDatabase(final TaskFactory taskFactory, final Hyperverse hyperverse) {
+        this.taskFactory = taskFactory;
         this.hyperverse = hyperverse;
         this.locations = new EnumMap<>(LocationType.class);
         for (final LocationType type : LocationType.values()) {
@@ -111,8 +111,8 @@ public abstract class HyperDatabase {
      */
     public abstract void clearWorld(@NotNull final String worldName);
 
-    @NotNull protected TaskChainFactory getTaskChainFactory() {
-        return this.taskChainFactory;
+    @NotNull protected TaskFactory getTaskFactory() {
+        return this.taskFactory;
     }
 
     @NotNull protected Hyperverse getHyperverse() {

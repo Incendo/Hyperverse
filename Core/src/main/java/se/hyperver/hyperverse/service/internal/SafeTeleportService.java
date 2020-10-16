@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.service.internal;
 
-import com.intellectualsites.services.types.Service;
+import cloud.commandframework.services.types.Service;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

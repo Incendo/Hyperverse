@@ -17,8 +17,8 @@
 
 package se.hyperver.hyperverse;
 
+import cloud.commandframework.services.ServicePipeline;
 import com.google.inject.Injector;
-import com.intellectualsites.services.ServicePipeline;
 import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;

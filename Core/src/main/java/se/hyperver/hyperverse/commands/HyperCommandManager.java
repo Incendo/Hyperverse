@@ -17,10 +17,10 @@
 
 package se.hyperver.hyperverse.commands;
 
+import cloud.commandframework.tasks.TaskFactory;
 import co.aikar.commands.*;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.*;
-import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
@@ -74,15 +74,15 @@ public class HyperCommandManager extends BaseCommand {
     private final FileHyperConfiguration fileHyperConfiguration;
     private final HyperWorldFactory hyperWorldFactory;
     private final GlobalWorldFlagContainer globalFlagContainer;
-    private final TaskChainFactory taskChainFactory;
+    private final TaskFactory taskChainFactory;
 
     @Inject public HyperCommandManager(final Hyperverse hyperverse, final WorldManager worldManager,
         final HyperWorldFactory hyperWorldFactory, final GlobalWorldFlagContainer globalFlagContainer,
-        final TaskChainFactory taskChainFactory, final FileHyperConfiguration hyperConfiguration) {
+        final TaskFactory taskFactory, final FileHyperConfiguration hyperConfiguration) {
         this.worldManager = Objects.requireNonNull(worldManager);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
         this.globalFlagContainer = Objects.requireNonNull(globalFlagContainer);
-        this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
+        this.taskChainFactory = Objects.requireNonNull(taskFactory);
         this.fileHyperConfiguration = Objects.requireNonNull(hyperConfiguration);
 
         // Create the command manager
@@ -899,7 +899,7 @@ public class HyperCommandManager extends BaseCommand {
     @Category("Misc") @Subcommand("debugpaste") @CommandPermission("hyperverse.debugpaste")
     @Description("{@@command.debugpaste}")
     public void doDebugPaste(final CommandSender sender) {
-        this.taskChainFactory.newChain().async(() -> {
+        this.taskChainFactory.recipe().begin(java.util.Optional.empty()).asynchronous((unused) -> {
             try {
                 final Hyperverse hyperverse = Hyperverse.getPlugin(Hyperverse.class);
 

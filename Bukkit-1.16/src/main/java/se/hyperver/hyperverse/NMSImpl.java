@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse;
 
-import co.aikar.taskchain.TaskChainFactory;
+import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
 import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_16_R1.*;
@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.util.NMS;
 
+import javax.swing.text.html.Option;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -44,17 +45,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {
 
-    private final TaskChainFactory taskChainFactory;
+    private final TaskFactory taskFactory;
     private Field entitiesByUUID;
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
-    @Inject public NMSImpl(final TaskChainFactory taskChainFactory, final HyperConfiguration hyperConfiguration) {
-        this.taskChainFactory = taskChainFactory;
+    @Inject public NMSImpl(final TaskFactory taskFactory, final HyperConfiguration hyperConfiguration) {
+        this.taskFactory = taskFactory;
         if (hyperConfiguration.shouldGroupProfiles()) {
             try {
                 final Field field = WorldServer.class.getDeclaredField("LOGGER");
@@ -129,7 +131,7 @@ public class NMSImpl implements NMS {
         hyperverse.setLong("writeTime", System.currentTimeMillis());
         hyperverse.setString("version", Hyperverse.getPlugin(Hyperverse.class).getDescription().getVersion());
 
-        taskChainFactory.newChain().async(() -> {
+        taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final OutputStream outputStream = Files.newOutputStream(file)) {
                 NBTCompressedStreamTools.a(playerTag, outputStream);
             } catch (final Exception e) {
@@ -140,17 +142,18 @@ public class NMSImpl implements NMS {
 
     @Override public void readPlayerData(@NotNull final Player player, @NotNull final Path file, @NotNull final Runnable whenDone) {
         final Location originLocation = player.getLocation().clone();
-        taskChainFactory.newChain().asyncFirst(() -> {
+        taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final InputStream inputStream = Files.newInputStream(file)) {
-                return NBTCompressedStreamTools.a(inputStream);
+                return Optional.of(NBTCompressedStreamTools.a(inputStream));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
-            return null;
-        }).syncLast(compound -> {
-            if (compound == null) {
+            return Optional.empty();
+        }).synchronous(optionalCompound -> {
+            if (!optionalCompound.isPresent()) {
                 return;
             }
+            final NBTTagCompound compound = (NBTTagCompound) optionalCompound.get();
             PaperLib.getChunkAtAsync(originLocation).thenAccept(chunk -> {
                 // Health and hunger don't update properly, so we
                 // give them a little help

@@ -17,11 +17,11 @@
 
 package se.hyperver.hyperverse.modules;
 
+import cloud.commandframework.services.ServicePipeline;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.bukkit.WorldCreator;
-import com.intellectualsites.services.ServicePipeline;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;

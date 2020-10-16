@@ -1,6 +1,6 @@
 package se.hyperver.hyperverse.database;
 
-import co.aikar.taskchain.TaskChainFactory;
+import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -12,6 +12,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,8 +28,8 @@ public class SQLiteDatabase extends HyperDatabase {
 
     private Connection connection;
 
-    @Inject public SQLiteDatabase(final TaskChainFactory taskChainFactory, final Hyperverse hyperverse) {
-        super(taskChainFactory, hyperverse);
+    @Inject public SQLiteDatabase(final TaskFactory taskFactory, final Hyperverse hyperverse) {
+        super(taskFactory, hyperverse);
     }
 
     @Override public boolean attemptConnect() {
@@ -79,7 +80,7 @@ public class SQLiteDatabase extends HyperDatabase {
                             persistentLocation);
         }
 
-        this.getTaskChainFactory().newChain().async(() -> {
+        this.getTaskFactory().recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final PreparedStatement statement = this.connection.prepareStatement("INSERT OR REPLACE INTO `locations` (`uuid`, `world`, `x`, `y`, `z`, `locationType`) VALUES(?, ?, ?, ?, ?, ?)")) {
                 statement.setString(1, persistentLocation.getUuid());
                 statement.setString(2, persistentLocation.getWorld());
@@ -91,7 +92,7 @@ public class SQLiteDatabase extends HyperDatabase {
             } catch (final SQLException e) {
                 e.printStackTrace();
             }
-        }).syncLast(in -> {
+        }).synchronous(in -> {
             if (clear) {
                 this.clearLocations(UUID.fromString(persistentLocation.getUuid()));
             }
@@ -100,7 +101,7 @@ public class SQLiteDatabase extends HyperDatabase {
 
     @Override public CompletableFuture<Collection<PersistentLocation>> getLocations(@NotNull final UUID uuid) {
         final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
-        this.getTaskChainFactory().newChain().async(() -> {
+        this.getTaskFactory().recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM `locations` WHERE `uuid` = ?")) {
                 statement.setString(1, uuid.toString());
                 final List<PersistentLocation> locationList = new ArrayList<>();
@@ -127,7 +128,7 @@ public class SQLiteDatabase extends HyperDatabase {
     }
 
     @Override public void clearWorld(@NotNull String worldName) {
-        this.getTaskChainFactory().newChain().async(() -> {
+        this.getTaskFactory().recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final PreparedStatement statement = this.connection.prepareStatement("DELETE FROM `locations` WHERE `world` = ?")) {
                 statement.setString(1, worldName);
                 statement.executeUpdate();
