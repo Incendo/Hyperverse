@@ -17,6 +17,7 @@
 
 package se.hyperver.hyperverse.modules;
 
+import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskSynchronizer;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -40,14 +41,16 @@ public class TaskFactoryModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public TaskSynchronizer provideTaskSynchronizer() {
+    public TaskFactory provideTaskFactory() {
+        final TaskSynchronizer synchronizer;
         try {
             final Constructor<?> constructor = Class.forName("cloud.commandframework.bukkit.BukkitSynchronizer").getDeclaredConstructor(Plugin.class);
             constructor.setAccessible(true);
-            return (TaskSynchronizer) constructor.newInstance(javaPlugin);
+            synchronizer = (TaskSynchronizer) constructor.newInstance(javaPlugin);
         } catch(final ReflectiveOperationException ex) {
             throw new RuntimeException(ex);
         }
+        return new TaskFactory(synchronizer);
     }
 
 }
