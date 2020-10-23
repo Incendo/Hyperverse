@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * {@link CommandSender} which does nothing at all
@@ -49,6 +50,13 @@ public final class NullRouteCommandSender implements CommandSender {
     }
 
     @Override public void sendMessage(@NotNull String[] messages) {
+    }
+
+    @Override public void sendMessage(@Nullable final UUID sender, @NotNull final String message) {
+    }
+
+    @Override
+    public void sendMessage(@Nullable final UUID sender, final @NotNull String[] messages) {
     }
 
     @Override @NotNull public Server getServer() {
