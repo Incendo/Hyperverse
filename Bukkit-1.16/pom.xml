@@ -76,10 +76,6 @@
                             <shadedPattern>se.hyperver.hyperverse.aikar.locales</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>co.aikar.taskchain</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.aikar.taskchain</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>co.aikar.util</pattern>
                             <shadedPattern>se.hyperver.hyperverse.aikar.util</shadedPattern>
                         </relocation>
@@ -98,6 +94,10 @@
                         <relocation>
                             <pattern>cloud.commandframework</pattern>
                             <shadedPattern>se.hyperver.hyperverse.cloud</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>ninja.leaping.configurate</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.configurate</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
