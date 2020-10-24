@@ -228,6 +228,12 @@
             <version>${parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>Nms-1_15_2</artifactId>
+            <version>${parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
