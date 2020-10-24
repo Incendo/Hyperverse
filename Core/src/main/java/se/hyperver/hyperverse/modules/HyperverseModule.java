@@ -19,9 +19,12 @@ package se.hyperver.hyperverse.modules;
 
 import cloud.commandframework.services.ServicePipeline;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.bukkit.WorldCreator;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
@@ -61,4 +64,9 @@ public class HyperverseModule extends AbstractModule {
             SimpleTeleportationManager.class).build(TeleportationManagerFactory.class));
     }
 
+    @Provides
+    @HyperConfigShouldGroupProfiles
+    boolean shouldGroupProfiles(final @NonNull HyperConfiguration configuration) {
+        return configuration.shouldGroupProfiles();
+    }
 }

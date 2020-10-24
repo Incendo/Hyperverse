@@ -18,7 +18,6 @@
 package se.hyperver.hyperverse;
 
 import cloud.commandframework.tasks.TaskFactory;
-import cloud.commandframework.tasks.TaskRecipe;
 import com.google.inject.Inject;
 import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_16_R2.*;
@@ -36,7 +35,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
-import se.hyperver.hyperverse.util.NMS;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import se.hyperver.hyperverse.util.NMS;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {
