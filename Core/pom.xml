@@ -226,25 +226,31 @@
             <groupId>se.hyperver.hyperverse</groupId>
             <artifactId>Nms-1_14_4</artifactId>
             <version>${parent.version}</version>
-            <scope>compile</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
             <artifactId>Nms-1_15_2</artifactId>
             <version>${parent.version}</version>
-            <scope>compile</scope>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>Nms-1_16_3</artifactId>
+            <version>${parent.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <defaultGoal>clean package</defaultGoal>
+        <finalName>${parent.artifactId}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
@@ -253,6 +259,7 @@
                     </annotationProcessors>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -263,7 +270,69 @@
                     <outputDirectory>../</outputDirectory>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>io.papermc.lib</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.paperlib</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.commands</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.locales</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.locales</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.util</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.aikar.util</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.jodah.expiringmap</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.expiringmap</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.minidigger.minimessage</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.messages</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.kyori</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>cloud.commandframework</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.cloud</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>ninja.leaping.configurate</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.configurate</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
         </plugins>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

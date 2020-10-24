@@ -22,11 +22,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Named;
+import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
-import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
@@ -37,18 +35,29 @@ import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlagContainer;
 import se.hyperver.hyperverse.teleportation.SimpleTeleportationManager;
 import se.hyperver.hyperverse.teleportation.TeleportationManager;
+import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.util.NMS;
-import se.hyperver.hyperverse.world.*;
+import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.world.HyperWorldCreator;
+import se.hyperver.hyperverse.world.SimpleWorld;
+import se.hyperver.hyperverse.world.SimpleWorldManager;
+import se.hyperver.hyperverse.world.WorldManager;
 
 public class HyperverseModule extends AbstractModule {
+
+    private static final @NonNull String CRAFTSERVER_CLASS_NAME = Bukkit.getServer().getClass().getName();
+    private static final @NonNull String PACKAGE_VERSION =
+        CRAFTSERVER_CLASS_NAME.substring("org.bukkit.craftbukkit.".length(),
+            CRAFTSERVER_CLASS_NAME.indexOf('.', "org.bukkit.craftbukkit.".length()));
 
     @Override protected void configure() {
         // Resolve the NMS implementation
         try {
-            bind(NMS.class).to((Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.NMSImpl"))
+            bind(NMS.class)
+                .to((Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.nms." + PACKAGE_VERSION + ".NMSImpl"))
                 .in(Singleton.class);
-        } catch (final Exception e) {
-            e.printStackTrace();
+        } catch (final ClassNotFoundException ex) {
+            throw new RuntimeException("Server version unsupported", ex);
         }
         bind(Hyperverse.class).toInstance(Hyperverse.getPlugin(Hyperverse.class));
         bind(HyperDatabase.class).to(SQLiteDatabase.class).in(Singleton.class);
