@@ -19,6 +19,7 @@ package se.hyperver.hyperverse.nms.v1_14_R1;
 
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.papermc.lib.PaperLib;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,6 +59,7 @@ import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.util.NMS;
 
 @SuppressWarnings("unused")
+@Singleton
 public class NMSImpl implements NMS {
 
     private final TaskFactory taskFactory;

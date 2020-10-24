@@ -15,13 +15,21 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse;
+package se.hyperver.hyperverse.nms.v1_15_R1;
 
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
-import org.bukkit.Bukkit;
-import se.hyperver.hyperverse.configuration.HyperConfiguration;
+import com.google.inject.Singleton;
 import io.papermc.lib.PaperLib;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.DimensionManager;
 import net.minecraft.server.v1_15_R1.EntityHuman;
@@ -38,6 +46,7 @@ import net.minecraft.server.v1_15_R1.WorldServer;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.RegexFilter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
@@ -46,28 +55,20 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.util.NMS;
 
 @SuppressWarnings("unused")
+@Singleton
 public class NMSImpl implements NMS {
 
     private final TaskFactory taskFactory;
     private Field entitiesByUUID;
-    private org.apache.logging.log4j.core.Logger worldServerLogger;
+    private Logger worldServerLogger;
 
-    @Inject public NMSImpl(final TaskFactory taskFactory, final HyperConfiguration hyperConfiguration) {
+    @Inject public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean shouldGroupProfiles) {
         this.taskFactory = taskFactory;
-        if (hyperConfiguration.shouldGroupProfiles()) {
+        if (shouldGroupProfiles) {
             try {
                 final Field field = WorldServer.class.getDeclaredField("LOGGER");
                 field.setAccessible(true);
@@ -140,7 +141,7 @@ public class NMSImpl implements NMS {
         }
         final NBTTagCompound hyperverse = playerTag.getCompound("hyperverse");
         hyperverse.setLong("writeTime", System.currentTimeMillis());
-        hyperverse.setString("version", Hyperverse.getPlugin(Hyperverse.class).getDescription().getVersion());
+        hyperverse.setString("version", Bukkit.getPluginManager().getPlugin("Hyperverse").getDescription().getVersion());
 
         taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final OutputStream outputStream = Files.newOutputStream(file)) {
