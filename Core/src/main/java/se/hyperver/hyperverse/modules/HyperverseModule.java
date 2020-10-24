@@ -54,7 +54,7 @@ public class HyperverseModule extends AbstractModule {
         // Resolve the NMS implementation
         try {
             bind(NMS.class)
-                .to((Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.nms." + PACKAGE_VERSION + ".NMSImpl"))
+                .to((Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.spigotnms." + PACKAGE_VERSION + ".NMSImpl"))
                 .in(Singleton.class);
         } catch (final ClassNotFoundException ex) {
             throw new RuntimeException("Server version unsupported", ex);

@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.nms.v1_15_R1;
+package se.hyperver.hyperverse.spigotnms.v1_15_R1;
 
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
