@@ -157,6 +157,12 @@
             <id>ender.zone</id>
             <url>https://ci.ender.zone/plugin/repository/everything/</url>
         </repository>
+
+        <repository>
+            <!-- This repository is last because it only supplies Spigot jars versions. -->
+            <id>proxi-nexus</id>
+            <url>https://nexus.proximyst.com/repository/maven-public/</url>
+        </repository>
     </repositories>
 
 </project>
