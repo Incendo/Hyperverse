@@ -40,12 +40,11 @@
 
     <modules>
         <module>Core</module>
-        <module>Bukkit-1.16.3</module>
         <module>AnnotationProcessor</module>
-
         <module>NmsCommon</module>
         <module>Nms-1_14_4</module>
         <module>Nms-1_15_2</module>
+        <module>Nms-1_16_3</module>
     </modules>
 
     <build>

@@ -15,12 +15,31 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse;
+package se.hyperver.hyperverse.nms.v1_16_R2;
 
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
 import io.papermc.lib.PaperLib;
-import net.minecraft.server.v1_16_R2.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import net.minecraft.server.v1_16_R2.BlockPosition;
+import net.minecraft.server.v1_16_R2.BlockUtil;
+import net.minecraft.server.v1_16_R2.DimensionManager;
+import net.minecraft.server.v1_16_R2.EntityHuman;
+import net.minecraft.server.v1_16_R2.EntityPlayer;
+import net.minecraft.server.v1_16_R2.NBTCompressedStreamTools;
+import net.minecraft.server.v1_16_R2.NBTTagCompound;
+import net.minecraft.server.v1_16_R2.NBTTagDouble;
+import net.minecraft.server.v1_16_R2.NBTTagList;
+import net.minecraft.server.v1_16_R2.PortalTravelAgent;
+import net.minecraft.server.v1_16_R2.WorldServer;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.RegexFilter;
@@ -34,17 +53,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import se.hyperver.hyperverse.configuration.HyperConfiguration;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.util.NMS;
 
 @SuppressWarnings("unused")
@@ -54,9 +63,9 @@ public class NMSImpl implements NMS {
     private Field entitiesByUUID;
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
-    @Inject public NMSImpl(final TaskFactory taskFactory, final HyperConfiguration hyperConfiguration) {
+    @Inject public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
         this.taskFactory = taskFactory;
-        if (hyperConfiguration.shouldGroupProfiles()) {
+        if (hyperConfiguration) {
             try {
                 final Field field = WorldServer.class.getDeclaredField("LOGGER");
                 field.setAccessible(true);
@@ -112,7 +121,7 @@ public class NMSImpl implements NMS {
         }
         final NBTTagCompound hyperverse = playerTag.getCompound("hyperverse");
         hyperverse.setLong("writeTime", System.currentTimeMillis());
-        hyperverse.setString("version", Hyperverse.getPlugin(Hyperverse.class).getDescription().getVersion());
+        hyperverse.setString("version", Bukkit.getPluginManager().getPlugin("Hyperverse").getDescription().getVersion());
 
         taskFactory.recipe().begin(file).asynchronous(passedFile -> {
             try (final OutputStream outputStream = Files.newOutputStream(passedFile)) {
