@@ -289,43 +289,73 @@
                     <relocations>
                         <relocation>
                             <pattern>io.papermc.lib</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.paperlib</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.paperlib</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.bstats</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.bstats</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.aikar.commands</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.aikar.commands</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>co.aikar.locales</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.aikar.locales</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.aikar.locales</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>co.aikar.util</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.aikar.util</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.aikar.util</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>net.jodah.expiringmap</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.expiringmap</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.expiringmap</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>me.minidigger.minimessage</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.messages</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.minimessage</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>net.kyori</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.kyori</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.kyori</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>cloud.commandframework</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.cloud</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.cloud</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>ninja.leaping.configurate</pattern>
-                            <shadedPattern>se.hyperver.hyperverse.configurate</shadedPattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.configurate</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.leangen.geantyref</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.geantyref</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.checkerframework</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.checkerframework</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.typesafe.config</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.hocon</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google.inject</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.guice</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <!-- Be specific with javax, not everything we may use must be relocated. -->
+                            <pattern>javax.inject</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.javax.inject</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.aopalliance</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.aop</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <!-- Be specific with javax, not everything we may use must be relocated. -->
+                            <pattern>javax.annotation</pattern>
+                            <shadedPattern>se.hyperver.hyperverse.libs.javax.annotation</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
