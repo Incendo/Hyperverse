@@ -41,7 +41,6 @@
     <modules>
         <module>Core</module>
         <module>Bukkit-1.16.3</module>
-        <module>Bukkit-1.16</module>
         <module>AnnotationProcessor</module>
 
         <module>NmsCommon</module>
