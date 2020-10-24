@@ -35,9 +35,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
-import se.hyperver.hyperverse.util.NMS;
 
-import javax.swing.text.html.Option;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -47,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import se.hyperver.hyperverse.util.NMS;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {

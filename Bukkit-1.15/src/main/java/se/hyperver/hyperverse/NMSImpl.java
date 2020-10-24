@@ -21,7 +21,6 @@ import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
 import org.bukkit.Bukkit;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
-import se.hyperver.hyperverse.util.NMS;
 import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.DimensionManager;
@@ -57,6 +56,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import se.hyperver.hyperverse.util.NMS;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {

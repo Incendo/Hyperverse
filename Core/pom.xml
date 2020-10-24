@@ -214,6 +214,20 @@
             <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- NMS implementations -->
+        <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>NmsCommon</artifactId>
+            <version>${parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>Nms-1_14_4</artifactId>
+            <version>${parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
