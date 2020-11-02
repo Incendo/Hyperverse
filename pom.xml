@@ -45,6 +45,7 @@
         <module>Nms-1_14_4</module>
         <module>Nms-1_15_2</module>
         <module>Nms-1_16_3</module>
+        <module>Nms-1_16_4</module>
     </modules>
 
     <build>
