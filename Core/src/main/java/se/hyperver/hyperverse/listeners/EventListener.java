@@ -334,9 +334,9 @@ public class EventListener implements Listener {
             return;
         }
 
-        final Long lastTeleportion =
+        final Long lastTeleportation =
             this.teleportationTimeout.getIfPresent(event.getPlayer().getUniqueId());
-        if (lastTeleportion != null && (System.currentTimeMillis() - lastTeleportion) < 5000L) {
+        if (lastTeleportation != null && (System.currentTimeMillis() - lastTeleportation) < 5000L) {
             event.setCancelled(true);
             return;
         }
@@ -398,9 +398,9 @@ public class EventListener implements Listener {
             return;
         }
 
-        final Long lastTeleportion =
+        final Long lastTeleportation =
             this.teleportationTimeout.getIfPresent(event.getEntity().getUniqueId());
-        if (lastTeleportion != null && (System.currentTimeMillis() - lastTeleportion) < 5000L) {
+        if (lastTeleportation != null && (System.currentTimeMillis() - lastTeleportation) < 5000L) {
             return;
         }
 
@@ -416,8 +416,22 @@ public class EventListener implements Listener {
                 if (location != null) {
                     this.teleportationTimeout
                         .put(event.getEntity().getUniqueId(), System.currentTimeMillis());
-                    PaperLib.teleportAsync(event.getEntity(), location,
-                        PlayerTeleportEvent.TeleportCause.COMMAND);
+
+                    // Prevents the default EntityPortalEvent call
+                    event.getEntity().setPortalCooldown(100);
+
+                    // Calls our own EntityPortalEvent
+                    EntityPortalEvent portalEvent = new EntityPortalEvent(event.getEntity(),
+                        event.getLocation(), location);
+                    Bukkit.getServer().getPluginManager().callEvent(portalEvent);
+                    if (portalEvent.isCancelled() || portalEvent.getTo() == null
+                        || portalEvent.getTo().getWorld() == null || portalEvent.getEntity()
+                        .isDead()) {
+                        return;
+                    }
+
+                    PaperLib.teleportAsync(event.getEntity(), portalEvent.getTo(),
+                        PlayerTeleportEvent.TeleportCause.NETHER_PORTAL);
                 } else {
                     hyperverse.getLogger().warning(String
                         .format("Failed to find/create a portal surrounding %s",
@@ -438,29 +452,25 @@ public class EventListener implements Listener {
             final Location destination =
                 hyperWorld.getTeleportationManager().endDestination(event.getEntity());
             if (destination != null) {
-                PaperLib.teleportAsync(event.getEntity(), destination,
-                    PlayerTeleportEvent.TeleportCause.COMMAND);
+                this.teleportationTimeout
+                    .put(event.getEntity().getUniqueId(), System.currentTimeMillis());
+
+                // Prevents the default EntityPortalEvent call
+                event.getEntity().setPortalCooldown(100);
+
+                // Calls our own EntityPortalEvent
+                EntityPortalEvent portalEvent = new EntityPortalEvent(event.getEntity(),
+                    event.getLocation(), destination);
+                Bukkit.getServer().getPluginManager().callEvent(portalEvent);
+                if (portalEvent.isCancelled() || portalEvent.getTo() == null
+                    || portalEvent.getTo().getWorld() == null || portalEvent.getEntity()
+                    .isDead()) {
+                    return;
+                }
+
+                PaperLib.teleportAsync(event.getEntity(), portalEvent.getTo(),
+                    PlayerTeleportEvent.TeleportCause.END_PORTAL);
             }
-        }
-    }
-
-    @EventHandler public void onEntityPortalEvent(final EntityPortalEvent event) {
-        if (event.getEntityType() == EntityType.PLAYER) {
-            return;
-        }
-
-        final HyperWorld hyperWorld =
-            this.worldManager.getWorld(Objects.requireNonNull(event.getFrom().getWorld()));
-        if (hyperWorld == null) {
-            return;
-        }
-
-        if (event.getFrom().getBlock().getType() == Material.NETHER_PORTAL && !hyperWorld
-            .getFlag(NetherFlag.class).isEmpty()) {
-            event.setCancelled(true);
-        } else if (event.getFrom().getBlock().getType() == Material.END_PORTAL && !hyperWorld
-            .getFlag(EndFlag.class).isEmpty()) {
-            event.setCancelled(true);
         }
     }
 
