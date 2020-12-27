@@ -17,19 +17,20 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
-import org.jetbrains.annotations.NotNull;
 
 public class ForceSpawn extends BooleanFlag<ForceSpawn> {
 
-    public static final ForceSpawn FORCE_SPAWN_TRUE  = new ForceSpawn(true);
+    public static final ForceSpawn FORCE_SPAWN_TRUE = new ForceSpawn(true);
     public static final ForceSpawn FORCE_SPAWN_FALSE = new ForceSpawn(false);
 
     private ForceSpawn(final boolean value) {
         super(value, Messages.flagDescriptionForceSpawn);
     }
 
-    @Override protected ForceSpawn flagOf(@NotNull final Boolean value) {
+    @Override
+    protected ForceSpawn flagOf(final @NonNull Boolean value) {
         return value ? FORCE_SPAWN_TRUE : FORCE_SPAWN_FALSE;
     }
 

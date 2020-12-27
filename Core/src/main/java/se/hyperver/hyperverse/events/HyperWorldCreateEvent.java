@@ -19,32 +19,33 @@ package se.hyperver.hyperverse.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 
 /**
  * Called when a new {@link se.hyperver.hyperverse.world.HyperWorld} has been created
  * {@inheritDoc}
  */
-public class HyperWorldCreateEvent extends HyperWorldEvent {
+public final class HyperWorldCreateEvent extends HyperWorldEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private HyperWorldCreateEvent(@NotNull final HyperWorld world) {
+    private HyperWorldCreateEvent(final @NonNull HyperWorld world) {
         super(world);
     }
 
-    @SuppressWarnings("unused") public static HandlerList getHandlerList() {
+    @SuppressWarnings("unused")
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 
-    public static HyperWorldCreateEvent callFor(@NotNull final HyperWorld world) {
+    public static void callFor(final @NonNull HyperWorld world) {
         final HyperWorldCreateEvent hyperWorldCreateEvent = new HyperWorldCreateEvent(world);
         Bukkit.getServer().getPluginManager().callEvent(hyperWorldCreateEvent);
-        return hyperWorldCreateEvent;
     }
 
-    @Override @NotNull public HandlerList getHandlers() {
+    @Override
+    public @NonNull HandlerList getHandlers() {
         return handlers;
     }
 

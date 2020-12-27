@@ -17,8 +17,26 @@
 
 package se.hyperver.hyperverse.flags;
 
-import se.hyperver.hyperverse.flags.implementation.*;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import se.hyperver.hyperverse.flags.implementation.AdvancementFlag;
+import se.hyperver.hyperverse.flags.implementation.AliasFlag;
+import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
+import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
+import se.hyperver.hyperverse.flags.implementation.EndFlag;
+import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
+import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
+import se.hyperver.hyperverse.flags.implementation.IgnoreBedsFlag;
+import se.hyperver.hyperverse.flags.implementation.LocalRespawnFlag;
+import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
+import se.hyperver.hyperverse.flags.implementation.NetherFlag;
+import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
+import se.hyperver.hyperverse.flags.implementation.PveFlag;
+import se.hyperver.hyperverse.flags.implementation.PvpFlag;
+import se.hyperver.hyperverse.flags.implementation.RespawnWorldFlag;
+import se.hyperver.hyperverse.flags.implementation.SaveWorldFlag;
+import se.hyperver.hyperverse.flags.implementation.UnloadSpawnFlag;
+import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -56,32 +74,33 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         this.addFlag(SaveWorldFlag.SAVE_WORLD_TRUE);
     }
 
-    @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {
+    @Override
+    public @NonNull WorldFlag<?, ?> getFlagErased(final @NonNull Class<?> flagClass) {
         final WorldFlag<?, ?> flag = super.getFlagErased(flagClass);
         if (flag != null) {
             return flag;
         } else {
             throw new IllegalStateException(String.format("Unrecognized flag '%s'. All flag types"
-                + " must be present in the global flag container.", flagClass.getSimpleName()));
+                    + " must be present in the global flag container.", flagClass.getSimpleName()));
         }
     }
 
-    @NotNull @Override
-    public <V, T extends WorldFlag<V, ?>> T getFlag(Class<? extends T> flagClass) {
+    @Override
+    public <V, T extends WorldFlag<V, ?>> @NonNull T getFlag(final @NonNull Class<? extends T> flagClass) {
         final WorldFlag<?, ?> flag = super.getFlag(flagClass);
         if (flag != null) {
             return castUnsafe(flag);
         } else {
             throw new IllegalStateException(String.format("Unrecognized flag '%s'. All flag types"
-                + " must be present in the global flag container.", flagClass.getSimpleName()));
+                    + " must be present in the global flag container.", flagClass.getSimpleName()));
         }
     }
 
-    public Class<?> getFlagClassFromString(final String name) {
+    public @Nullable Class<?> getFlagClassFromString(final @NonNull String name) {
         return stringClassMap.get(name.toLowerCase(Locale.ENGLISH));
     }
 
-    public WorldFlag<?, ?> getFlagFromString(final String name) {
+    public @Nullable WorldFlag<?, ?> getFlagFromString(final @NonNull String name) {
         final Class<?> flagClass = this.getFlagClassFromString(name);
         if (flagClass == null) {
             return null;

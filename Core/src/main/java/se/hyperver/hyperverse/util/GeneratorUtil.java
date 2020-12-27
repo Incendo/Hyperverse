@@ -21,8 +21,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -48,15 +48,15 @@ public final class GeneratorUtil {
      * @param world world name
      * @return Generator, if found
      */
-    @Nullable public static ChunkGenerator getGenerator(@NotNull final String world)
-        throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static @Nullable ChunkGenerator getGenerator(final @NonNull String world)
+            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (generatorGetter == null) {
             final Class<? extends Server> serverClass = Bukkit.getServer().getClass();
             generatorGetter = serverClass.getDeclaredMethod("getGenerator", String.class);
             generatorGetter.setAccessible(true);
         }
         return (ChunkGenerator) generatorGetter
-            .invoke(Bukkit.getServer(), Objects.requireNonNull(world));
+                .invoke(Bukkit.getServer(), Objects.requireNonNull(world));
     }
 
     /**
@@ -65,8 +65,8 @@ public final class GeneratorUtil {
      * @param generator Generator instance
      * @return Plugin, if found
      */
-    @Nullable public static JavaPlugin matchGenerator(@NotNull final ChunkGenerator generator)
-        throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+    public static @Nullable JavaPlugin matchGenerator(final @NonNull ChunkGenerator generator)
+            throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         Objects.requireNonNull(generator);
         final ClassLoader classLoader = generator.getClass().getClassLoader();
         if (pluginClassLoaderClass == null) {
@@ -86,10 +86,10 @@ public final class GeneratorUtil {
      * @param generatorName Generator name
      * @return True if the generator is available, false if not
      */
-    public static boolean isGeneratorAvailable(@Nullable final String generatorName) {
+    public static boolean isGeneratorAvailable(final @Nullable String generatorName) {
         if (generatorName == null ||
-            generatorName.isEmpty() ||
-            generatorName.equalsIgnoreCase("vanilla")) {
+                generatorName.isEmpty() ||
+                generatorName.equalsIgnoreCase("vanilla")) {
             return true;
         }
         final String pluginName;

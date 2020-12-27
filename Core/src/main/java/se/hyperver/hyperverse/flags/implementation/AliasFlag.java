@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.WorldFlag;
 
@@ -25,27 +25,32 @@ public class AliasFlag extends WorldFlag<String, AliasFlag> {
 
     public static final AliasFlag ALIAS_NONE = new AliasFlag("");
 
-    private AliasFlag(@NotNull final String alias) {
+    private AliasFlag(final @NonNull String alias) {
         super(alias, Messages.flagDescriptionAlias);
     }
 
-    @Override public AliasFlag parse(@NotNull final String input) {
+    @Override
+    public AliasFlag parse(final @NonNull String input) {
         return flagOf(input.replaceAll("&[A-Za-z0-9]", ""));
     }
 
-    @Override public AliasFlag merge(@NotNull final String newValue) {
+    @Override
+    public AliasFlag merge(final @NonNull String newValue) {
         return flagOf(newValue);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return this.getValue();
     }
 
-    @Override public String getExample() {
+    @Override
+    public String getExample() {
         return "&cFancy World Name";
     }
 
-    @Override protected AliasFlag flagOf(@NotNull final String value) {
+    @Override
+    protected AliasFlag flagOf(final @NonNull String value) {
         return new AliasFlag(value);
     }
 

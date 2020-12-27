@@ -17,8 +17,8 @@
 
 package se.hyperver.hyperverse.exception;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -29,12 +29,20 @@ public class HyperException extends Exception {
 
     private final HyperWorld world;
 
-    public HyperException(@NotNull final HyperWorld world, @NotNull final String message) {
+    public HyperException(
+            final @NonNull HyperWorld world,
+            final @NonNull String message
+    ) {
         super(Objects.requireNonNull(message));
         this.world = Objects.requireNonNull(world);
     }
 
-    @NotNull public HyperWorld getWorld() {
+    /**
+     * Get the world involved in the exception
+     *
+     * @return World
+     */
+    public final @NonNull HyperWorld getWorld() {
         return this.world;
     }
 

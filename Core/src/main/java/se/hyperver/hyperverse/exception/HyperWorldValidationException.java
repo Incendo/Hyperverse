@@ -17,27 +17,29 @@
 
 package se.hyperver.hyperverse.exception;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Exception thrown when the validation of a {@link HyperWorld} fails
  */
-public class HyperWorldValidationException extends HyperException {
+public final class HyperWorldValidationException extends HyperException {
 
     private final HyperWorldCreator.ValidationResult validationResult;
 
     public HyperWorldValidationException(
-        @NotNull final HyperWorldCreator.ValidationResult validationResult,
-        @NotNull final HyperWorld world) {
+            final HyperWorldCreator.@NonNull ValidationResult validationResult,
+            final @NonNull HyperWorld world
+    ) {
         super(world, String
-            .format("Failed to validate world configuration for world %s. Result: %s",
-                world.getConfiguration().getName(), validationResult.name()));
+                .format("Failed to validate world configuration for world %s. Result: %s",
+                        world.getConfiguration().getName(), validationResult.name()
+                ));
         this.validationResult = validationResult;
     }
 
-    @NotNull public HyperWorldCreator.ValidationResult getValidationResult() {
+    public HyperWorldCreator.@NonNull ValidationResult getValidationResult() {
         return this.validationResult;
     }
 

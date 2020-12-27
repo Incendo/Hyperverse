@@ -17,19 +17,20 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 
 public final class CreatureSpawnFlag extends BooleanFlag<CreatureSpawnFlag> {
 
-    public static final CreatureSpawnFlag CREATURE_SPAWN_ALLOWED   = new CreatureSpawnFlag(true);
+    public static final CreatureSpawnFlag CREATURE_SPAWN_ALLOWED = new CreatureSpawnFlag(true);
     public static final CreatureSpawnFlag CREATURE_SPAWN_FORBIDDEN = new CreatureSpawnFlag(false);
 
     private CreatureSpawnFlag(final boolean value) {
         super(value, Messages.flagDescriptionCreatureSpawn);
     }
 
-    @Override protected CreatureSpawnFlag flagOf(@NotNull final Boolean value) {
+    @Override
+    protected CreatureSpawnFlag flagOf(final @NonNull Boolean value) {
         return value ? CREATURE_SPAWN_ALLOWED : CREATURE_SPAWN_FORBIDDEN;
     }
 

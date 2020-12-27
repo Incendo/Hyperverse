@@ -28,7 +28,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.Hyperverse;
 
 import java.io.File;
@@ -38,12 +38,13 @@ import java.io.IOException;
  * {@inheritDoc}
  */
 @Singleton
-public class FileHyperConfiguration implements HyperConfiguration {
+public final class FileHyperConfiguration implements HyperConfiguration {
 
-    private FileConfigurationObject fileConfigurationObject;
     private final Hyperverse hyperverse;
+    private FileConfigurationObject fileConfigurationObject;
 
-    @Inject public FileHyperConfiguration(@NotNull final Hyperverse hyperverse) {
+    @Inject
+    public FileHyperConfiguration(final @NonNull Hyperverse hyperverse) {
         this.hyperverse = hyperverse;
         this.loadConfiguration();
     }
@@ -51,10 +52,15 @@ public class FileHyperConfiguration implements HyperConfiguration {
     public void loadConfiguration() {
         final File configFile = new File(hyperverse.getDataFolder(), "hyperverse.conf");
         final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
-            .builder()
-            .setParseOptions(ConfigParseOptions.defaults().setClassLoader(hyperverse.getClass().getClassLoader()))
-            .setRenderOptions(ConfigRenderOptions.defaults().setComments(true).setFormatted(true).setOriginComments(false).setJson(false))
-            .setDefaultOptions(ConfigurationOptions.defaults()).setFile(configFile).build();
+                .builder()
+                .setParseOptions(ConfigParseOptions.defaults().setClassLoader(hyperverse.getClass().getClassLoader()))
+                .setRenderOptions(ConfigRenderOptions
+                        .defaults()
+                        .setComments(true)
+                        .setFormatted(true)
+                        .setOriginComments(false)
+                        .setJson(false))
+                .setDefaultOptions(ConfigurationOptions.defaults()).setFile(configFile).build();
         FileConfigurationObject configObject = null;
         ConfigurationNode configurationNode;
         try {
@@ -68,15 +74,17 @@ public class FileHyperConfiguration implements HyperConfiguration {
             try {
                 final CommentedConfigurationNode defaultNode = loader.createEmptyNode();
                 defaultNode.setComment("");
-                loader.save(defaultNode.setValue(TypeToken.of(FileConfigurationObject.class),
-                    configObject));
+                loader.save(defaultNode.setValue(
+                        TypeToken.of(FileConfigurationObject.class),
+                        configObject
+                ));
             } catch (final IOException | ObjectMappingException e) {
                 e.printStackTrace();
             }
         } else {
             try {
                 configObject = configurationNode
-                    .getValue(TypeToken.of(FileConfigurationObject.class), new FileConfigurationObject());
+                        .getValue(TypeToken.of(FileConfigurationObject.class), new FileConfigurationObject());
             } catch (final ObjectMappingException e) {
                 e.printStackTrace();
             }
@@ -84,31 +92,38 @@ public class FileHyperConfiguration implements HyperConfiguration {
         this.fileConfigurationObject = configObject;
     }
 
-    @Override public boolean shouldImportAutomatically() {
+    @Override
+    public boolean shouldImportAutomatically() {
         return this.fileConfigurationObject.isImportAutomatically();
     }
 
-    @Override public boolean shouldPersistLocations() {
+    @Override
+    public boolean shouldPersistLocations() {
         return this.fileConfigurationObject.isPersistLocations();
     }
 
-    @Override public boolean shouldKeepSpawnLoaded() {
+    @Override
+    public boolean shouldKeepSpawnLoaded() {
         return this.fileConfigurationObject.isKeepSpawnLoaded();
     }
 
-    @Override public boolean shouldGroupProfiles() {
+    @Override
+    public boolean shouldGroupProfiles() {
         return this.fileConfigurationObject.useGroupedProfiles();
     }
 
-    @Override @NotNull public String getLanguageCode() {
+    @Override
+    public @NonNull String getLanguageCode() {
         return this.fileConfigurationObject.getLanguageCode();
     }
 
-    @Override public boolean shouldSafeTeleport() {
+    @Override
+    public boolean shouldSafeTeleport() {
         return this.fileConfigurationObject.shouldSafeTeleport();
     }
 
-    @Override public boolean shouldHookEssentials() {
+    @Override
+    public boolean shouldHookEssentials() {
         return this.fileConfigurationObject.shouldHookEssentials();
     }
 

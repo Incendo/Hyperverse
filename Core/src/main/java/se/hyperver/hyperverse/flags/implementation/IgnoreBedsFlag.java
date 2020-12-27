@@ -17,19 +17,20 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 
 public class IgnoreBedsFlag extends BooleanFlag<IgnoreBedsFlag> {
 
-    public static final IgnoreBedsFlag IGNORE_BEDS_TRUE  = new IgnoreBedsFlag(true);
+    public static final IgnoreBedsFlag IGNORE_BEDS_TRUE = new IgnoreBedsFlag(true);
     public static final IgnoreBedsFlag IGNORE_BEDS_FALSE = new IgnoreBedsFlag(false);
 
     private IgnoreBedsFlag(final boolean value) {
         super(value, Messages.flagDescriptionIgnoreBeds);
     }
 
-    @Override protected IgnoreBedsFlag flagOf(@NotNull final Boolean value) {
+    @Override
+    protected IgnoreBedsFlag flagOf(final @NonNull Boolean value) {
         return value ? IGNORE_BEDS_TRUE : IGNORE_BEDS_FALSE;
     }
 

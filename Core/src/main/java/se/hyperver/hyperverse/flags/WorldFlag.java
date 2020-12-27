@@ -19,8 +19,8 @@ package se.hyperver.hyperverse.flags;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Message;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +31,7 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
     private final Message flagDescription;
     private final String flagName;
 
-    protected WorldFlag(@NotNull final T value, @NotNull final Message flagDescription) {
+    protected WorldFlag(final @NonNull T value, final @NonNull Message flagDescription) {
         this.value = value;
         this.flagDescription = flagDescription;
         final StringBuilder flagName = new StringBuilder();
@@ -53,7 +53,8 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
      *
      * @return Non-nullable flag value
      */
-    @NotNull public final T getValue() {
+    @NonNull
+    public final T getValue() {
         return this.value;
     }
 
@@ -66,7 +67,7 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
      * @return Parsed value, if valid.
      * @throws FlagParseException If the value could not be parsed.
      */
-    public abstract F parse(@NotNull final String input) throws FlagParseException;
+    public abstract F parse(final @NonNull String input) throws FlagParseException;
 
     /**
      * Merge this flag's value with another value and return an instance
@@ -75,7 +76,7 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
      * @param newValue New flag value.
      * @return Flag containing parsed flag value.
      */
-    public abstract F merge(@NotNull final T newValue);
+    public abstract F merge(final @NonNull T newValue);
 
     /**
      * Returns a string representation of the flag instance, that when
@@ -112,7 +113,7 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
      */
     public abstract String getExample();
 
-    protected abstract F flagOf(@NotNull T value);
+    protected abstract F flagOf(@NonNull T value);
 
     /**
      * Create a new instance of the flag using a provided
@@ -121,7 +122,7 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
      * @param value The flag value
      * @return The created flag instance
      */
-    public final F createFlagInstance(@NotNull final T value) {
+    public final F createFlagInstance(final @NonNull T value) {
         return flagOf(Preconditions.checkNotNull(value));
     }
 
@@ -135,7 +136,8 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
         return Collections.emptyList();
     }
 
-    @Override public boolean equals(final Object o) {
+    @Override
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -146,7 +148,8 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
         return Objects.equal(this.value, worldFlag.value);
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hashCode(this.value);
     }
 

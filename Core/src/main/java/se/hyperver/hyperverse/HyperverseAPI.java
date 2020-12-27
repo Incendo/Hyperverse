@@ -19,7 +19,7 @@ package se.hyperver.hyperverse;
 
 import cloud.commandframework.services.ServicePipeline;
 import com.google.inject.Injector;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.exception.HyperWorldCreationException;
@@ -41,7 +41,7 @@ public interface HyperverseAPI {
      *
      * @return World manager instance
      */
-    @NotNull WorldManager getWorldManager();
+    @NonNull WorldManager getWorldManager();
 
     /**
      * Get the {@link Injector} instance
@@ -51,7 +51,7 @@ public interface HyperverseAPI {
      *
      * @return Injector instance.
      */
-    @NotNull Injector getInjector();
+    @NonNull Injector getInjector();
 
     /**
      * Get the {@link HyperDatabase} implementation
@@ -59,7 +59,7 @@ public interface HyperverseAPI {
      *
      * @return Database instance
      */
-    @NotNull HyperDatabase getDatabase();
+    @NonNull HyperDatabase getDatabase();
 
     /**
      * Get the {@link HyperConfiguration} implementation
@@ -67,7 +67,7 @@ public interface HyperverseAPI {
      *
      * @return Configuration instance
      */
-    @NotNull HyperConfiguration getConfiguration();
+    @NonNull HyperConfiguration getConfiguration();
 
     /**
      * Get a factory class that creates
@@ -75,7 +75,7 @@ public interface HyperverseAPI {
      *
      * @return World factory
      */
-    @NotNull HyperWorldFactory getWorldFactory();
+    @NonNull HyperWorldFactory getWorldFactory();
 
     /**
      * Attempt to create a new world from a given configuration.
@@ -89,8 +89,8 @@ public interface HyperverseAPI {
      * @throws HyperWorldCreationException If the world cannot
      *                                     be created from the given configuration
      */
-    @NotNull HyperWorld createWorld(@NotNull final WorldConfiguration configuration)
-        throws HyperWorldCreationException;
+    @NonNull HyperWorld createWorld(final @NonNull WorldConfiguration configuration)
+            throws HyperWorldCreationException;
 
     /**
      * Gets the plugin feature manager. This can be used to register third party plugin
@@ -98,13 +98,13 @@ public interface HyperverseAPI {
      *
      * @return The plugin feature manager
      */
-    @NotNull PluginFeatureManager getPluginFeatureManager();
+    @NonNull PluginFeatureManager getPluginFeatureManager();
 
     /**
      * Get the service pipeline implementation used by Hyperverse.
      *
      * @return Service pipeline
      */
-    @NotNull ServicePipeline getServicePipeline();
+    @NonNull ServicePipeline getServicePipeline();
 
 }

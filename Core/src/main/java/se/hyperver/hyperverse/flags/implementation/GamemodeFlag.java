@@ -17,27 +17,28 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.bukkit.GameMode;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
-import org.bukkit.GameMode;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 public class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
 
-    public static final GamemodeFlag GAMEMODE_SURVIVAL  = new GamemodeFlag(GameMode.SURVIVAL);
-    public static final GamemodeFlag GAMEMODE_CREATIVE  = new GamemodeFlag(GameMode.CREATIVE);
+    public static final GamemodeFlag GAMEMODE_SURVIVAL = new GamemodeFlag(GameMode.SURVIVAL);
+    public static final GamemodeFlag GAMEMODE_CREATIVE = new GamemodeFlag(GameMode.CREATIVE);
     public static final GamemodeFlag GAMEMODE_ADVENTURE = new GamemodeFlag(GameMode.ADVENTURE);
     public static final GamemodeFlag GAMEMODE_SPECTATOR = new GamemodeFlag(GameMode.SPECTATOR);
 
-    private GamemodeFlag(@NotNull final GameMode value) {
+    private GamemodeFlag(final @NonNull GameMode value) {
         super(value, Messages.flagDescriptionGamemode);
     }
 
-    @Override public GamemodeFlag parse(@NotNull final String input) throws FlagParseException {
+    @Override
+    public GamemodeFlag parse(final @NonNull String input) throws FlagParseException {
         switch (input.toLowerCase()) {
             case "survival":
             case "0":
@@ -59,19 +60,23 @@ public class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
         }
     }
 
-    @Override public GamemodeFlag merge(@NotNull final GameMode newValue) {
+    @Override
+    public GamemodeFlag merge(final @NonNull GameMode newValue) {
         return flagOf(newValue);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return this.getValue().name();
     }
 
-    @Override public String getExample() {
+    @Override
+    public String getExample() {
         return "survival";
     }
 
-    @Override protected GamemodeFlag flagOf(@NotNull final GameMode value) {
+    @Override
+    protected GamemodeFlag flagOf(final @NonNull GameMode value) {
         switch (value) {
             case SURVIVAL:
                 return GAMEMODE_SURVIVAL;
@@ -86,7 +91,8 @@ public class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
         }
     }
 
-    @Override public Collection<String> getTabCompletions() {
+    @Override
+    public Collection<String> getTabCompletions() {
         return Arrays.asList("survival", "creative", "adventure", "spectator");
     }
 

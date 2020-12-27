@@ -17,10 +17,11 @@
 
 package se.hyperver.hyperverse.modules;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.flags.FlagContainer;
 
 public interface FlagContainerFactory {
 
-    FlagContainer create(final FlagContainer.WorldFlagUpdateHandler flagUpdateHandler);
+    FlagContainer create(final FlagContainer.@NonNull WorldFlagUpdateHandler flagUpdateHandler);
 
 }

@@ -17,19 +17,20 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
-import org.jetbrains.annotations.NotNull;
 
 public class PveFlag extends BooleanFlag<PveFlag> {
 
-    public static final PveFlag PVE_FLAG_TRUE  = new PveFlag(true);
+    public static final PveFlag PVE_FLAG_TRUE = new PveFlag(true);
     public static final PveFlag PVE_FLAG_FALSE = new PveFlag(false);
 
     private PveFlag(final boolean value) {
         super(value, Messages.flagDescriptionPve);
     }
 
-    @Override protected PveFlag flagOf(@NotNull final Boolean value) {
+    @Override
+    protected PveFlag flagOf(final @NonNull Boolean value) {
         return value ? PVE_FLAG_TRUE : PVE_FLAG_FALSE;
     }
 

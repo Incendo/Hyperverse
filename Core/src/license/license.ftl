@@ -13,12 +13,12 @@
     </#if>
 </#function>
 <#if dependencyMap?size == 0>
-The project has no dependencies.
+    The project has no dependencies.
 <#else>
-Lists of ${dependencyMap?size} third-party dependencies.
-<#list dependencyMap as e>
-<#assign project = e.getKey()/>
-<#assign licenses = e.getValue()/>
-${licenseFormat(licenses)} ${artifactFormat(project)}
-</#list>
+    Lists of ${dependencyMap?size} third-party dependencies.
+    <#list dependencyMap as e>
+        <#assign project = e.getKey()/>
+        <#assign licenses = e.getValue()/>
+        ${licenseFormat(licenses)} ${artifactFormat(project)}
+    </#list>
 </#if>

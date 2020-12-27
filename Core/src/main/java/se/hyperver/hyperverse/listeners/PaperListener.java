@@ -23,22 +23,23 @@ import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.flags.implementation.AdvancementFlag;
 import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldManager;
 
-public class PaperListener implements Listener {
+public final class PaperListener implements Listener {
 
     private final WorldManager worldManager;
 
-    PaperListener(final WorldManager worldManager) {
+    PaperListener(final @NonNull WorldManager worldManager) {
         this.worldManager = worldManager;
     }
 
     @EventHandler
-    public void onEntityPreSpawn(final PreCreatureSpawnEvent event) {
+    public void onEntityPreSpawn(final @NonNull PreCreatureSpawnEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getSpawnLocation().getWorld());
         if (hyperWorld == null) {
             return;
@@ -54,7 +55,7 @@ public class PaperListener implements Listener {
     }
 
     @EventHandler
-    public void onMobPreSpawn(final PlayerNaturallySpawnCreaturesEvent event) {
+    public void onMobPreSpawn(final @NonNull PlayerNaturallySpawnCreaturesEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {
             return;
@@ -66,7 +67,7 @@ public class PaperListener implements Listener {
     }
 
     @EventHandler
-    public void onAdvancementGrant(final PlayerAdvancementCriterionGrantEvent event) {
+    public void onAdvancementGrant(final @NonNull PlayerAdvancementCriterionGrantEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {
             return;

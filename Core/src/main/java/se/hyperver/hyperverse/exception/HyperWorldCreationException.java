@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.exception;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.WorldConfiguration;
@@ -27,32 +27,39 @@ import se.hyperver.hyperverse.world.WorldConfiguration;
  * if it for some reason cannot be created
  * {@inheritDoc}
  */
-public class HyperWorldCreationException extends Exception {
+public final class HyperWorldCreationException extends Exception {
 
     private final HyperWorldCreator.ValidationResult validationResult;
     private final WorldConfiguration configuration;
 
-    public HyperWorldCreationException(@NotNull final HyperWorldCreator.ValidationResult validationResult,
-        @NotNull final WorldConfiguration configuration) {
+    public HyperWorldCreationException(
+            final HyperWorldCreator.@NonNull ValidationResult validationResult,
+            final @NonNull WorldConfiguration configuration
+    ) {
         super(String.format("Failed to create world '%s' from configuration. Result: %s",
-                configuration.getName(), validationResult.name()));
+                configuration.getName(), validationResult.name()
+        ));
         this.validationResult = validationResult;
         this.configuration = configuration;
     }
 
-    public HyperWorldCreationException(@NotNull final Throwable cause,
-        @NotNull final WorldConfiguration configuration) {
-        super(String.format("Failed to create world '%s' from configuration for an unknown reason.",
-            configuration.getName()), cause);
+    public HyperWorldCreationException(
+            final @NonNull Throwable cause,
+            final @NonNull WorldConfiguration configuration
+    ) {
+        super(String.format(
+                "Failed to create world '%s' from configuration for an unknown reason.",
+                configuration.getName()
+        ), cause);
         this.validationResult = HyperWorldCreator.ValidationResult.UNKNOWN_ERROR;
         this.configuration = configuration;
     }
 
-    @NotNull public HyperWorldCreator.ValidationResult getValidationResult() {
+    public HyperWorldCreator.@NonNull ValidationResult getValidationResult() {
         return this.validationResult;
     }
 
-    @NotNull public WorldConfiguration getConfiguration() {
+    public @NonNull WorldConfiguration getConfiguration() {
         return this.configuration;
     }
 

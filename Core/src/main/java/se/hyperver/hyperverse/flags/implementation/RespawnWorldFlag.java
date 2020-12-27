@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
@@ -27,30 +27,35 @@ public class RespawnWorldFlag extends WorldFlag<String, RespawnWorldFlag> {
 
     public static final RespawnWorldFlag RESPAWN_WORLD_FLAG_EMPTY = new RespawnWorldFlag("");
 
-    private RespawnWorldFlag(@NotNull final String world) {
+    private RespawnWorldFlag(final @NonNull String world) {
         super(world, Messages.flagDescriptionRespawnWorld);
     }
 
-    @Override public RespawnWorldFlag parse(@NotNull String input) throws FlagParseException {
+    @Override
+    public RespawnWorldFlag parse(@NonNull String input) throws FlagParseException {
         if (WorldUtil.validateName(input)) {
             return flagOf(input);
         }
         throw new FlagParseException(this, input, "A world name may only contain (up to) 16 alphanumerical characters, - and _");
     }
 
-    @Override public RespawnWorldFlag merge(@NotNull final String newValue) {
+    @Override
+    public RespawnWorldFlag merge(final @NonNull String newValue) {
         return flagOf(newValue);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return this.getValue();
     }
 
-    @Override public String getExample() {
+    @Override
+    public String getExample() {
         return "world";
     }
 
-    @Override protected RespawnWorldFlag flagOf(@NotNull final String value) {
+    @Override
+    protected RespawnWorldFlag flagOf(final @NonNull String value) {
         return new RespawnWorldFlag(value);
     }
 

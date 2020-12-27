@@ -19,6 +19,7 @@ package se.hyperver.hyperverse.configuration;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Data holder class that is instantiated in
@@ -28,14 +29,14 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 public class FileConfigurationObject {
 
     @Setting(value = "import-automatically",
-        comment = "Whether or not worlds should be automatically imported into Hyperverse on load")
+            comment = "Whether or not worlds should be automatically imported into Hyperverse on load")
     private boolean importAutomatically = true;
     @Setting(value = "persist-locations",
-        comment = "Whether or not player locations should be saved to the database,"
-                + " and be used when a player teleports between worlds")
+            comment = "Whether or not player locations should be saved to the database,"
+                    + " and be used when a player teleports between worlds")
     private boolean persistLocations = true;
     @Setting(value = "keep-loaded", comment = "Whether or not world spawn chunks"
-        + " should be kept in memory")
+            + " should be kept in memory")
     private boolean keepSpawnLoaded = true;
     @Setting(value = "grouped-inventories", comment = "Whether or player profile groups are enabled")
     private boolean groupedProfiles = false;
@@ -48,35 +49,35 @@ public class FileConfigurationObject {
     @Setting(value = "debug", comment = "Whether or not Hyperverse should print verbose debugging messages")
     private boolean debug = false;
 
-    public boolean isImportAutomatically() {
+    boolean isImportAutomatically() {
         return this.importAutomatically;
     }
 
-    public boolean isPersistLocations() {
+    boolean isPersistLocations() {
         return this.persistLocations;
     }
 
-    public boolean isKeepSpawnLoaded() {
+    boolean isKeepSpawnLoaded() {
         return this.keepSpawnLoaded;
     }
 
-    public boolean useGroupedProfiles() {
+    boolean useGroupedProfiles() {
         return this.groupedProfiles;
     }
 
-    public String getLanguageCode() {
+    @NonNull String getLanguageCode() {
         return this.languageCode;
     }
 
-    public boolean shouldSafeTeleport() {
+    boolean shouldSafeTeleport() {
         return this.safeTeleport;
     }
 
-    public boolean shouldHookEssentials() {
+    boolean shouldHookEssentials() {
         return this.hookEssentials;
     }
 
-    public boolean shouldPrintDebug() {
+    boolean shouldPrintDebug() {
         return this.debug;
     }
 

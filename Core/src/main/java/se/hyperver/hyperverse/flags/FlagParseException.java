@@ -34,10 +34,13 @@ public class FlagParseException extends Exception {
      * @param errorMessage An error message explaining the failure
      * @param args         Arguments used to format the error message
      */
-    public FlagParseException(final WorldFlag<?, ?> flag, final String value,
-        final String errorMessage, final String... args) {
+    public FlagParseException(
+            final WorldFlag<?, ?> flag, final String value,
+            final String errorMessage, final String... args
+    ) {
         super(String.format("Failed to parse flag of type '%s'. Value '%s' was not accepted.",
-            flag.getName(), value));
+                flag.getName(), value
+        ));
         this.flag = flag;
         this.value = value;
         this.errorMessage = MessageUtil.format(errorMessage, args);

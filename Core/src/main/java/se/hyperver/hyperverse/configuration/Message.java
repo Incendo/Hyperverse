@@ -19,7 +19,7 @@ package se.hyperver.hyperverse.configuration;
 
 import co.aikar.locales.MessageKey;
 import co.aikar.locales.MessageKeyProvider;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 
@@ -35,10 +35,13 @@ public final class Message implements MessageKeyProvider {
     /**
      * Construct a new message
      *
-     * @param key The message key, used as a path in the configuration file
+     * @param key          The message key, used as a path in the configuration file
      * @param defaultValue The default message
      */
-    public Message(@NotNull final String key, @NotNull final String defaultValue) {
+    public Message(
+            final @NonNull String key,
+            final @NonNull String defaultValue
+    ) {
         this.key = Objects.requireNonNull(key);
         this.defaultValue = Objects.requireNonNull(defaultValue);
         this.messageKey = MessageKey.of(key);
@@ -49,7 +52,7 @@ public final class Message implements MessageKeyProvider {
      *
      * @return Configuration key
      */
-    @NotNull public String getKey() {
+    public @NonNull String getKey() {
         return this.key;
     }
 
@@ -58,19 +61,21 @@ public final class Message implements MessageKeyProvider {
      *
      * @return Default message
      */
-    @NotNull public String getDefaultValue() {
+    public @NonNull String getDefaultValue() {
         return this.defaultValue;
     }
 
-    @Override public String toString() {
+    @Override
+    public @NonNull String toString() {
         return Messages.getConfigured(this);
     }
 
-    public String withoutColorCodes() {
+    public @NonNull String withoutColorCodes() {
         return this.toString().replaceAll("&[A-Za-z0-9]", "");
     }
 
-    @Override public MessageKey getMessageKey() {
+    @Override
+    public @NonNull MessageKey getMessageKey() {
         return this.messageKey;
     }
 

@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.events;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 
 import java.util.Objects;
@@ -29,7 +29,7 @@ public abstract class HyperWorldEvent extends HyperverseEvent {
 
     private final HyperWorld world;
 
-    public HyperWorldEvent(@NotNull final HyperWorld world) {
+    public HyperWorldEvent(final @NonNull HyperWorld world) {
         this.world = Objects.requireNonNull(world, "world");
     }
 
@@ -38,7 +38,7 @@ public abstract class HyperWorldEvent extends HyperverseEvent {
      *
      * @return Event world
      */
-    @NotNull public final HyperWorld getWorld() {
+    public final @NonNull HyperWorld getWorld() {
         return this.world;
     }
 

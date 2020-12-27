@@ -2,7 +2,7 @@ name: Hyperverse
 version: ${project.version}
 main: se.hyperver.hyperverse.Hyperverse
 api-version: "1.14"
-authors: [Citymonstret, andrewandy]
+authors: [ Citymonstret, andrewandy ]
 description: A minecraft world management plugin
 softdepend:
   - Essentials

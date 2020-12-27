@@ -17,6 +17,7 @@
 
 package se.hyperver.hyperverse.world;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.util.SeedUtil;
 
 /**
@@ -33,50 +34,51 @@ public class WorldConfigurationBuilder {
     private String generator = "";
     private String generatorArg = "";
 
-    public WorldConfigurationBuilder setName(String name) {
+    public final @NonNull WorldConfigurationBuilder setName(final @NonNull String name) {
         this.name = name;
         return this;
     }
 
-    public WorldConfigurationBuilder setType(WorldType type) {
+    public final @NonNull WorldConfigurationBuilder setType(final @NonNull WorldType type) {
         this.type = type;
         return this;
     }
 
-    public WorldConfigurationBuilder setSettings(String settings) {
+    public final @NonNull WorldConfigurationBuilder setSettings(final @NonNull String settings) {
         this.settings = settings;
         return this;
     }
 
-    public WorldConfigurationBuilder setSeed(long seed) {
+    public final @NonNull WorldConfigurationBuilder setSeed(final long seed) {
         this.seed = seed;
         return this;
     }
 
-    public WorldConfigurationBuilder setGenerateStructures(WorldStructureSetting generateStructures) {
+    public @NonNull WorldConfigurationBuilder setGenerateStructures(final @NonNull WorldStructureSetting generateStructures) {
         this.generateStructures = generateStructures;
         return this;
     }
 
-    public WorldConfigurationBuilder setGenerator(String generator) {
+    public @NonNull WorldConfigurationBuilder setGenerator(final @NonNull String generator) {
         this.generator = generator;
         return this;
     }
 
-    public WorldConfigurationBuilder setGeneratorArg(String generatorArg) {
+    public @NonNull WorldConfigurationBuilder setGeneratorArg(final @NonNull String generatorArg) {
         this.generatorArg = generatorArg;
         return this;
     }
 
-    public WorldConfigurationBuilder setWorldFeatures(WorldFeatures worldFeatures) {
+    public @NonNull WorldConfigurationBuilder setWorldFeatures(final @NonNull WorldFeatures worldFeatures) {
         this.worldFeatures = worldFeatures;
         return this;
     }
 
-    public WorldConfiguration createWorldConfiguration() {
+    public @NonNull WorldConfiguration createWorldConfiguration() {
         return new WorldConfiguration(name, type, worldFeatures, settings, seed,
-            generateStructures == WorldStructureSetting.GENERATE_STRUCTURES,
-            generator, generatorArg);
+                generateStructures == WorldStructureSetting.GENERATE_STRUCTURES,
+                generator, generatorArg
+        );
     }
 
 }

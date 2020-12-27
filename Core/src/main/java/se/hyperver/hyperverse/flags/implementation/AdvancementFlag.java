@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 
 public class AdvancementFlag extends BooleanFlag<AdvancementFlag> {
@@ -29,7 +29,8 @@ public class AdvancementFlag extends BooleanFlag<AdvancementFlag> {
         super(value, Messages.flagDescriptionAdvancements);
     }
 
-    @Override protected AdvancementFlag flagOf(@NotNull Boolean value) {
+    @Override
+    protected AdvancementFlag flagOf(@NonNull Boolean value) {
         return value ? ADVANCEMENTS_ALLOWED : ADVANCEMENTS_FORBIDDEN;
     }
 

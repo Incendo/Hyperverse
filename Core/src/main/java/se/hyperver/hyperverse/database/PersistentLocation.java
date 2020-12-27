@@ -19,7 +19,7 @@ package se.hyperver.hyperverse.database;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -33,8 +33,14 @@ public final class PersistentLocation {
     private final double z;
     private final LocationType locationType;
 
-    public PersistentLocation(@NotNull final String uuid, @NotNull final String world,
-        final double x, final double y, final double z, @NotNull final LocationType locationType) {
+    public PersistentLocation(
+            final @NonNull String uuid,
+            final @NonNull String world,
+            final double x,
+            final double y,
+            final double z,
+            final @NonNull LocationType locationType
+    ) {
         this.uuid = Objects.requireNonNull(uuid);
         this.world = Objects.requireNonNull(world);
         this.locationType = Objects.requireNonNull(locationType);
@@ -43,17 +49,21 @@ public final class PersistentLocation {
         this.z = z;
     }
 
-    public static PersistentLocation fromLocation(@NotNull final UUID owner,
-        @NotNull final Location location, @NotNull final LocationType locationType) {
+    public static @NonNull PersistentLocation fromLocation(
+            final @NonNull UUID owner,
+            final @NonNull Location location,
+            final @NonNull LocationType locationType
+    ) {
         return new PersistentLocation(owner.toString(), Objects.requireNonNull(location.getWorld()).getName(),
-            location.getX(), location.getY(), location.getZ(), locationType);
+                location.getX(), location.getY(), location.getZ(), locationType
+        );
     }
 
-    @NotNull public String getUuid() {
+    public @NonNull String getUuid() {
         return this.uuid;
     }
 
-    @NotNull public String getWorld() {
+    public @NonNull String getWorld() {
         return this.world;
     }
 
@@ -69,11 +79,11 @@ public final class PersistentLocation {
         return this.z;
     }
 
-    public LocationType getLocationType() {
+    public @NonNull LocationType getLocationType() {
         return this.locationType;
     }
 
-    @NotNull public Location toLocation() {
+    public @NonNull Location toLocation() {
         return new Location(Bukkit.getWorld(world), x, y, z);
     }
 

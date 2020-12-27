@@ -20,8 +20,8 @@ package se.hyperver.hyperverse.util;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.nio.file.Path;
 
@@ -30,16 +30,23 @@ import java.nio.file.Path;
  */
 public interface NMS {
 
-    @Nullable Location getOrCreateNetherPortal(@NotNull final Entity entity,
-        @NotNull final Location origin);
+    @Nullable
+    Location getOrCreateNetherPortal(
+            final @NonNull Entity entity,
+            final @NonNull Location origin
+    );
 
-    @Nullable Location getDimensionSpawn(@NotNull final Location origin);
+    @Nullable
+    Location getDimensionSpawn(final @NonNull Location origin);
 
-    @Nullable Location findBedRespawn(@NotNull final Location spawnLocation);
+    @Nullable
+    Location findBedRespawn(final @NonNull Location spawnLocation);
 
-    void writePlayerData(@NotNull final Player player, @NotNull final Path file);
+    void writePlayerData(final @NonNull Player player, final @NonNull Path file);
 
-    void readPlayerData(@NotNull final Player player, @NotNull final Path file,
-        @NotNull final Runnable whenDone);
+    void readPlayerData(
+            final @NonNull Player player, final @NonNull Path file,
+            final @NonNull Runnable whenDone
+    );
 
 }

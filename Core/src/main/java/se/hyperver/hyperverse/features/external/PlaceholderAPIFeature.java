@@ -22,9 +22,10 @@ import se.hyperver.hyperverse.features.PluginFeature;
 /**
  * {@link PluginFeature} adding PlaceholderAPI support
  */
-public class PlaceholderAPIFeature extends PluginFeature {
+public final class PlaceholderAPIFeature extends PluginFeature {
 
-    @Override public void initializeFeature() {
+    @Override
+    public void initializeFeature() {
         final HyperverseExpansion hyperverseExpansion = new HyperverseExpansion();
         hyperverseExpansion.register();
     }

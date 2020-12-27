@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.configuration;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Hyperverse configuration options
@@ -66,13 +66,13 @@ public interface HyperConfiguration {
      *
      * @return Language code
      */
-    @NotNull String getLanguageCode();
+    @NonNull String getLanguageCode();
 
     /**
      * Whether or not Hyperverse should enforce
      * safe teleportation
      *
-     * @return True if Hypeverse should enforce
+     * @return True if Hyperverse should enforce
      *         safe teleportation
      */
     boolean shouldSafeTeleport();

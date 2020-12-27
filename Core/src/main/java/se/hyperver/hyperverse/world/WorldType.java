@@ -18,7 +18,7 @@
 package se.hyperver.hyperverse.world;
 
 import org.bukkit.World;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,27 +36,12 @@ public enum WorldType {
     private final World.Environment bukkitType;
     private final Collection<String> aliases;
 
-    WorldType(final World.Environment bukkitType, final Collection<String> aliases) {
+    WorldType(
+            final World.@NonNull Environment bukkitType,
+            final @NonNull Collection<@NonNull String> aliases
+    ) {
         this.bukkitType = bukkitType;
         this.aliases = aliases;
-    }
-
-    /**
-     * Get the bukkit equivalent
-     *
-     * @return Bukkit equivalent
-     */
-    @NotNull public World.Environment getBukkitType() {
-        return this.bukkitType;
-    }
-
-    /**
-     * Get all aliases of the type name
-     *
-     * @return Name aliases
-     */
-    @NotNull public Collection<String> getAliases() {
-        return this.aliases;
     }
 
     /**
@@ -65,7 +50,7 @@ public enum WorldType {
      * @param string String to match
      * @return Optional containing the type, if found
      */
-    @NotNull public static Optional<WorldType> fromString(@NotNull final String string) {
+    public static @NonNull Optional<@NonNull WorldType> fromString(final @NonNull String string) {
         final String normalized = Objects.requireNonNull(string.toLowerCase());
         for (final WorldType worldType : values()) {
             if (worldType.getAliases().contains(normalized)) {
@@ -81,13 +66,31 @@ public enum WorldType {
      * @param environment Bukkit environment
      * @return Equivalent Hyperverse world type
      */
-    @NotNull public static WorldType fromBukkit(@NotNull final World.Environment environment) {
+    public static @NonNull WorldType fromBukkit(final World.@NonNull Environment environment) {
         for (final WorldType worldType : values()) {
             if (worldType.getBukkitType() == environment) {
                 return worldType;
             }
         }
         return WorldType.OVER_WORLD;
+    }
+
+    /**
+     * Get the bukkit equivalent
+     *
+     * @return Bukkit equivalent
+     */
+    public World.@NonNull Environment getBukkitType() {
+        return this.bukkitType;
+    }
+
+    /**
+     * Get all aliases of the type name
+     *
+     * @return Name aliases
+     */
+    public @NonNull Collection<@NonNull String> getAliases() {
+        return this.aliases;
     }
 
 }

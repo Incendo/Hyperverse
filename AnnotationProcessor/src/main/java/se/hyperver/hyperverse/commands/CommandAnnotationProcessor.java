@@ -64,8 +64,11 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
     private final Map<TypeMirror, Command> commandMap = new HashMap<>();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    @Override public boolean process(final Set<? extends TypeElement> annotations,
-        final RoundEnvironment roundEnv) {
+    @Override
+    public boolean process(
+            final Set<? extends TypeElement> annotations,
+            final RoundEnvironment roundEnv
+    ) {
 
         final Path commandOutput = Paths.get("./", "commands");
         if (!Files.exists(commandOutput)) {
@@ -85,27 +88,32 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
         }
 
         final Set<? extends Element> commandAliases =
-            roundEnv.getElementsAnnotatedWith(CommandAlias.class);
+                roundEnv.getElementsAnnotatedWith(CommandAlias.class);
         for (final Element commandAlias : commandAliases) {
             if (commandAlias.getKind() == ElementKind.CLASS) {
                 final CommandAlias alias = commandAlias.getAnnotation(CommandAlias.class);
                 final CommandPermission permission =
-                    commandAlias.getAnnotation(CommandPermission.class);
+                        commandAlias.getAnnotation(CommandPermission.class);
                 System.out.printf("Found base command: '%s' in type '%s'\n", alias.value(),
-                    commandAlias.asType());
-                this.commandMap.put(commandAlias.asType(),
-                    new Command(alias.value().split("\\|"), permission.value()));
+                        commandAlias.asType()
+                );
+                this.commandMap.put(
+                        commandAlias.asType(),
+                        new Command(alias.value().split("\\|"), permission.value())
+                );
             }
         }
 
         final Set<? extends Element> subCommands =
-            roundEnv.getElementsAnnotatedWith(Subcommand.class);
+                roundEnv.getElementsAnnotatedWith(Subcommand.class);
         for (final Element commandAlias : subCommands) {
             final Command owningCommand =
-                commandMap.get(commandAlias.getEnclosingElement().asType());
+                    commandMap.get(commandAlias.getEnclosingElement().asType());
             if (owningCommand == null) {
-                System.err.printf("Could not find owning command for type %s\n",
-                    commandAlias.getEnclosingElement().asType());
+                System.err.printf(
+                        "Could not find owning command for type %s\n",
+                        commandAlias.getEnclosingElement().asType()
+                );
                 continue;
             }
             final List<String> names = new ArrayList<>();
@@ -122,7 +130,7 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
             }
 
             final CommandPermission commandPermission =
-                commandAlias.getAnnotation(CommandPermission.class);
+                    commandAlias.getAnnotation(CommandPermission.class);
             final Description description = commandAlias.getAnnotation(Description.class);
             final Syntax syntaxA = commandAlias.getAnnotation(Syntax.class);
             final String syntax;
@@ -132,13 +140,13 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
                 final StringBuilder syntaxBuilder = new StringBuilder();
 
                 final VariableElement[] parameters =
-                    ((ExecutableElement) commandAlias).getParameters()
-                        .toArray(new VariableElement[0]);
+                        ((ExecutableElement) commandAlias).getParameters()
+                                .toArray(new VariableElement[0]);
                 for (int i = 1; i < parameters.length; i++) {
                     final VariableElement parameter = parameters[i];
 
                     boolean optional = parameter.getAnnotation(Optional.class) != null
-                        || parameter.getAnnotation(Default.class) != null;
+                            || parameter.getAnnotation(Default.class) != null;
 
                     if (optional) {
                         syntaxBuilder.append("[");
@@ -170,20 +178,22 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
             final Category category = commandAlias.getAnnotation(Category.class);
 
             owningCommand.subCommands.add(new SubCommand(names.toArray(new String[0]),
-                commandPermission == null ? "" : commandPermission.value(),
-                description == null ? "" : replace(description.value(), captions), replace(syntax, captions),
-                category == null ? "Misc" : category.value()));
+                    commandPermission == null ? "" : commandPermission.value(),
+                    description == null ? "" : replace(description.value(), captions), replace(syntax, captions),
+                    category == null ? "Misc" : category.value()
+            ));
         }
 
         System.out.printf("Writing commands to %s\n", commandOutput.toString());
         for (final Map.Entry<TypeMirror, Command> commandEntry : this.commandMap.entrySet()) {
             final Path commandFile =
-                commandOutput.resolve(commandEntry.getKey().toString() + ".json");
+                    commandOutput.resolve(commandEntry.getKey().toString() + ".json");
             System.out
-                .printf("Writing base command in class %s to file %s\n", commandEntry.getKey(),
-                    commandFile);
+                    .printf("Writing base command in class %s to file %s\n", commandEntry.getKey(),
+                            commandFile
+                    );
             try (final BufferedWriter bufferedWriter = Files.newBufferedWriter(commandFile);
-                final JsonWriter jsonWriter = this.gson.newJsonWriter(bufferedWriter)) {
+                 final JsonWriter jsonWriter = this.gson.newJsonWriter(bufferedWriter)) {
                 gson.toJson(commandEntry.getValue(), Command.class, jsonWriter);
             } catch (final IOException e) {
                 e.printStackTrace();
@@ -191,9 +201,11 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
             try {
                 final String[] parts = commandEntry.getKey().toString().split("\\.");
                 final String simpleName = parts[parts.length - 1];
-                Files.write(commandOutput.resolve(simpleName + ".md"),
-                    formatMarkdown(commandEntry.getValue()).getBytes(
-                    StandardCharsets.UTF_8));
+                Files.write(
+                        commandOutput.resolve(simpleName + ".md"),
+                        formatMarkdown(commandEntry.getValue()).getBytes(
+                                StandardCharsets.UTF_8)
+                );
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -204,11 +216,11 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
 
     private String formatMarkdown(final Command command) {
         final StringBuilder builder = new StringBuilder("# Command Reference\n\n")
-            .append("| Command | Permission | Aliases |\n")
-            .append("|------------|------------|---------|\n")
-            .append("|`/").append(command.command).append("`")
-            .append("|`").append(command.permission).append("`")
-            .append("|");
+                .append("| Command | Permission | Aliases |\n")
+                .append("|------------|------------|---------|\n")
+                .append("|`/").append(command.command).append("`")
+                .append("|`").append(command.permission).append("`")
+                .append("|");
         for (int i = 1; i < command.names.length; i++) {
             builder.append("`/").append(command.names[i]).append("`");
             if ((i + 1) < command.names.length) {
@@ -220,8 +232,10 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
 
         final Map<String, List<SubCommand>> categories = new HashMap<>();
         for (final SubCommand subCommand : command.subCommands) {
-            final List<SubCommand> subCommands = categories.computeIfAbsent(subCommand.category,
-                k -> new ArrayList<>());
+            final List<SubCommand> subCommands = categories.computeIfAbsent(
+                    subCommand.category,
+                    k -> new ArrayList<>()
+            );
             subCommands.add(subCommand);
         }
 
@@ -229,7 +243,7 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
             builder.append("## ").append(category).append("\n");
             for (final SubCommand subCommand : categories.get(category)) {
                 builder.append("**/").append(subCommand.subCommand).append("**\\\n")
-                       .append("Permission: `").append(subCommand.permission).append("`\\\n");
+                        .append("Permission: `").append(subCommand.permission).append("`\\\n");
 
                 if (subCommand.names.length > 1) {
                     builder.append("Aliases: ");
@@ -290,8 +304,10 @@ public class CommandAnnotationProcessor extends AbstractProcessor {
         private final String fullSyntax;
         private final String category;
 
-        private SubCommand(final String[] names, final String permission, final String description,
-            final String syntax, final String category) {
+        private SubCommand(
+                final String[] names, final String permission, final String description,
+                final String syntax, final String category
+        ) {
             this.names = names;
             this.subCommand = names[0];
             this.permission = permission;

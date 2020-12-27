@@ -23,4 +23,5 @@ import org.bukkit.event.Event;
  * Just a generic Hyperverse event class
  */
 public abstract class HyperverseEvent extends Event {
+
 }

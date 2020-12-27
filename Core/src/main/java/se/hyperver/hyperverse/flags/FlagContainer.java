@@ -17,8 +17,8 @@
 
 package se.hyperver.hyperverse.flags;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -32,16 +32,27 @@ public interface FlagContainer {
      */
     @Nullable FlagContainer getParentContainer();
 
-    void setParentContainer(FlagContainer parentContainer);
+    /**
+     * Set the parent container
+     *
+     * @param parentContainer Parent container
+     */
+    void setParentContainer(@NonNull FlagContainer parentContainer);
 
-    @SuppressWarnings("unused") Map<Class<?>, WorldFlag<?, ?>> getInternalPlotFlagMap();
+    /**
+     * Get the internal flag map. This should not be used
+     *
+     * @return Flag map
+     */
+    @SuppressWarnings("unused")
+    @NonNull Map<Class<?>, WorldFlag<?, ?>> getInternalWorldFlagMap();
 
     /**
      * Get an immutable view of the underlying flag map
      *
      * @return Immutable flag map
      */
-    Map<Class<?>, WorldFlag<?, ?>> getFlagMap();
+    @NonNull Map<Class<?>, WorldFlag<?, ?>> getFlagMap();
 
     /**
      * Add a flag to the container
@@ -49,14 +60,14 @@ public interface FlagContainer {
      * @param flag Flag to add
      * @see #addAll(Collection) to add multiple flags
      */
-    <V, T extends WorldFlag<V, ?>> void addFlag(T flag);
+    <V, T extends WorldFlag<V, ?>> void addFlag(@NonNull T flag);
 
     /**
      * Remove a flag from the container
      *
      * @param flag Flag to remove
      */
-    <V, T extends WorldFlag<V, ?>> V removeFlag(T flag);
+    <V, T extends WorldFlag<V, ?>> @Nullable V removeFlag(@NonNull T flag);
 
     /**
      * Add all flags to the container
@@ -64,9 +75,14 @@ public interface FlagContainer {
      * @param flags Flags to add
      * @see #addFlag(WorldFlag) to add a single flagg
      */
-    void addAll(Collection<WorldFlag<?, ?>> flags);
+    void addAll(@NonNull Collection<@NonNull WorldFlag<?, ?>> flags);
 
-    void addAll(FlagContainer container);
+    /**
+     * Add all flags from an existing container
+     *
+     * @param container Existing container
+     */
+    void addAll(@NonNull FlagContainer container);
 
     /**
      * Clears the local flag map
@@ -79,7 +95,7 @@ public interface FlagContainer {
      *
      * @return All recognized flag types
      */
-    Collection<WorldFlag<?, ?>> getRecognizedPlotFlags();
+    @NonNull Collection<@NonNull WorldFlag<?, ?>> getRecognizedPlotFlags();
 
     /**
      * Recursively seek for the highest order flag container.
@@ -87,7 +103,7 @@ public interface FlagContainer {
      *
      * @return Highest order class container.
      */
-    FlagContainer getHighestClassContainer();
+    @NonNull FlagContainer getHighestClassContainer();
 
     /**
      * Has the same functionality as {@link #getFlag(Class)}, but
@@ -95,7 +111,7 @@ public interface FlagContainer {
      *
      * @param flagClass The {@link WorldFlag} class.
      */
-    WorldFlag<?, ?> getFlagErased(Class<?> flagClass);
+    @Nullable WorldFlag<?, ?> getFlagErased(@NonNull Class<?> flagClass);
 
     /**
      * Query all levels of flag containers for a flag. This guarantees that a flag
@@ -107,7 +123,7 @@ public interface FlagContainer {
      * @param <T>       Flag type
      * @return Flag instance
      */
-    <V, T extends WorldFlag<V, ?>> T getFlag(Class<? extends T> flagClass);
+    <V, T extends WorldFlag<V, ?>> @Nullable T getFlag(@NonNull Class<? extends T> flagClass);
 
     /**
      * Check for flag existence in this flag container instance.
@@ -117,7 +133,7 @@ public interface FlagContainer {
      * @param <T>       Flag type
      * @return The flag instance, if it exists in this container, else null.
      */
-    @Nullable <V, T extends WorldFlag<V, ?>> T queryLocal(Class<?> flagClass);
+    <V, T extends WorldFlag<V, ?>> @Nullable T queryLocal(@NonNull Class<?> flagClass);
 
     /**
      * Subscribe to flag updates in this particular flag container instance.
@@ -127,9 +143,18 @@ public interface FlagContainer {
      * @param worldFlagUpdateHandler The update handler which will react to changes.
      * @see WorldFlagUpdateType World flag update types
      */
-    void subscribe(@NotNull FlagContainer.WorldFlagUpdateHandler worldFlagUpdateHandler);
+    void subscribe(FlagContainer.@NonNull WorldFlagUpdateHandler worldFlagUpdateHandler);
 
-    void handleUnknowns(WorldFlag<?, ?> flag, WorldFlagUpdateType worldFlagUpdateType);
+    /**
+     * Handle an unknown flag
+     *
+     * @param flag                Updated flag
+     * @param worldFlagUpdateType Update type
+     */
+    void handleUnknowns(
+            @NonNull WorldFlag<?, ?> flag,
+            @NonNull WorldFlagUpdateType worldFlagUpdateType
+    );
 
     /**
      * Register a flag key-value pair which cannot yet be associated with
@@ -142,22 +167,7 @@ public interface FlagContainer {
      * @param flagName Flag name
      * @param value    Flag value
      */
-    void addUnknownFlag(String flagName, String value);
-
-    /**
-     * Handler for update events in {@link WorldFlagContainer flag containers}.
-     */
-    @FunctionalInterface interface WorldFlagUpdateHandler {
-
-        /**
-         * Act on the flag update event
-         *
-         * @param worldFlag World flag
-         * @param type      Update type
-         */
-        void handle(WorldFlag<?, ?> worldFlag, WorldFlagUpdateType type);
-
-    }
+    void addUnknownFlag(@NonNull String flagName, @NonNull String value);
 
     /**
      * Update event types used in {@link WorldFlagUpdateHandler}.
@@ -176,6 +186,22 @@ public interface FlagContainer {
          * but a new instance has bow replaced it
          */
         FLAG_UPDATED
+    }
+
+    /**
+     * Handler for update events in {@link WorldFlagContainer flag containers}.
+     */
+    @FunctionalInterface
+    interface WorldFlagUpdateHandler {
+
+        /**
+         * Act on the flag update event
+         *
+         * @param worldFlag World flag
+         * @param type      Update type
+         */
+        void handle(WorldFlag<?, ?> worldFlag, WorldFlagUpdateType type);
+
     }
 
 }

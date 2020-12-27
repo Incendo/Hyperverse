@@ -4,11 +4,15 @@ import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 import se.hyperver.hyperverse.Hyperverse;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,19 +24,21 @@ import java.util.concurrent.CompletableFuture;
 public class SQLiteDatabase extends HyperDatabase {
 
     private static final String TABLE_LOCATIONS = "CREATE TABLE IF NOT EXISTS locations ("
-        + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        + "uuid VARCHAR, world VARCHAR,"
-        + "x [DOUBLE PRECISION], y [DOUBLE PRECISION],"
-        + "z [DOUBLE PRECISION], locationType VARCHAR,"
-        + "UNIQUE (uuid, world, locationType));";
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + "uuid VARCHAR, world VARCHAR,"
+            + "x [DOUBLE PRECISION], y [DOUBLE PRECISION],"
+            + "z [DOUBLE PRECISION], locationType VARCHAR,"
+            + "UNIQUE (uuid, world, locationType));";
 
     private Connection connection;
 
-    @Inject public SQLiteDatabase(final TaskFactory taskFactory, final Hyperverse hyperverse) {
+    @Inject
+    public SQLiteDatabase(final TaskFactory taskFactory, final Hyperverse hyperverse) {
         super(taskFactory, hyperverse);
     }
 
-    @Override public boolean attemptConnect() {
+    @Override
+    public boolean attemptConnect() {
         try {
             Class.forName("org.sqlite.JDBC");
 
@@ -51,7 +57,8 @@ public class SQLiteDatabase extends HyperDatabase {
             if (this.connection != null) {
                 this.executeUpdate(TABLE_LOCATIONS);
             } else {
-                this.getHyperverse().getLogger().severe("No connection was established. The location table will not not be created.");
+                this.getHyperverse().getLogger().severe(
+                        "No connection was established. The location table will not not be created.");
                 return false;
             }
 
@@ -63,7 +70,8 @@ public class SQLiteDatabase extends HyperDatabase {
         return true;
     }
 
-    @Override public void attemptClose() {
+    @Override
+    public void attemptClose() {
         try {
             this.connection.close();
         } catch (final Exception e) {
@@ -72,16 +80,20 @@ public class SQLiteDatabase extends HyperDatabase {
     }
 
     @Override
-    public void storeLocation(@NotNull final PersistentLocation persistentLocation, final boolean updateTable,
-        final boolean clear) {
+    public void storeLocation(
+            final @NonNull PersistentLocation persistentLocation, final boolean updateTable,
+            final boolean clear
+    ) {
         if (updateTable) {
             this.getLocations().get(persistentLocation.getLocationType())
                     .put(UUID.fromString(persistentLocation.getUuid()), persistentLocation.getWorld(),
-                            persistentLocation);
+                            persistentLocation
+                    );
         }
 
         this.getTaskFactory().recipe().begin(Optional.empty()).asynchronous((unused) -> {
-            try (final PreparedStatement statement = this.connection.prepareStatement("INSERT OR REPLACE INTO `locations` (`uuid`, `world`, `x`, `y`, `z`, `locationType`) VALUES(?, ?, ?, ?, ?, ?)")) {
+            try (final PreparedStatement statement = this.connection.prepareStatement(
+                    "INSERT OR REPLACE INTO `locations` (`uuid`, `world`, `x`, `y`, `z`, `locationType`) VALUES(?, ?, ?, ?, ?, ?)")) {
                 statement.setString(1, persistentLocation.getUuid());
                 statement.setString(2, persistentLocation.getWorld());
                 statement.setDouble(3, persistentLocation.getX());
@@ -99,7 +111,8 @@ public class SQLiteDatabase extends HyperDatabase {
         }).execute();
     }
 
-    @Override public CompletableFuture<Collection<PersistentLocation>> getLocations(@NotNull final UUID uuid) {
+    @Override
+    public @NonNull CompletableFuture<Collection<PersistentLocation>> getLocations(final @NonNull UUID uuid) {
         final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
         this.getTaskFactory().recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM `locations` WHERE `uuid` = ?")) {
@@ -107,9 +120,14 @@ public class SQLiteDatabase extends HyperDatabase {
                 final List<PersistentLocation> locationList = new ArrayList<>();
                 try (final ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
-                        final PersistentLocation persistentLocation = new PersistentLocation(uuid.toString(), resultSet.getString("world"),
-                                resultSet.getDouble("x"), resultSet.getDouble("y"), resultSet.getDouble("z"),
-                                LocationType.valueOf(resultSet.getString("locationType")));
+                        final PersistentLocation persistentLocation = new PersistentLocation(
+                                uuid.toString(),
+                                resultSet.getString("world"),
+                                resultSet.getDouble("x"),
+                                resultSet.getDouble("y"),
+                                resultSet.getDouble("z"),
+                                LocationType.valueOf(resultSet.getString("locationType"))
+                        );
                         locationList.add(persistentLocation);
                         this.getLocations().get(persistentLocation.getLocationType())
                                 .put(uuid, persistentLocation.getWorld(), persistentLocation);
@@ -117,7 +135,8 @@ public class SQLiteDatabase extends HyperDatabase {
                 }
                 if (this.getHyperverse().getConfiguration().shouldPrintDebug()) {
                     this.getHyperverse().getLogger().info(String.format("(Debug) Loaded %s persistent locations for player %s",
-                            locationList.size(), uuid));
+                            locationList.size(), uuid
+                    ));
                 }
                 future.complete(locationList);
             } catch (final Exception e) {
@@ -127,7 +146,8 @@ public class SQLiteDatabase extends HyperDatabase {
         return future;
     }
 
-    @Override public void clearWorld(@NotNull String worldName) {
+    @Override
+    public void clearWorld(final @NonNull String worldName) {
         this.getTaskFactory().recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final PreparedStatement statement = this.connection.prepareStatement("DELETE FROM `locations` WHERE `world` = ?")) {
                 statement.setString(1, worldName);
@@ -138,7 +158,7 @@ public class SQLiteDatabase extends HyperDatabase {
         }).execute();
     }
 
-    private void executeUpdate(@NonNull final String sql) {
+    private void executeUpdate(final @NonNull String sql) {
         try (final Statement statement = this.connection.createStatement()) {
             statement.executeUpdate(sql);
         } catch (final SQLException e) {

@@ -17,24 +17,25 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
 public class WorldPermissionFlag extends WorldFlag<String, WorldPermissionFlag> {
 
-    private static final Pattern permissionPattern = Pattern.compile("[A-Za-z0-9\\-_.]+");
     public static final WorldPermissionFlag WORLD_PERMISSION_FLAG_DEFAULT = new WorldPermissionFlag("");
+    private static final Pattern permissionPattern = Pattern.compile("[A-Za-z0-9\\-_.]+");
 
-    public WorldPermissionFlag(@NotNull final String value) {
+    public WorldPermissionFlag(final @NonNull String value) {
         super(value, Messages.flagDescriptionWorldPermission);
     }
 
-    @Override public WorldPermissionFlag parse(@NotNull final String input) throws
-        FlagParseException {
+    @Override
+    public WorldPermissionFlag parse(final @NonNull String input) throws
+            FlagParseException {
         if (input.isEmpty()) {
             return WORLD_PERMISSION_FLAG_DEFAULT;
         }
@@ -42,22 +43,26 @@ public class WorldPermissionFlag extends WorldFlag<String, WorldPermissionFlag> 
             return flagOf(input);
         }
         throw new FlagParseException(this, input, "A permission node may only contain alphanumerical characters,"
-            + " -, . and _");
+                + " -, . and _");
     }
 
-    @Override public WorldPermissionFlag merge(@NotNull final String newValue) {
+    @Override
+    public WorldPermissionFlag merge(final @NonNull String newValue) {
         return flagOf(newValue);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return getValue();
     }
 
-    @Override public String getExample() {
+    @Override
+    public String getExample() {
         return "your.permission.node";
     }
 
-    @Override protected WorldPermissionFlag flagOf(@NotNull final String value) {
+    @Override
+    protected WorldPermissionFlag flagOf(final @NonNull String value) {
         return new WorldPermissionFlag(value);
     }
 

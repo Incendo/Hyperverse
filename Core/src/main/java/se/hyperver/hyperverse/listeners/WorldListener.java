@@ -18,7 +18,13 @@
 package se.hyperver.hyperverse.listeners;
 
 import com.google.inject.Inject;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldInitEvent;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.implementation.SaveWorldFlag;
@@ -26,36 +32,36 @@ import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.SimpleWorldManager;
 import se.hyperver.hyperverse.world.WorldManager;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldInitEvent;
 
 import java.util.Objects;
 
-public class WorldListener implements Listener {
+public final class WorldListener implements Listener {
 
     private final SimpleWorldManager worldManager;
     private final HyperConfiguration hyperConfiguration;
 
-    @Inject public WorldListener(final SimpleWorldManager worldManager,
-        final HyperConfiguration hyperConfiguration) {
+    @Inject
+    public WorldListener(
+            final @NonNull SimpleWorldManager worldManager,
+            final @NonNull HyperConfiguration hyperConfiguration
+    ) {
         this.worldManager = worldManager;
         this.hyperConfiguration = hyperConfiguration;
     }
 
-    @EventHandler public void onWorldInit(final WorldInitEvent event) {
+    @EventHandler
+    public void onWorldInit(final @NonNull WorldInitEvent event) {
         final World world = event.getWorld();
         // We ignore our own world loads
         if (worldManager.shouldIgnore(world.getName())) {
             return;
         }
         MessageUtil.sendMessage(Bukkit.getConsoleSender(),
-            Messages.messageWorldLoadDetected, "%world%", world.getName());
+                Messages.messageWorldLoadDetected, "%world%", world.getName()
+        );
         HyperWorld hyperWorld = this.worldManager.getWorld(world);
         if (hyperWorld != null
-            || (hyperWorld = this.worldManager.getWorld(world.getName())) != null) {
+                || (hyperWorld = this.worldManager.getWorld(world.getName())) != null) {
             if (hyperWorld.getBukkitWorld() != null) {
                 hyperWorld.setBukkitWorld(world);
             }
@@ -66,13 +72,14 @@ public class WorldListener implements Listener {
             // any control over the generator, and otherwise we just take on
             // responsibility over the world
             final WorldManager.WorldImportResult result =
-                this.worldManager.importWorld(world, false, null);
+                    this.worldManager.importWorld(world, false, null);
             if (result == WorldManager.WorldImportResult.SUCCESS) {
                 MessageUtil
-                    .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportedOnLoad,
-                        "%world%", world.getName(), "%generator%",
-                        Objects.requireNonNull(this.worldManager.getWorld(world)).getConfiguration()
-                            .getGenerator());
+                        .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportedOnLoad,
+                                "%world%", world.getName(), "%generator%",
+                                Objects.requireNonNull(this.worldManager.getWorld(world)).getConfiguration()
+                                        .getGenerator()
+                        );
                 if ((hyperWorld = this.worldManager.getWorld(world)) != null) {
                     world.setKeepSpawnInMemory(hyperWorld.shouldKeepSpawnLoaded());
                 } else if (hyperConfiguration.shouldKeepSpawnLoaded()) {
@@ -80,13 +87,15 @@ public class WorldListener implements Listener {
                 }
             } else {
                 MessageUtil
-                    .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
-                        "%world%", world.getName(), "%result%", result.getDescription());
+                        .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
+                                "%world%", world.getName(), "%result%", result.getDescription()
+                        );
             }
         }
     }
 
-    @EventHandler public void onChunkUnload(final ChunkUnloadEvent event) {
+    @EventHandler
+    public void onChunkUnload(final @NonNull ChunkUnloadEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getWorld());
 
         if (hyperWorld != null) {

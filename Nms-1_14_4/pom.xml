@@ -1,74 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <parent>
-    <artifactId>Hyperverse</artifactId>
-    <groupId>se.hyperver.hyperverse</groupId>
-    <version>0.10.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>Hyperverse</artifactId>
+        <groupId>se.hyperver.hyperverse</groupId>
+        <version>0.10.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>Nms-1_14_4</artifactId>
+    <artifactId>Nms-1_14_4</artifactId>
 
-  <licenses>
-    <license>
-      <name>GNU General Public License Version 3</name>
-      <url>https://raw.githubusercontent.com/Sauilitired/Hyperverse/master/LICENSE</url>
-    </license>
-  </licenses>
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 3</name>
+            <url>https://raw.githubusercontent.com/Sauilitired/Hyperverse/master/LICENSE</url>
+        </license>
+    </licenses>
 
-  <dependencies>
-    <dependency>
-      <groupId>se.hyperver.hyperverse</groupId>
-      <artifactId>NmsCommon</artifactId>
-      <version>${parent.version}</version>
-      <scope>provided</scope>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>NmsCommon</artifactId>
+            <version>${parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-    <!-- Declare API THEN server, to let the API provide javadocs & sources -->
-    <dependency>
-      <groupId>com.destroystokyo.paper</groupId>
-      <artifactId>paper-api</artifactId>
-      <version>1.14.2-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.14.4-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
+        <!-- Declare API THEN server, to let the API provide javadocs & sources -->
+        <dependency>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.14.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.14.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>io.papermc</groupId>
-      <artifactId>paperlib</artifactId>
-      <version>1.0.5</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-      <version>4.2.3</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>cloud.commandframework</groupId>
-      <artifactId>cloud-tasks</artifactId>
-      <version>1.1.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains</groupId>
-      <artifactId>annotations</artifactId>
-      <version>20.1.0</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>io.papermc</groupId>
+            <artifactId>paperlib</artifactId>
+            <version>1.0.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>4.2.3</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-tasks</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

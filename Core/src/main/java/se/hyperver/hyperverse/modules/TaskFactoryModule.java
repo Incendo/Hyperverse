@@ -17,40 +17,32 @@
 
 package se.hyperver.hyperverse.modules;
 
+import cloud.commandframework.bukkit.BukkitSynchronizer;
 import cloud.commandframework.tasks.TaskFactory;
-import cloud.commandframework.tasks.TaskSynchronizer;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.lang.reflect.Constructor;
 import java.util.Objects;
 
 public class TaskFactoryModule extends AbstractModule {
 
     private final JavaPlugin javaPlugin;
 
-    public TaskFactoryModule(@NotNull final JavaPlugin javaPlugin) {
+    public TaskFactoryModule(final @NonNull JavaPlugin javaPlugin) {
         this.javaPlugin = Objects.requireNonNull(javaPlugin);
     }
 
-    @Override protected void configure() { }
+    @Override
+    protected void configure() {
+    }
 
     @Provides
     @Singleton
     public TaskFactory provideTaskFactory() {
-        final TaskSynchronizer synchronizer;
-        try {
-            final Constructor<?> constructor = Class.forName("cloud.commandframework.bukkit.BukkitSynchronizer").getDeclaredConstructor(Plugin.class);
-            constructor.setAccessible(true);
-            synchronizer = (TaskSynchronizer) constructor.newInstance(javaPlugin);
-        } catch(final ReflectiveOperationException ex) {
-            throw new RuntimeException(ex);
-        }
-        return new TaskFactory(synchronizer);
+        return new TaskFactory(new BukkitSynchronizer(javaPlugin));
     }
 
 }

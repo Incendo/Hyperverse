@@ -29,7 +29,7 @@ A profile for this can be found [here](https://github.com/IntellectualSites/Plot
 Other than that, try to keep annotations on the same line
 as method and type declarations when possible. Mark
 all non-mutable fields as final, and make liberal
-use of @Nullable and @NotNull annotations.
+use of @Nullable and @NonNull annotations.
 
 ## Licensing
 

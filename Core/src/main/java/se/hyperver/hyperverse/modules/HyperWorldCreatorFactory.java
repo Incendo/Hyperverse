@@ -17,11 +17,12 @@
 
 package se.hyperver.hyperverse.modules;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 
 public interface HyperWorldCreatorFactory {
 
-    HyperWorldCreator create(final HyperWorld hyperWorld);
+    @NonNull HyperWorldCreator create(final @NonNull HyperWorld hyperWorld);
 
 }

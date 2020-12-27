@@ -20,15 +20,6 @@ package se.hyperver.hyperverse.spigotnms.v1_16_R3;
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
 import io.papermc.lib.PaperLib;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockUtil;
 import net.minecraft.server.v1_16_R3.DimensionManager;
@@ -51,10 +42,20 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.util.NMS;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {
@@ -63,7 +64,8 @@ public class NMSImpl implements NMS {
     private Field entitiesByUUID;
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
-    @Inject public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
+    @Inject
+    public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
         this.taskFactory = taskFactory;
         if (hyperConfiguration) {
             try {
@@ -75,8 +77,9 @@ public class NMSImpl implements NMS {
             }
             try {
                 final RegexFilter regexFilter = RegexFilter
-                    .createFilter("[\\S\\s]*Force-added player with duplicate UUID[\\S\\s]*", null, false,
-                        Filter.Result.DENY, Filter.Result.ACCEPT);
+                        .createFilter("[\\S\\s]*Force-added player with duplicate UUID[\\S\\s]*", null, false,
+                                Filter.Result.DENY, Filter.Result.ACCEPT
+                        );
                 this.worldServerLogger.addFilter(regexFilter);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -84,34 +87,50 @@ public class NMSImpl implements NMS {
         }
     }
 
-    @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final Entity entity,
-        @NotNull final Location origin) {
+    private static NBTTagList doubleList(final double... values) {
+        final NBTTagList nbttaglist = new NBTTagList();
+        for (final double d : values) {
+            nbttaglist.add(NBTTagDouble.a(d));
+        }
+        return nbttaglist;
+    }
+
+    @Override
+    @Nullable
+    public Location getOrCreateNetherPortal(
+            final @NonNull Entity entity,
+            final @NonNull Location origin
+    ) {
         final WorldServer worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
         final PortalTravelAgent portalTravelAgent = Objects.requireNonNull(worldServer.getTravelAgent());
         final net.minecraft.server.v1_16_R3.Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
         final BlockPosition blockPosition = new BlockPosition(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
         Optional<BlockUtil.Rectangle> portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
-            .findPortal(Objects.requireNonNull(blockPosition, "position"), 128);
+                .findPortal(Objects.requireNonNull(blockPosition, "position"), 128);
         if (!portalShape.isPresent()) {
-            portalShape = portalTravelAgent.createPortal( blockPosition, nmsEntity.getDirection().n(),nmsEntity,  16);
+            portalShape = portalTravelAgent.createPortal(blockPosition, nmsEntity.getDirection().n(), nmsEntity, 16);
         }
         if (!portalShape.isPresent()) {
             return null;
         }
         final BlockUtil.Rectangle rectangle = portalShape.get();
         return new Location(origin.getWorld(), rectangle.origin.getX() + 1, rectangle.origin.getY() - 1,
-            rectangle.origin.getZ() + 1);
+                rectangle.origin.getZ() + 1
+        );
     }
 
-    @Override @Nullable public Location getDimensionSpawn(@NotNull final Location origin) {
+    @Override
+    @Nullable
+    public Location getDimensionSpawn(final @NonNull Location origin) {
         if (Objects.requireNonNull(origin.getWorld()).getEnvironment()
-            == World.Environment.THE_END) {
+                == World.Environment.THE_END) {
             return new Location(origin.getWorld(), 100, 50, 0);
         }
         return origin.getWorld().getSpawnLocation();
     }
 
-    @Override public void writePlayerData(@NotNull final Player player, @NotNull final Path file) {
+    @Override
+    public void writePlayerData(final @NonNull Player player, final @NonNull Path file) {
         final NBTTagCompound playerTag = new NBTTagCompound();
         final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         entityPlayer.save(playerTag);
@@ -132,7 +151,8 @@ public class NMSImpl implements NMS {
         }).execute();
     }
 
-    @Override public void readPlayerData(@NotNull final Player player, @NotNull final Path file, @NotNull final Runnable whenDone) {
+    @Override
+    public void readPlayerData(final @NonNull Player player, final @NonNull Path file, final @NonNull Runnable whenDone) {
         final Location originLocation = player.getLocation().clone();
         taskFactory.recipe().begin(Optional.empty()).asynchronous(unused -> {
             try (final InputStream inputStream = Files.newInputStream(file)) {
@@ -158,7 +178,8 @@ public class NMSImpl implements NMS {
                 final int spawnY = compound.getInt("SpawnY");
                 final int spawnZ = compound.getInt("SpawnZ");
                 final Location spawnLocation = new Location(Bukkit.getWorld(spawnWorld), spawnX,
-                    spawnY, spawnZ);
+                        spawnY, spawnZ
+                );
 
                 final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
@@ -202,7 +223,8 @@ public class NMSImpl implements NMS {
                 }
 
                 entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, worldServer,
-                    true, originLocation, true);
+                        true, originLocation, true
+                );
 
                 // Apply health and foodLevel
                 player.setHealth(health);
@@ -213,23 +235,18 @@ public class NMSImpl implements NMS {
         }).execute(whenDone);
     }
 
-    @Override @Nullable public Location findBedRespawn(@NotNull final Location spawnLocation) {
+    @Override
+    @Nullable
+    public Location findBedRespawn(final @NonNull Location spawnLocation) {
         final CraftWorld craftWorld = (CraftWorld) spawnLocation.getWorld();
         if (craftWorld == null) {
             return null;
         }
         return EntityHuman.getBed(craftWorld.getHandle(), new BlockPosition(spawnLocation.getBlockX(),
-            spawnLocation.getBlockY(), spawnLocation.getBlockZ()), 0,true, false)
-            .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.getX(), vec3D.getY(), vec3D.getZ()))
-            .orElse(null);
-    }
-
-    private static NBTTagList doubleList(final double... values) {
-        final NBTTagList nbttaglist = new NBTTagList();
-        for (final double d : values) {
-            nbttaglist.add(NBTTagDouble.a(d));
-        }
-        return nbttaglist;
+                spawnLocation.getBlockY(), spawnLocation.getBlockZ()
+        ), 0, true, false)
+                .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.getX(), vec3D.getY(), vec3D.getZ()))
+                .orElse(null);
     }
 
 }

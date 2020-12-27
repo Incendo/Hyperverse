@@ -20,8 +20,8 @@ package se.hyperver.hyperverse.teleportation;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import se.hyperver.hyperverse.world.HyperWorld;
 
 import java.util.concurrent.CompletableFuture;
@@ -35,11 +35,14 @@ public interface TeleportationManager {
      * Get the spawn location for a player in a particular world. This can be a bed
      * spawn location, the world spawn location, or some other location
      *
-     * @param player Player to check the location for
+     * @param player     Player to check the location for
      * @param hyperWorld The world in which the location exists
      * @return The spawn location
      */
-    @NotNull Location getSpawnLocation(@NotNull final Player player, @NotNull final HyperWorld hyperWorld);
+    @NonNull Location getSpawnLocation(
+            @NonNull Player player,
+            @NonNull HyperWorld hyperWorld
+    );
 
     /**
      * Check whether or not the player is allowed
@@ -49,8 +52,10 @@ public interface TeleportationManager {
      * @param location Location the player is teleporting to
      * @return True if the player is allowed to teleport to the location
      */
-    @NotNull CompletableFuture<Boolean> allowedTeleport(@NotNull final Player player,
-        @NotNull final Location location);
+    @NonNull CompletableFuture<Boolean> allowedTeleport(
+            @NonNull Player player,
+            @NonNull Location location
+    );
 
     /**
      * Check whether or not the player can safely teleport
@@ -60,8 +65,10 @@ public interface TeleportationManager {
      * @param location Location the player is teleporting to
      * @return True if the player is able to teleport to the location
      */
-    @NotNull CompletableFuture<Boolean> canTeleport(@NotNull final Player player,
-        @NotNull final Location location);
+    @NonNull CompletableFuture<Boolean> canTeleport(
+            @NonNull Player player,
+            @NonNull Location location
+    );
 
     /**
      * Find a safe teleportation location near the specified
@@ -70,7 +77,7 @@ public interface TeleportationManager {
      * @param location Search origin
      * @return Safe location
      */
-    @NotNull CompletableFuture<Location> findSafe(@NotNull final Location location);
+    @NonNull CompletableFuture<Location> findSafe(@NonNull Location location);
 
     /**
      * Teleport the player to a given location
@@ -78,7 +85,10 @@ public interface TeleportationManager {
      * @param player   Player to teleport
      * @param location Location to teleport the player to
      */
-    void teleportPlayer(@NotNull final Player player, @NotNull final Location location);
+    void teleportPlayer(
+            @NonNull Player player,
+            @NonNull Location location
+    );
 
     /**
      * Handle nether portal teleportation
@@ -86,14 +96,16 @@ public interface TeleportationManager {
      * @param entity   Entity to teleport
      * @param location Portal location
      */
-    @Nullable Location netherDestination(@NotNull final Entity entity,
-        @NotNull final Location location);
+    @Nullable Location netherDestination(
+            @NonNull Entity entity,
+            @NonNull Location location
+    );
 
     /**
      * Handle end portal teleportation
      *
-     * @param entity   Entity to teleport
+     * @param entity Entity to teleport
      */
-    @Nullable Location endDestination(@NotNull final Entity entity);
+    @Nullable Location endDestination(@NonNull Entity entity);
 
 }

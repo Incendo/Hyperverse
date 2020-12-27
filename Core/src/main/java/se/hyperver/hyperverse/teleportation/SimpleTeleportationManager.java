@@ -25,8 +25,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
@@ -36,8 +36,8 @@ import se.hyperver.hyperverse.flags.implementation.EndFlag;
 import se.hyperver.hyperverse.flags.implementation.IgnoreBedsFlag;
 import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
-import se.hyperver.hyperverse.util.NMS;
 import se.hyperver.hyperverse.service.internal.SafeTeleportService;
+import se.hyperver.hyperverse.util.NMS;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldManager;
 import se.hyperver.hyperverse.world.WorldType;
@@ -57,9 +57,15 @@ public final class SimpleTeleportationManager implements TeleportationManager {
     private final HyperDatabase hyperDatabase;
     private final NMS nms;
 
-    @Inject public SimpleTeleportationManager(final Hyperverse hyperverse, @Assisted final HyperWorld hyperWorld,
-        final WorldManager worldManager, final NMS nms, final HyperConfiguration configuration,
-        final HyperDatabase hyperDatabase) {
+    @Inject
+    public SimpleTeleportationManager(
+            final @NonNull Hyperverse hyperverse,
+            @Assisted final @NonNull HyperWorld hyperWorld,
+            final @NonNull WorldManager worldManager,
+            final @NonNull NMS nms,
+            final @NonNull HyperConfiguration configuration,
+            final @NonNull HyperDatabase hyperDatabase
+    ) {
         this.hyperverse = hyperverse;
         this.hyperWorld = hyperWorld;
         this.worldManager = worldManager;
@@ -68,8 +74,16 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         this.hyperDatabase = hyperDatabase;
     }
 
-    @Override @NotNull public CompletableFuture<Boolean> allowedTeleport(@NotNull final Player player,
-        @NotNull final Location location) {
+    private static boolean hasBedNearby(final @NonNull Location location) {
+        return location.getBlock().getBlockData() instanceof Bed;
+    }
+
+    @Override
+
+    public @NonNull CompletableFuture<@NonNull Boolean> allowedTeleport(
+            final @NonNull Player player,
+            final @NonNull Location location
+    ) {
         if (!this.hyperWorld.getFlag(WorldPermissionFlag.class).isEmpty()) {
             final String permission = this.hyperWorld.getFlag(WorldPermissionFlag.class);
             if (!player.hasPermission(permission)) {
@@ -79,34 +93,44 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         return CompletableFuture.completedFuture(true);
     }
 
-    @Override @NotNull public CompletableFuture<Boolean> canTeleport(@NotNull final Player player,
-        @NotNull final Location location) {
+    @Override
+    public @NonNull CompletableFuture<@NonNull Boolean> canTeleport(
+            final @NonNull Player player,
+            final @NonNull Location location
+    ) {
         if (this.configuration.shouldSafeTeleport()) {
             return PaperLib.getChunkAtAsync(location).thenApply(
-                chunk -> location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid());
+                    chunk -> location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid());
         } else {
             return CompletableFuture.completedFuture(true);
         }
     }
 
-    @Override @NotNull public CompletableFuture<Location> findSafe(@NotNull Location location) {
+    @Override
+    public @NonNull CompletableFuture<@NonNull Location> findSafe(final @NonNull Location location) {
         if (this.configuration.shouldSafeTeleport()) {
             return PaperLib.getChunkAtAsync(location).thenApply(chunk ->
-                this.hyperverse.getServicePipeline().pump(location).through(SafeTeleportService.class)
-                    .getResult());
+                    this.hyperverse.getServicePipeline().pump(location).through(SafeTeleportService.class)
+                            .getResult());
         } else {
             return PaperLib.getChunkAtAsync(location).thenApply(c -> location);
         }
     }
 
-    @Override public void teleportPlayer(@NotNull final Player player,
-        @NotNull final Location location) {
+    @Override
+    public void teleportPlayer(
+            final @NonNull Player player,
+            final @NonNull Location location
+    ) {
         PaperLib.teleportAsync(player, Objects.requireNonNull(location)).thenAccept(l ->
-            player.setPortalCooldown(100));
+                player.setPortalCooldown(100));
     }
 
-    @Override @Nullable public Location netherDestination(@NotNull final Entity entity,
-        @NotNull final Location location) {
+    @Override
+    public @Nullable Location netherDestination(
+            final @NonNull Entity entity,
+            final @NonNull Location location
+    ) {
         final String netherLinkedWorld = this.hyperWorld.getFlag(NetherFlag.class);
         if (netherLinkedWorld.isEmpty()) {
             return null;
@@ -122,11 +146,11 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         int z = location.getBlockZ();
 
         if (this.hyperWorld.getConfiguration().getType() != WorldType.NETHER &&
-            destination.getConfiguration().getType() == WorldType.NETHER) {
+                destination.getConfiguration().getType() == WorldType.NETHER) {
             x >>= 3;
             z >>= 3;
         } else if (this.hyperWorld.getConfiguration().getType() == WorldType.NETHER &&
-            destination.getConfiguration().getType() != WorldType.NETHER) {
+                destination.getConfiguration().getType() != WorldType.NETHER) {
             x <<= 3;
             z <<= 3;
         }
@@ -134,7 +158,8 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         return new Location(destination.getBukkitWorld(), x, y, z);
     }
 
-    @Override @Nullable public Location endDestination(@NotNull final Entity entity) {
+    @Override
+    public @Nullable Location endDestination(final @NonNull Entity entity) {
         final String endLinkedWorld = this.hyperWorld.getFlag(EndFlag.class);
         if (endLinkedWorld.isEmpty()) {
             return null;
@@ -146,13 +171,17 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         return nms.getDimensionSpawn(Objects.requireNonNull(destination.getSpawn()));
     }
 
-    @Override @NotNull public Location getSpawnLocation(@NotNull final Player player,
-        @NotNull final HyperWorld hyperWorld) {
+    @Override
+    public @NonNull Location getSpawnLocation(
+            final @NonNull Player player,
+            final @NonNull HyperWorld hyperWorld
+    ) {
         if (!this.configuration.shouldPersistLocations() || hyperWorld.getFlag(IgnoreBedsFlag.class)) {
             return Objects.requireNonNull(hyperWorld.getSpawn());
         }
         final Location spawnLocation = hyperDatabase.getLocation(player.getUniqueId(), hyperWorld.getConfiguration().getName(),
-            LocationType.BED_SPAWN).map(PersistentLocation::toLocation).orElse(null);
+                LocationType.BED_SPAWN
+        ).map(PersistentLocation::toLocation).orElse(null);
         if (spawnLocation != null && hasBedNearby(spawnLocation)) {
             final Location adjustedLocation = nms.findBedRespawn(spawnLocation);
             if (adjustedLocation != null) {
@@ -160,10 +189,6 @@ public final class SimpleTeleportationManager implements TeleportationManager {
             }
         }
         return Objects.requireNonNull(hyperWorld.getSpawn());
-    }
-
-    private static boolean hasBedNearby(@NotNull final Location location) {
-        return location.getBlock().getBlockData() instanceof Bed;
     }
 
 }

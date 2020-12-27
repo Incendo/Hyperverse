@@ -24,8 +24,8 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
@@ -39,89 +39,120 @@ public final class NullRouteCommandSender implements CommandSender {
 
     private static final NullRouteCommandSender instance = new NullRouteCommandSender();
 
-    @NotNull public static NullRouteCommandSender getInstance() {
-        return instance;
-    }
-
     private NullRouteCommandSender() {
     }
 
-    @Override public void sendMessage(@NotNull String message) {
-    }
-
-    @Override public void sendMessage(@NotNull String[] messages) {
-    }
-
-    @Override public void sendMessage(@Nullable final UUID sender, @NotNull final String message) {
+    @NonNull
+    public static NullRouteCommandSender getInstance() {
+        return instance;
     }
 
     @Override
-    public void sendMessage(@Nullable final UUID sender, final @NotNull String[] messages) {
+    public void sendMessage(@NonNull String message) {
     }
 
-    @Override @NotNull public Server getServer() {
+    @Override
+    public void sendMessage(@NonNull String[] messages) {
+    }
+
+    @Override
+    public void sendMessage(final @Nullable UUID sender, final @NonNull String message) {
+    }
+
+    @Override
+    public void sendMessage(final @Nullable UUID sender, final @NonNull String[] messages) {
+    }
+
+    @Override
+    @NonNull
+    public Server getServer() {
         return Bukkit.getServer();
     }
 
-    @Override @NotNull public String getName() {
+    @Override
+    @NonNull
+    public String getName() {
         return "null";
     }
 
-    @Override @NotNull public Spigot spigot() {
+    @Override
+    @NonNull
+    public Spigot spigot() {
         return new Spigot();
     }
 
-    @Override public boolean isPermissionSet(@NotNull String name) {
+    @Override
+    public boolean isPermissionSet(@NonNull String name) {
         return true;
     }
 
-    @Override public boolean isPermissionSet(@NotNull Permission perm) {
+    @Override
+    public boolean isPermissionSet(@NonNull Permission perm) {
         return true;
     }
 
-    @Override public boolean hasPermission(@NotNull String name) {
+    @Override
+    public boolean hasPermission(@NonNull String name) {
         return true;
     }
 
-    @Override public boolean hasPermission(@NotNull Permission perm) {
+    @Override
+    public boolean hasPermission(@NonNull Permission perm) {
         return true;
     }
 
-    @Override @NotNull
-    public PermissionAttachment addAttachment(@NotNull Plugin plugin, @NotNull String name,
-        boolean value) {
+    @Override
+    public @NonNull PermissionAttachment addAttachment(
+            final @NonNull Plugin plugin,
+            final @NonNull String name,
+            final boolean value
+    ) {
         return new PermissionAttachment(plugin, this);
     }
 
-    @Override @NotNull public PermissionAttachment addAttachment(@NotNull Plugin plugin) {
+    @Override
+    public @NonNull PermissionAttachment addAttachment(final @NonNull Plugin plugin) {
         return new PermissionAttachment(plugin, this);
     }
 
-    @Override @NotNull public PermissionAttachment addAttachment(@NotNull Plugin plugin, @NotNull String name,
-        boolean value, int ticks) {
+    @Override
+    public @NonNull PermissionAttachment addAttachment(
+            final @NonNull Plugin plugin,
+            final @NonNull String name,
+            final boolean value,
+            final int ticks
+    ) {
         return new PermissionAttachment(plugin, this);
     }
 
-    @Override @Nullable
-    public PermissionAttachment addAttachment(@NotNull Plugin plugin, int ticks) {
+    @Override
+    public @Nullable PermissionAttachment addAttachment(
+            final @NonNull Plugin plugin,
+            final int ticks
+    ) {
         return null;
     }
 
-    @Override public void removeAttachment(@NotNull PermissionAttachment attachment) {
+    @Override
+    public void removeAttachment(final @NonNull PermissionAttachment attachment) {
     }
 
-    @Override public void recalculatePermissions() {
+    @Override
+    public void recalculatePermissions() {
     }
 
-    @Override @NotNull public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+    @Override
+    public @NonNull Set<@NonNull PermissionAttachmentInfo> getEffectivePermissions() {
         return Collections.emptySet();
     }
 
-    @Override public boolean isOp() {
+    @Override
+    public boolean isOp() {
         return true;
     }
 
-    @Override public void setOp(boolean value) {
+    @Override
+    public void setOp(final boolean value) {
     }
 
 }

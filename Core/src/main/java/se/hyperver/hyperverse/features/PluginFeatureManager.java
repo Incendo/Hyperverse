@@ -20,7 +20,7 @@ package se.hyperver.hyperverse.features;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.util.MessageUtil;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Manager for {@link PluginFeature plugin features}
  */
-public class PluginFeatureManager {
+public final class PluginFeatureManager {
 
     private final Map<String, Class<? extends PluginFeature>> registeredFeatures;
     private final Collection<String> loadedFeatures;
@@ -45,7 +45,10 @@ public class PluginFeatureManager {
         this.loaded = false;
     }
 
-    public void registerFeature(@NotNull final String pluginName, @NotNull final Class<? extends PluginFeature> featureClass) {
+    public void registerFeature(
+            final @NonNull String pluginName,
+            final @NonNull Class<? extends PluginFeature> featureClass
+    ) {
         Constructor<?> constructor = null;
         try {
             constructor = featureClass.getConstructor();
@@ -66,7 +69,8 @@ public class PluginFeatureManager {
      */
     public void loadFeatures() {
         MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageFeaturesLoading, "%num%",
-            Integer.toString(this.registeredFeatures.size()));
+                Integer.toString(this.registeredFeatures.size())
+        );
         for (final String feature : this.registeredFeatures.keySet()) {
             if (isPluginPresent(feature)) {
                 this.loadFeature(feature);
@@ -81,7 +85,7 @@ public class PluginFeatureManager {
      * @param name Plugin name
      * @return True if the plugin is present
      */
-    public boolean isPluginPresent(@NotNull final String name) {
+    public boolean isPluginPresent(final @NonNull String name) {
         return Bukkit.getPluginManager().isPluginEnabled(name);
     }
 
@@ -91,25 +95,26 @@ public class PluginFeatureManager {
      * @param name Name of the plugin. It has to be enabled on the
      *             server
      */
-    public void loadFeature(@NotNull final String name) {
+    public void loadFeature(final @NonNull String name) {
         if (this.loadedFeatures.contains(name)) {
             return;
         }
         try {
             final Constructor<? extends PluginFeature> featureConstructor = this.registeredFeatures.get(name)
-                .getConstructor();
+                    .getConstructor();
             final PluginFeature feature = featureConstructor.newInstance();
             feature.initializeFeature();
 
             MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageFeatureLoaded, "%plugin%", name,
-                "%feature%", featureConstructor.getDeclaringClass().getSimpleName());
+                    "%feature%", featureConstructor.getDeclaringClass().getSimpleName()
+            );
         } catch (final Exception e) {
             throw new IllegalStateException("Cannot initialize plugin feature", e);
         }
         this.loadedFeatures.add(name);
     }
 
-    @NotNull public Collection<String> getRegisteredFeatures() {
+    public @NonNull Collection<String> getRegisteredFeatures() {
         return new HashSet<>(registeredFeatures.keySet());
     }
 

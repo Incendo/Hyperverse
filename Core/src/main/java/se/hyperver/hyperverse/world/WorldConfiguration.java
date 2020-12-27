@@ -20,12 +20,12 @@ package se.hyperver.hyperverse.world;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
-import se.hyperver.hyperverse.util.GeneratorUtil;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import se.hyperver.hyperverse.util.GeneratorUtil;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -39,7 +39,7 @@ import java.util.Objects;
 /**
  * Configuration of a {@link HyperWorld}
  */
-public class WorldConfiguration implements Cloneable {
+public final class WorldConfiguration implements Cloneable {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -55,8 +55,16 @@ public class WorldConfiguration implements Cloneable {
     private boolean loaded = true;
     private Map<String, String> flags;
 
-    WorldConfiguration(final String name, final WorldType type, final WorldFeatures worldFeatures,
-        final String settings, final long seed, final boolean generateStructures, final String generator, final String generatorArg) {
+    WorldConfiguration(
+            final @NonNull String name,
+            final @NonNull WorldType type,
+            final @NonNull WorldFeatures worldFeatures,
+            final @NonNull String settings,
+            final long seed,
+            final boolean generateStructures,
+            final @NonNull String generator,
+            final @NonNull String generatorArg
+    ) {
         this.name = name;
         this.type = type;
         this.settings = settings;
@@ -73,7 +81,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @return New builder instance
      */
-    public static WorldConfigurationBuilder builder() {
+    public static @NonNull WorldConfigurationBuilder builder() {
         return new WorldConfigurationBuilder();
     }
 
@@ -84,23 +92,26 @@ public class WorldConfiguration implements Cloneable {
      * @param world World instance
      * @return The constructed configuration instance
      */
-    @NotNull public static WorldConfiguration fromWorld(@NotNull final World world) {
+    public static @NonNull WorldConfiguration fromWorld(final @NonNull World world) {
         Objects.requireNonNull(world);
         final WorldConfigurationBuilder worldConfigurationBuilder = builder();
         worldConfigurationBuilder.setName(world.getName());
         if (world.getWorldType() != null) {
-            worldConfigurationBuilder.setWorldFeatures(WorldFeatures
-                .fromBukkitType(world.getWorldType()));
+            worldConfigurationBuilder.setWorldFeatures(Objects.requireNonNull(WorldFeatures
+                    .fromBukkitType(world.getWorldType())));
         }
         worldConfigurationBuilder.setType(WorldType.fromBukkit(world.getEnvironment()));
         worldConfigurationBuilder.setSeed(world.getSeed());
         worldConfigurationBuilder.setGenerateStructures(world.canGenerateStructures() ?
-            WorldStructureSetting.GENERATE_STRUCTURES : WorldStructureSetting.NO_STRUCTURES);
+                WorldStructureSetting.GENERATE_STRUCTURES : WorldStructureSetting.NO_STRUCTURES);
         // Try to retrieve the generator
         try {
             if (Bukkit.getAllowNether() && world.getName().equalsIgnoreCase(Bukkit.getWorlds().get(0).getName() + "_nether")) {
                 worldConfigurationBuilder.setGenerator("");
-            } else if (Bukkit.getAllowNether() && world.getName().equalsIgnoreCase(Bukkit.getWorlds().get(0).getName() + "_the_end")) {
+            } else if (Bukkit.getAllowNether() && world.getName().equalsIgnoreCase(Bukkit
+                    .getWorlds()
+                    .get(0)
+                    .getName() + "_the_end")) {
                 worldConfigurationBuilder.setGenerator("");
             } else {
                 ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());
@@ -126,7 +137,7 @@ public class WorldConfiguration implements Cloneable {
      * @param path File path
      * @return Constructed configuration instance
      */
-    @Nullable public static WorldConfiguration fromFile(@NotNull final Path path) {
+    public static @Nullable WorldConfiguration fromFile(final @NonNull Path path) {
         if (!Files.exists(path)) {
             return null;
         }
@@ -138,7 +149,12 @@ public class WorldConfiguration implements Cloneable {
         return null;
     }
 
-    public WorldConfiguration copy() {
+    /**
+     * Create a copy of the world configuration
+     *
+     * @return Copy of this configuration
+     */
+    public @NonNull WorldConfiguration copy() {
         try {
             return this.clone();
         } catch (CloneNotSupportedException e) {
@@ -147,7 +163,8 @@ public class WorldConfiguration implements Cloneable {
         return null;
     }
 
-    @Override protected WorldConfiguration clone() throws CloneNotSupportedException {
+    @Override
+    protected @NonNull WorldConfiguration clone() throws CloneNotSupportedException {
         final WorldConfiguration other = (WorldConfiguration) super.clone();
         other.name = this.name;
         other.type = this.type;
@@ -161,7 +178,12 @@ public class WorldConfiguration implements Cloneable {
         return other;
     }
 
-    public WorldFeatures getWorldFeatures() {
+    /**
+     * Get the world features
+     *
+     * @return World features enum
+     */
+    public @NonNull WorldFeatures getWorldFeatures() {
         return this.worldFeatures;
     }
 
@@ -170,7 +192,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @return World name
      */
-    @NotNull public String getName() {
+    public @NonNull String getName() {
         return this.name;
     }
 
@@ -179,7 +201,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @return World type
      */
-    @NotNull public WorldType getType() {
+    public @NonNull WorldType getType() {
         return this.type;
     }
 
@@ -189,7 +211,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @return Setting string
      */
-    @NotNull public String getSettings() {
+    public @NonNull String getSettings() {
         return this.settings;
     }
 
@@ -202,6 +224,11 @@ public class WorldConfiguration implements Cloneable {
         return this.seed;
     }
 
+    /**
+     * Set the seed
+     *
+     * @param seed New seed
+     */
     public void setSeed(final long seed) {
         this.seed = seed;
     }
@@ -220,7 +247,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @return World generator name
      */
-    public String getGenerator() {
+    public @NonNull String getGenerator() {
         return this.generator;
     }
 
@@ -229,7 +256,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @param generator New generator
      */
-    public void setGenerator(@NotNull final String generator) {
+    public void setGenerator(final @NonNull String generator) {
         this.generator = generator;
     }
 
@@ -238,7 +265,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @return World generator ID
      */
-    public String getGeneratorArg() {
+    public @NonNull String getGeneratorArg() {
         return this.generatorArg;
     }
 
@@ -248,7 +275,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @return All configured world flags
      */
-    @NotNull public Map<String, String> getFlags() {
+    public @NonNull Map<@NonNull String, @NonNull String> getFlags() {
         if (this.flags == null) {
             this.flags = new HashMap<>();
         }
@@ -258,10 +285,13 @@ public class WorldConfiguration implements Cloneable {
     /**
      * Update a flag value internally
      *
-     * @param flag Flag name
+     * @param flag      Flag name
      * @param flagValue Flag value
      */
-    public void setFlagValue(@NotNull final String flag, @Nullable final String flagValue) {
+    public void setFlagValue(
+            final @NonNull String flag,
+            final @Nullable String flagValue
+    ) {
         if (flagValue == null) {
             this.flags.remove(flag);
         } else {
@@ -292,7 +322,7 @@ public class WorldConfiguration implements Cloneable {
      *
      * @param path File to write to
      */
-    public void writeToFile(@NotNull final Path path) {
+    public void writeToFile(final @NonNull Path path) {
         if (!Files.exists(path)) {
             try {
                 Files.createFile(path);
@@ -302,7 +332,7 @@ public class WorldConfiguration implements Cloneable {
             }
         }
         try (final BufferedWriter bufferedWriter = Files
-            .newBufferedWriter(Objects.requireNonNull(path))) {
+                .newBufferedWriter(Objects.requireNonNull(path))) {
             gson.toJson(this, WorldConfiguration.class, gson.newJsonWriter(bufferedWriter));
             return;
         } catch (final Exception e) {
@@ -311,9 +341,11 @@ public class WorldConfiguration implements Cloneable {
         return;
     }
 
-    @Override public String toString() {
+    @Override
+    public @NonNull String toString() {
         return "WorldConfiguration{" + "name='" + name + '\'' + ", type=" + type + ", settings='"
-            + settings + '\'' + ", seed=" + seed + ", generateStructures=" + generateStructures
-            + ", generator='" + generator + '\'' + ", generatorArg='" + generatorArg + '\'' + '}';
+                + settings + '\'' + ", seed=" + seed + ", generateStructures=" + generateStructures
+                + ", generator='" + generator + '\'' + ", generatorArg='" + generatorArg + '\'' + '}';
     }
+
 }

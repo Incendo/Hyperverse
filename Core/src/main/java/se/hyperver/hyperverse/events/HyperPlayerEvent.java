@@ -18,7 +18,7 @@
 package se.hyperver.hyperverse.events;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 
 import java.util.Objects;
@@ -32,12 +32,20 @@ public abstract class HyperPlayerEvent extends HyperWorldEvent {
 
     private final Player player;
 
-    public HyperPlayerEvent(@NotNull final Player player, @NotNull final HyperWorld hyperWorld) {
+    public HyperPlayerEvent(
+            final @NonNull Player player,
+            final @NonNull HyperWorld hyperWorld
+    ) {
         super(hyperWorld);
         this.player = Objects.requireNonNull(player, "player");
     }
 
-    @NotNull public final Player getPlayer() {
+    /**
+     * Get the player involved in the event
+     *
+     * @return Player involved in the event
+     */
+    public final @NonNull Player getPlayer() {
         return this.player;
     }
 

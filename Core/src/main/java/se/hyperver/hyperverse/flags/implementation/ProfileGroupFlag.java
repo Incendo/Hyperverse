@@ -17,40 +17,45 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.util.WorldUtil;
-import org.jetbrains.annotations.NotNull;
 
 public class ProfileGroupFlag extends WorldFlag<String, ProfileGroupFlag> {
 
     public static final ProfileGroupFlag PROFILE_GROUP_FLAG_EMPTY = new ProfileGroupFlag("default");
 
-    private ProfileGroupFlag(@NotNull final String group) {
+    private ProfileGroupFlag(final @NonNull String group) {
         super(group, Messages.flagDescriptionProfileGroup);
     }
 
-    @Override public ProfileGroupFlag parse(@NotNull String input) throws FlagParseException {
+    @Override
+    public ProfileGroupFlag parse(@NonNull String input) throws FlagParseException {
         if (WorldUtil.validateName(input)) {
             return flagOf(input);
         }
         throw new FlagParseException(this, input, "A world name may only contain (up to) 16 alphanumerical characters, - and _");
     }
 
-    @Override public ProfileGroupFlag merge(@NotNull String newValue) {
+    @Override
+    public ProfileGroupFlag merge(@NonNull String newValue) {
         return flagOf(newValue);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return this.getValue();
     }
 
-    @Override public String getExample() {
+    @Override
+    public String getExample() {
         return "survival_worlds";
     }
 
-    @Override protected ProfileGroupFlag flagOf(@NotNull final String value) {
+    @Override
+    protected ProfileGroupFlag flagOf(final @NonNull String value) {
         return new ProfileGroupFlag(value);
     }
 

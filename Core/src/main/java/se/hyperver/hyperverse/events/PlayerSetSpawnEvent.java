@@ -21,13 +21,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 
 /**
  * Called when a {@link org.bukkit.entity.Player} attempts to set their
  * spawn point using a bed in a {@link se.hyperver.hyperverse.world.HyperWorld}.
- *
+ * <p>
  * Cancelling this event will prevent Hyperverse from updating the spawn point.
  * This will not affect the vanilla spawn point, however. To do that, one would
  * need to interact with {@link org.bukkit.event.player.PlayerBedEnterEvent}
@@ -38,31 +38,41 @@ public class PlayerSetSpawnEvent extends HyperPlayerEvent implements Cancellable
 
     private boolean cancelled;
 
-    private PlayerSetSpawnEvent(@NotNull final Player player, @NotNull final HyperWorld world) {
+    private PlayerSetSpawnEvent(
+            final @NonNull Player player,
+            final @NonNull HyperWorld world
+    ) {
         super(player, world);
         this.cancelled = false;
     }
 
-    @SuppressWarnings("unused") public static HandlerList getHandlerList() {
+    @SuppressWarnings("unused")
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 
-    public static PlayerSetSpawnEvent callFor(@NotNull final Player player, @NotNull final HyperWorld world) {
+    public static @NonNull PlayerSetSpawnEvent callFor(
+            final @NonNull Player player,
+            final @NonNull HyperWorld world
+    ) {
         final PlayerSetSpawnEvent playerSetSpawnEvent = new PlayerSetSpawnEvent(player, world);
         Bukkit.getServer().getPluginManager().callEvent(playerSetSpawnEvent);
         return playerSetSpawnEvent;
     }
 
-    @Override @NotNull public HandlerList getHandlers() {
+    @Override
+    public @NonNull HandlerList getHandlers() {
         return handlers;
     }
 
-    @Override public void setCancelled(final boolean cancelled) {
-        this.cancelled = cancelled;
+    @Override
+    public boolean isCancelled() {
+        return this.cancelled;
     }
 
-    @Override public boolean isCancelled() {
-        return this.cancelled;
+    @Override
+    public void setCancelled(final boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
 }

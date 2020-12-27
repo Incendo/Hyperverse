@@ -18,8 +18,8 @@
 package se.hyperver.hyperverse.util;
 
 import com.google.common.base.Charsets;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.Hyperverse;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +42,8 @@ import java.util.stream.Collectors;
 /**
  * Single class paster for the Incendo paste service
  */
-@SuppressWarnings({"unused", "WeakerAccess"}) public final class IncendoPaster {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public final class IncendoPaster {
 
     /**
      * Upload service URL
@@ -52,7 +53,7 @@ import java.util.stream.Collectors;
      * Valid paste applications
      */
     public static final Collection<String> VALID_APPLICATIONS =
-        Arrays.asList("plotsquared", "fastasyncworldedit", "incendopermissions", "kvantum");
+            Arrays.asList("plotsquared", "fastasyncworldedit", "incendopermissions", "kvantum");
 
     private final Collection<PasteFile> files = new ArrayList<>();
     private final String pasteApplication;
@@ -62,18 +63,18 @@ import java.util.stream.Collectors;
      *
      * @param pasteApplication The application that is sending the paste
      */
-    public IncendoPaster(final String pasteApplication) {
-        if (pasteApplication == null || pasteApplication.isEmpty()) {
+    public IncendoPaster(final @NonNull String pasteApplication) {
+        if (pasteApplication.isEmpty()) {
             throw new IllegalArgumentException("paste application cannot be null, nor empty");
         }
         if (!VALID_APPLICATIONS.contains(pasteApplication.toLowerCase(Locale.ENGLISH))) {
             throw new IllegalArgumentException(
-                String.format("Unknown application name: %s", pasteApplication));
+                    String.format("Unknown application name: %s", pasteApplication));
         }
         this.pasteApplication = pasteApplication;
     }
 
-    public static String readFile(@NotNull final File file) throws IOException {
+    public static String readFile(final @NonNull File file) throws IOException {
         final List<String> lines;
         try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
             lines = reader.lines().collect(Collectors.toList());
@@ -90,7 +91,7 @@ import java.util.stream.Collectors;
      *
      * @return Unmodifiable collection
      */
-    public final Collection<PasteFile> getFiles() {
+    public final @NonNull Collection<@NonNull PasteFile> getFiles() {
         return Collections.unmodifiableCollection(this.files);
     }
 
@@ -99,15 +100,12 @@ import java.util.stream.Collectors;
      *
      * @param file File to paste
      */
-    public void addFile(final PasteFile file) {
-        if (file == null) {
-            throw new IllegalArgumentException("File cannot be null");
-        }
+    public void addFile(final @NonNull PasteFile file) {
         // Check to see that no duplicate files are submitted
         for (final PasteFile pasteFile : this.files) {
             if (pasteFile.fileName.equalsIgnoreCase(file.getFileName())) {
                 throw new IllegalArgumentException(
-                    String.format("Found duplicate file with name %s", file.getFileName()));
+                        String.format("Found duplicate file with name %s", file.getFileName()));
             }
         }
         this.files.add(file);
@@ -118,10 +116,10 @@ import java.util.stream.Collectors;
      *
      * @return compiled JSON string
      */
-    private String toJsonString() {
+    private @NonNull String toJsonString() {
         final StringBuilder builder = new StringBuilder("{\n");
         builder.append("\"paste_application\": \"").append(this.pasteApplication)
-            .append("\",\n\"files\": \"");
+                .append("\",\n\"files\": \"");
         Iterator<PasteFile> fileIterator = this.files.iterator();
         while (fileIterator.hasNext()) {
             final PasteFile file = fileIterator.next();
@@ -135,7 +133,7 @@ import java.util.stream.Collectors;
         while (fileIterator.hasNext()) {
             final PasteFile file = fileIterator.next();
             builder.append("\"file-").append(file.getFileName()).append("\": \"")
-                .append(file.getContent().replaceAll("\"", "\\\\\"")).append("\"");
+                    .append(file.getContent().replaceAll("\"", "\\\\\"")).append("\"");
             if (fileIterator.hasNext()) {
                 builder.append(",\n");
             }
@@ -150,7 +148,7 @@ import java.util.stream.Collectors;
      * @return Status message
      * @throws Throwable any and all exceptions
      */
-    public final String upload() throws Throwable {
+    public final @NonNull String upload() throws Throwable {
         final URL url = new URL(UPLOAD_PATH);
         final URLConnection connection = url.openConnection();
         final HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
@@ -168,15 +166,16 @@ import java.util.stream.Collectors;
             if (httpURLConnection.getResponseCode() == 413) {
                 final long size = content.length;
                 Hyperverse.getPlugin(Hyperverse.class).getLogger()
-                    .warning(String.format("Paste Too Big > Size: %dMB", size / 1_000_000));
+                        .warning(String.format("Paste Too Big > Size: %dMB", size / 1_000_000));
             }
             throw new IllegalStateException(String
-                .format("Server returned status: %d %s", httpURLConnection.getResponseCode(),
-                    httpURLConnection.getResponseMessage()));
+                    .format("Server returned status: %d %s", httpURLConnection.getResponseCode(),
+                            httpURLConnection.getResponseMessage()
+                    ));
         }
         final StringBuilder input = new StringBuilder();
         try (final BufferedReader inputStream = new BufferedReader(
-            new InputStreamReader(httpURLConnection.getInputStream()))) {
+                new InputStreamReader(httpURLConnection.getInputStream()))) {
             String line;
             while ((line = inputStream.readLine()) != null) {
                 input.append(line).append("\n");
@@ -189,7 +188,7 @@ import java.util.stream.Collectors;
     /**
      * Simple class that represents a paste file
      */
-    public static class PasteFile {
+    public static final class PasteFile {
 
         private final String fileName;
         private final String content;
@@ -200,11 +199,11 @@ import java.util.stream.Collectors;
          * @param fileName File name, cannot be empty, nor null
          * @param content  File content, cannot be empty, nor null
          */
-        public PasteFile(final String fileName, final String content) {
-            if (fileName == null || fileName.isEmpty()) {
+        public PasteFile(final @NonNull String fileName, final @NonNull String content) {
+            if (fileName.isEmpty()) {
                 throw new IllegalArgumentException("file name cannot be null, nor empty");
             }
-            if (content == null || content.isEmpty()) {
+            if (content.isEmpty()) {
                 throw new IllegalArgumentException("content cannot be null, nor empty");
             }
             this.fileName = fileName;
@@ -216,7 +215,7 @@ import java.util.stream.Collectors;
          *
          * @return File name
          */
-        public String getFileName() {
+        public @NonNull String getFileName() {
             return this.fileName;
         }
 
@@ -225,9 +224,10 @@ import java.util.stream.Collectors;
          *
          * @return File content
          */
-        public String getContent() {
+        public @NonNull String getContent() {
             return this.content;
         }
+
     }
 
 }

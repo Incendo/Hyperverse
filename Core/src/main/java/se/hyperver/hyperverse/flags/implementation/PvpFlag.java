@@ -17,8 +17,8 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
-import org.jetbrains.annotations.NotNull;
 
 public class PvpFlag extends BooleanFlag<PvpFlag> {
 
@@ -29,7 +29,8 @@ public class PvpFlag extends BooleanFlag<PvpFlag> {
         super(value, Messages.flagDescriptionPvp);
     }
 
-    @Override protected PvpFlag flagOf(@NotNull Boolean value) {
+    @Override
+    protected PvpFlag flagOf(@NonNull Boolean value) {
         return value ? PVP_FLAG_TRUE : PVP_FLAG_FALSE;
     }
 

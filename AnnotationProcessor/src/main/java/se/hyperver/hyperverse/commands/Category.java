@@ -25,5 +25,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.CLASS)
 public @interface Category {
+
     String value();
+
 }

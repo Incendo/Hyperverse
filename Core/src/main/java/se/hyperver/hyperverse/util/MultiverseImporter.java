@@ -26,7 +26,7 @@ import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.implementation.AliasFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
@@ -42,30 +42,38 @@ import se.hyperver.hyperverse.world.WorldManager;
 import java.util.Collection;
 import java.util.UUID;
 
-@Singleton public final class MultiverseImporter {
+@Singleton
+public final class MultiverseImporter {
 
     private final WorldManager worldManager;
     private final HyperWorldFactory hyperWorldFactory;
 
-    @Inject public MultiverseImporter(final WorldManager worldManager,
-        @Assisted final HyperWorldFactory hyperWorldFactory) {
+    @Inject
+    public MultiverseImporter(
+            final @NonNull WorldManager worldManager,
+            @Assisted final @NonNull HyperWorldFactory hyperWorldFactory
+    ) {
         this.worldManager = worldManager;
         this.hyperWorldFactory = hyperWorldFactory;
     }
 
-    public void performImport(@NotNull final CommandSender commandSender) {
+    public void performImport(
+            final @NonNull CommandSender commandSender
+    ) {
         final MultiverseCore multiverseCore = MultiverseCore.getPlugin(MultiverseCore.class);
         final MVWorldManager worldManager = multiverseCore.getMVWorldManager();
         final Collection<MultiverseWorld> worlds = worldManager.getMVWorlds();
 
         MessageUtil.sendMessage(commandSender, Messages.messageImportPluginInitializing,
-            "%worlds%", Integer.toString(worlds.size()), "%plugin%", "Multiverse");
+                "%worlds%", Integer.toString(worlds.size()), "%plugin%", "Multiverse"
+        );
 
         for (final MultiverseWorld multiverseWorld : worlds) {
             HyperWorld hyperWorld = this.worldManager.getWorld(multiverseWorld.getName());
             if (hyperWorld == null) {
                 MessageUtil.sendMessage(commandSender, Messages.messageImportPluginCreating,
-                    "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse");
+                        "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse"
+                );
                 final WorldConfiguration worldConfiguration = WorldConfiguration.fromWorld(multiverseWorld.getCBWorld());
                 final UUID uuid;
                 if (multiverseWorld.getCBWorld() != null) {
@@ -84,10 +92,11 @@ import java.util.UUID;
             hyperWorld.getConfiguration().setGenerator(generator);
             hyperWorld.getConfiguration().setSeed(multiverseWorld.getSeed());
             MessageUtil.sendMessage(commandSender, Messages.messageImportingExternalWorld,
-                "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse");
+                    "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse"
+            );
             hyperWorld.setFlagInstance(DifficultyFlag.DIFFICULTY_FLAG_NORMAL.createFlagInstance(multiverseWorld.getDifficulty()));
             hyperWorld.setFlagInstance(WorldPermissionFlag.WORLD_PERMISSION_FLAG_DEFAULT
-                .createFlagInstance(multiverseWorld.getAccessPermission().getName()));
+                    .createFlagInstance(multiverseWorld.getAccessPermission().getName()));
             hyperWorld.setFlagInstance(PvpFlag.PVP_FLAG_TRUE.createFlagInstance(multiverseWorld.isPVPEnabled()));
             hyperWorld.setFlagInstance(GamemodeFlag.GAMEMODE_SURVIVAL.createFlagInstance(multiverseWorld.getGameMode()));
             final String worldAlias = multiverseWorld.getAlias();
@@ -100,7 +109,8 @@ import java.util.UUID;
             }
             hyperWorld.saveConfiguration();
             MessageUtil.sendMessage(commandSender, Messages.messageExternalImportCompleted,
-            "%world%", multiverseWorld.getName(),"%plugin%", "Multiverse");
+                    "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse"
+            );
         }
         MessageUtil.sendMessage(commandSender, Messages.messageImportDone, "%plugin%", "Multiverse");
     }

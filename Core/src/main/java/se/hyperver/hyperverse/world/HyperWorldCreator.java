@@ -19,11 +19,11 @@ package se.hyperver.hyperverse.world;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import se.hyperver.hyperverse.util.NullRouteCommandSender;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.generator.ChunkGenerator;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import se.hyperver.hyperverse.util.NullRouteCommandSender;
 
 import java.util.Objects;
 
@@ -34,7 +34,8 @@ public final class HyperWorldCreator extends WorldCreator {
 
     private final HyperWorld hyperWorld;
 
-    @Inject public HyperWorldCreator(@Assisted final HyperWorld hyperWorld) {
+    @Inject
+    public HyperWorldCreator(@Assisted final @NonNull HyperWorld hyperWorld) {
         super(Objects.requireNonNull(hyperWorld).getConfiguration().getName());
         this.hyperWorld = hyperWorld;
     }
@@ -44,13 +45,14 @@ public final class HyperWorldCreator extends WorldCreator {
      *
      * @return Result of the validation
      */
-    @NotNull public ValidationResult validate() {
+    public @NonNull ValidationResult validate() {
         final WorldConfiguration worldConfiguration = this.hyperWorld.getConfiguration();
         if (!worldConfiguration.getGenerator().isEmpty() &&
-            !worldConfiguration.getGenerator().equalsIgnoreCase("vanilla")) {
+                !worldConfiguration.getGenerator().equalsIgnoreCase("vanilla")) {
             final ChunkGenerator chunkGenerator =
-                getGeneratorForName(worldConfiguration.getName(), getJoinedName(),
-                    NullRouteCommandSender.getInstance());
+                    getGeneratorForName(worldConfiguration.getName(), getJoinedName(),
+                            NullRouteCommandSender.getInstance()
+                    );
             if (chunkGenerator == null) {
                 return ValidationResult.UNKNOWN_GENERATOR;
             }
@@ -75,19 +77,23 @@ public final class HyperWorldCreator extends WorldCreator {
         this.generator(getJoinedName(), NullRouteCommandSender.getInstance());
     }
 
-    private String getJoinedName() {
+    private @NonNull String getJoinedName() {
         if (this.hyperWorld.getConfiguration().getGeneratorArg().isEmpty()) {
             return this.hyperWorld.getConfiguration().getGenerator();
         }
         return String.format("%s:%s", this.hyperWorld.getConfiguration().getGenerator(),
-            this.hyperWorld.getConfiguration().getGeneratorArg());
+                this.hyperWorld.getConfiguration().getGeneratorArg()
+        );
     }
 
     /**
      * Result of configuration validation
      */
     public enum ValidationResult {
-        SUCCESS, UNKNOWN_GENERATOR, NAME_TAKEN, UNKNOWN_ERROR
+        SUCCESS,
+        UNKNOWN_GENERATOR,
+        NAME_TAKEN,
+        UNKNOWN_ERROR
     }
 
 }

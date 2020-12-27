@@ -22,7 +22,7 @@ import me.minidigger.minimessage.bungee.MiniMessageSerializer;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
 
@@ -42,11 +42,14 @@ public final class MessageUtil {
      * value is the replacement, example:
      * %key1%, value1, %key2%, value2
      *
-     * @param message String to format
+     * @param message      String to format
      * @param replacements Replacements, needs to be a multiple of 2
      * @return The formatted string
      */
-    @NotNull public static String format(@NotNull final String message, @NotNull final String... replacements) {
+    public static @NonNull String format(
+            final @NonNull String message,
+            final @NonNull String... replacements
+    ) {
         if (replacements.length % 2 != 0) {
             throw new IllegalArgumentException("Replacement length must be a multiple of two");
         }
@@ -60,13 +63,15 @@ public final class MessageUtil {
     /**
      * Send a message to a recipient
      *
-     * @param recipient Receiver of the message
-     * @param message Message to send
+     * @param recipient    Receiver of the message
+     * @param message      Message to send
      * @param replacements Replacements
      * @see #format(String, String...) for information about string replacements
      */
-    public static void sendMessage(@NotNull final CommandSender recipient,
-        @NotNull final Message message, @NotNull final String... replacements) {
+    public static void sendMessage(
+            final @NonNull CommandSender recipient,
+            final @NonNull Message message, final @NonNull String... replacements
+    ) {
         Objects.requireNonNull(recipient);
         final String replacedMessage = format(message.toString(), replacements);
         if (replacedMessage.isEmpty()) {
@@ -74,8 +79,10 @@ public final class MessageUtil {
         }
         if (replacedMessage.contains("<") && replacedMessage.contains(">")) {
             if (replacedMessage.contains(ChatColor.COLOR_CHAR + "")) {
-                final String prefixedMessage = ChatColor.translateAlternateColorCodes('&',
-                    Messages.messagePrefix.toString() + replacedMessage);
+                final String prefixedMessage = ChatColor.translateAlternateColorCodes(
+                        '&',
+                        Messages.messagePrefix.toString() + replacedMessage
+                );
                 final String fixedMessage = MiniMessageSerializer.serialize(TextComponent.fromLegacyText(prefixedMessage));
                 recipient.spigot().sendMessage(MiniMessageParser.parseFormat(fixedMessage));
             } else {
@@ -83,8 +90,10 @@ public final class MessageUtil {
                 recipient.spigot().sendMessage(MiniMessageParser.parseFormat(prefixedMessage));
             }
         } else {
-            final String prefixedMessage = ChatColor.translateAlternateColorCodes('&',
-                Messages.messagePrefix.toString() + replacedMessage);
+            final String prefixedMessage = ChatColor.translateAlternateColorCodes(
+                    '&',
+                    Messages.messagePrefix.toString() + replacedMessage
+            );
             recipient.sendMessage(prefixedMessage);
         }
     }

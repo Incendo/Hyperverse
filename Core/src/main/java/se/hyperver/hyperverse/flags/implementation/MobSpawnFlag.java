@@ -17,19 +17,20 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 
 public final class MobSpawnFlag extends BooleanFlag<MobSpawnFlag> {
 
-    public static final MobSpawnFlag MOB_SPAWN_ALLOWED   = new MobSpawnFlag(true);
+    public static final MobSpawnFlag MOB_SPAWN_ALLOWED = new MobSpawnFlag(true);
     public static final MobSpawnFlag MOB_SPAWN_FORBIDDEN = new MobSpawnFlag(false);
 
     private MobSpawnFlag(final boolean value) {
         super(value, Messages.flagDescriptionMobSpawn);
     }
 
-    @Override protected MobSpawnFlag flagOf(@NotNull final Boolean value) {
+    @Override
+    protected MobSpawnFlag flagOf(final @NonNull Boolean value) {
         return value ? MOB_SPAWN_ALLOWED : MOB_SPAWN_FORBIDDEN;
     }
 

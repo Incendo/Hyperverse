@@ -18,8 +18,8 @@
 package se.hyperver.hyperverse.world;
 
 import org.bukkit.WorldType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,19 +33,26 @@ public enum WorldFeatures {
     AMPLIFIED(WorldType.AMPLIFIED, "amplified"),
     BUFFET("BUFFET", "buffet");
 
-    private static final IllegalStateException INCOMPATIBLE_VERSION =  new IllegalStateException("WorldType is unavailable on this version.");
+    private static final IllegalStateException INCOMPATIBLE_VERSION = new IllegalStateException(
+            "WorldType is unavailable on this version.");
     private final WorldType bukkitType;
     private final Collection<String> names;
 
-    WorldFeatures(@NotNull final WorldType bukkitType, @NotNull final String ... names) {
+    WorldFeatures(
+            final @NonNull WorldType bukkitType,
+            final @NonNull String... names
+    ) {
         this.bukkitType = Objects.requireNonNull(bukkitType);
         this.names = Arrays.asList(names);
     }
 
-    WorldFeatures(@NotNull final String enumName, @NotNull final String... names) {
+    WorldFeatures(
+            final @NonNull String enumName,
+            final @NonNull String... names
+    ) {
         WorldType worldType;
         try {
-          worldType = WorldType.valueOf(enumName);
+            worldType = WorldType.valueOf(enumName);
         } catch (IllegalArgumentException ex) {
             worldType = null;
         }
@@ -53,25 +60,7 @@ public enum WorldFeatures {
         this.names = Arrays.asList(names);
     }
 
-    /**
-     * Get the Bukkit enum world type for this world feature.
-     * @return Returns a never null {@link WorldType}.
-     * @throws IllegalStateException Thrown if the bukkit world type is not available.
-     *                               This method will always throw an {@link IllegalStateException}
-     *                               if {@link #isAvailable()} returns false.
-     */
-    @NotNull public WorldType getBukkitType() throws IllegalStateException{
-        if (this.bukkitType == null) {
-          throw INCOMPATIBLE_VERSION;
-        }
-        return this.bukkitType;
-    }
-
-    public boolean isAvailable() {
-        return this.bukkitType != null;
-    }
-
-    @NotNull public static Optional<WorldFeatures> fromName(@NotNull final String name) {
+    public static @NonNull Optional<WorldFeatures> fromName(final @NonNull String name) {
         Objects.requireNonNull(name);
         for (final WorldFeatures worldFeatures : values()) {
             if (worldFeatures.names.contains(name.toLowerCase(Locale.ENGLISH)) && worldFeatures.bukkitType != null) {
@@ -81,7 +70,7 @@ public enum WorldFeatures {
         return Optional.empty();
     }
 
-    @Nullable public static WorldFeatures fromBukkitType(@NotNull final WorldType bukkitType) {
+    public static @Nullable WorldFeatures fromBukkitType(final @NonNull WorldType bukkitType) {
         Objects.requireNonNull(bukkitType);
         for (final WorldFeatures worldFeatures : values()) {
             if (worldFeatures.getBukkitType() == bukkitType) {
@@ -89,6 +78,25 @@ public enum WorldFeatures {
             }
         }
         return null;
+    }
+
+    /**
+     * Get the Bukkit enum world type for this world feature.
+     *
+     * @return Returns a never null {@link WorldType}.
+     * @throws IllegalStateException Thrown if the bukkit world type is not available.
+     *                               This method will always throw an {@link IllegalStateException}
+     *                               if {@link #isAvailable()} returns false.
+     */
+    public @NonNull WorldType getBukkitType() throws IllegalStateException {
+        if (this.bukkitType == null) {
+            throw INCOMPATIBLE_VERSION;
+        }
+        return this.bukkitType;
+    }
+
+    public boolean isAvailable() {
+        return this.bukkitType != null;
     }
 
 }

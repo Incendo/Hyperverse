@@ -27,15 +27,6 @@ import com.typesafe.config.ConfigRenderOptions;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import io.papermc.lib.PaperLib;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Logger;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -48,8 +39,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import se.hyperver.hyperverse.commands.HyperCommandManager;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
@@ -72,6 +64,16 @@ import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Plugin main class
@@ -98,15 +100,17 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
      *
      * @return API implementation
      */
-    public static HyperverseAPI getApi() {
+    public static @MonotonicNonNull HyperverseAPI getApi() {
         return instance;
     }
 
-    @Override public void onLoad() {
+    @Override
+    public void onLoad() {
         instance = this;
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         // Register this first
         Bukkit.getPluginManager().registerEvents(this, this);
 
@@ -120,7 +124,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
         try {
             this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(),
-                new TaskFactoryModule(this));
+                    new TaskFactoryModule(this)
+            );
         } catch (final Exception e) {
             e.printStackTrace();
             getLogger().severe("Failed to creator the Guice injector. Disabling.");
@@ -188,9 +193,9 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         // Register events
         try {
             this.getServer().getPluginManager()
-                .registerEvents(injector.getInstance(WorldListener.class), this);
+                    .registerEvents(injector.getInstance(WorldListener.class), this);
             this.getServer().getPluginManager()
-                .registerEvents(injector.getInstance(EventListener.class), this);
+                    .registerEvents(injector.getInstance(EventListener.class), this);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -217,7 +222,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         // Unload the worlds with save-world=false without saving before the server does it.
         // Also kick everyone from there showing the shutdown message.
         // This will only make sense if this isn't a /reload or an unloadplugin/disableplugin. If it is, I feel really, really sorry for the server.
@@ -240,14 +246,14 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             this.hyperConfiguration = this.injector.getInstance(HyperConfiguration.class);
             this.getLogger().info("§6Hyperverse Options");
             this.getLogger().info("§8- §7use persistent locations? " + this.hyperConfiguration
-                .shouldPersistLocations());
+                    .shouldPersistLocations());
             this.getLogger().info(
-                "§8- §7keep spawns loaded? " + this.hyperConfiguration.shouldKeepSpawnLoaded());
+                    "§8- §7keep spawns loaded? " + this.hyperConfiguration.shouldKeepSpawnLoaded());
             this.getLogger().info("§8- §7should detect worlds? " + this.hyperConfiguration
-                .shouldImportAutomatically());
+                    .shouldImportAutomatically());
             this.getLogger().info(
-                "§8- §7should separate player profiles? " + this.hyperConfiguration
-                    .shouldGroupProfiles());
+                    "§8- §7should separate player profiles? " + this.hyperConfiguration
+                            .shouldGroupProfiles());
         } catch (final Exception e) {
             e.printStackTrace();
             return false;
@@ -268,7 +274,10 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     private boolean loadServices() {
         try {
-            this.servicePipeline.registerServiceType(TypeToken.get(SafeTeleportService.class), SafeTeleportService.defaultService());
+            this.servicePipeline.registerServiceType(
+                    TypeToken.get(SafeTeleportService.class),
+                    SafeTeleportService.defaultService()
+            );
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -284,7 +293,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
                 logger.info("- " + feature);
             }
         } else {
-            logger.info( "- No Hooks Detected");
+            logger.info("- No Hooks Detected");
         }
         logger.info("§6Hyperverse Services (Internal) ");
         for (Type type : this.servicePipeline.getRecognizedTypes()) {
@@ -331,29 +340,29 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
      *
      * @param invoker An optional CommandSender who invoked the reload.
      */
-    public boolean reloadConfiguration(@Nullable final CommandSender invoker) {
+    public boolean reloadConfiguration(final @Nullable CommandSender invoker) {
         ((FileHyperConfiguration) this.hyperConfiguration).loadConfiguration();
         final boolean reloadMessages = loadMessages(this.hyperConfiguration.getLanguageCode());
         if (invoker != null) {
             MessageUtil.sendMessage(invoker, reloadMessages ?
-                Messages.messageMessagesReloaded :
-                Messages.messageMessageReloadFailed, "%reason%", ""); //Force a reload.
+                    Messages.messageMessagesReloaded :
+                    Messages.messageMessageReloadFailed, "%reason%", ""); //Force a reload.
             MessageUtil.sendMessage(invoker, Messages.messageConfigReloaded);
         }
         return reloadMessages;
     }
 
-    private boolean loadMessages(final String language) {
+    private boolean loadMessages(final @NonNull String language) {
         // Message configuration
         final Path messagePath =
-            this.getDataFolder().toPath().resolve(String.format("messages_%s.conf", language));
+                this.getDataFolder().toPath().resolve(String.format("messages_%s.conf", language));
         final AbstractConfigurationLoader<CommentedConfigurationNode> loader =
-            HoconConfigurationLoader.builder().setParseOptions(
-                ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
-                .setRenderOptions(
-                    ConfigRenderOptions.defaults().setComments(true).setFormatted(true)
-                        .setOriginComments(false).setJson(false))
-                .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
+                HoconConfigurationLoader.builder().setParseOptions(
+                        ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
+                        .setRenderOptions(
+                                ConfigRenderOptions.defaults().setComments(true).setFormatted(true)
+                                        .setOriginComments(false).setJson(false))
+                        .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
 
         ConfigurationNode translationNode;
         try {
@@ -391,7 +400,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         return true;
     }
 
-    private void attemptCopyCaptions(final String code) {
+    private void attemptCopyCaptions(final @NonNull String code) {
         final String fileName = String.format("messages_%s.conf", code.toLowerCase());
         final Path path = this.getDataFolder().toPath().resolve(fileName);
         if (!Files.exists(path)) {
@@ -399,43 +408,53 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         }
     }
 
-    @Override @NotNull public WorldManager getWorldManager() {
+    @Override
+    public @NonNull WorldManager getWorldManager() {
         return this.worldManager;
     }
 
-    @Override @NotNull public Injector getInjector() {
+    @Override
+    public @NonNull Injector getInjector() {
         return this.injector;
     }
 
-    @Override @NotNull public HyperDatabase getDatabase() {
+    @Override
+    public @NonNull HyperDatabase getDatabase() {
         return this.hyperDatabase;
     }
 
-    @Override @NotNull public HyperConfiguration getConfiguration() {
+    @Override
+    public @NonNull HyperConfiguration getConfiguration() {
         return this.hyperConfiguration;
     }
 
-    @Override @NotNull public HyperWorldFactory getWorldFactory() {
+    @Override
+    public @NonNull HyperWorldFactory getWorldFactory() {
         return this.worldFactory;
     }
 
-    @Override @NotNull public HyperWorld createWorld(@NotNull WorldConfiguration configuration)
-        throws HyperWorldCreationException {
+    @Override
+    public @NonNull HyperWorld createWorld(final @NonNull WorldConfiguration configuration)
+            throws HyperWorldCreationException {
         // Verify that no such world exists
         for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
             if (hyperWorld.getConfiguration().getName().equalsIgnoreCase(configuration.getName())) {
-                throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN,
-                    configuration);
+                throw new HyperWorldCreationException(
+                        HyperWorldCreator.ValidationResult.NAME_TAKEN,
+                        configuration
+                );
             }
         }
         if (Bukkit.getWorld(configuration.getName()) != null) {
-            throw new HyperWorldCreationException(HyperWorldCreator.ValidationResult.NAME_TAKEN,
-                configuration);
+            throw new HyperWorldCreationException(
+                    HyperWorldCreator.ValidationResult.NAME_TAKEN,
+                    configuration
+            );
         }
 
         // Create the world instance
         final HyperWorld hyperWorld =
-            this.getWorldFactory().create(UUID.randomUUID(), configuration);
+                this.getWorldFactory().create(UUID.randomUUID(), configuration);
 
         // Make sure to ignore the load event
         this.getWorldManager().ignoreWorld(configuration.getName());
@@ -447,9 +466,11 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             this.worldManager.addWorld(hyperWorld);
         } catch (final HyperWorldValidationException validationException) {
             if (validationException.getValidationResult()
-                != HyperWorldCreator.ValidationResult.SUCCESS) {
-                throw new HyperWorldCreationException(validationException.getValidationResult(),
-                    configuration);
+                    != HyperWorldCreator.ValidationResult.SUCCESS) {
+                throw new HyperWorldCreationException(
+                        validationException.getValidationResult(),
+                        configuration
+                );
             }
         } catch (final Exception e) {
             throw new HyperWorldCreationException(e, configuration);
@@ -459,16 +480,19 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         return hyperWorld;
     }
 
-    @NotNull @Override public PluginFeatureManager getPluginFeatureManager() {
+    @Override
+    public @NonNull PluginFeatureManager getPluginFeatureManager() {
         return this.pluginFeatureManager;
     }
 
-    @EventHandler public void onServerLoaded(final ServerLoadEvent event) {
+    @EventHandler
+    public void onServerLoaded(final @NonNull ServerLoadEvent event) {
         this.pluginFeatureManager.loadFeatures();
         logHookInformation();
     }
 
-    @NotNull @Override public ServicePipeline getServicePipeline() {
+    @Override
+    public @NonNull ServicePipeline getServicePipeline() {
         return this.servicePipeline;
     }
 

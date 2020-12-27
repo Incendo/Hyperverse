@@ -18,8 +18,8 @@
 package se.hyperver.hyperverse.world;
 
 import org.bukkit.World;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -39,7 +39,7 @@ public interface WorldManager {
      *                  will be guessed from the chunk generator
      * @return The result of the import
      */
-    WorldImportResult importWorld(@NotNull World world, boolean vanilla, @Nullable String generator);
+    WorldImportResult importWorld(@NonNull World world, boolean vanilla, @Nullable String generator);
 
     /**
      * Load all pre-configured worlds. This will not create the worlds,
@@ -57,21 +57,21 @@ public interface WorldManager {
      *
      * @param hyperWorld World to add
      */
-    void addWorld(@NotNull HyperWorld hyperWorld);
+    void addWorld(@NonNull HyperWorld hyperWorld);
 
     /**
      * Register the world internally
      *
      * @param hyperWorld World to register
      */
-    void registerWorld(@NotNull HyperWorld hyperWorld);
+    void registerWorld(@NonNull HyperWorld hyperWorld);
 
     /**
      * Get all registered worlds
      *
      * @return Immutable view of all recognized worlds
      */
-    @NotNull Collection<HyperWorld> getWorlds();
+    @NonNull Collection<HyperWorld> getWorlds();
 
     /**
      * Get a world using its name
@@ -79,7 +79,7 @@ public interface WorldManager {
      * @param name World name
      * @return World, if it exists
      */
-    @Nullable HyperWorld getWorld(@NotNull String name);
+    @Nullable HyperWorld getWorld(@NonNull String name);
 
     /**
      * Get a world from a Bukkit world
@@ -87,7 +87,7 @@ public interface WorldManager {
      * @param world Bukkit world
      * @return World, if it exists
      */
-    @Nullable HyperWorld getWorld(@NotNull final World world);
+    @Nullable HyperWorld getWorld(final @NonNull World world);
 
     /**
      * Make a world ignored, this means that it won't
@@ -96,7 +96,7 @@ public interface WorldManager {
      *
      * @param world World to ignore
      */
-    void ignoreWorld(@NotNull final String world);
+    void ignoreWorld(final @NonNull String world);
 
     /**
      * Check whether or not a world is ignored
@@ -105,14 +105,14 @@ public interface WorldManager {
      * @return True if the world is ignored
      * @see #ignoreWorld(String) To ignore a world
      */
-    boolean shouldIgnore(@NotNull final String name);
+    boolean shouldIgnore(final @NonNull String name);
 
     /**
      * Get the directory containing world configurations
      *
      * @return Path to configurations
      */
-    @NotNull Path getWorldDirectory();
+    @NonNull Path getWorldDirectory();
 
     /**
      * Remove a world. This will not delete the world,
@@ -120,18 +120,19 @@ public interface WorldManager {
      *
      * @param hyperWorld World to remove
      */
-    void unregisterWorld(@NotNull final HyperWorld hyperWorld);
+    void unregisterWorld(final @NonNull HyperWorld hyperWorld);
 
     /**
      * Result of attempts to import worlds
      */
     enum WorldImportResult {
-        SUCCESS("Success"), ALREADY_IMPORTED("The world was already imported"),
+        SUCCESS("Success"),
+        ALREADY_IMPORTED("The world was already imported"),
         GENERATOR_NOT_FOUND("The specified generator could not be found");
 
         final String description;
 
-        WorldImportResult(@NotNull final String description) {
+        WorldImportResult(final @NonNull String description) {
             this.description = Objects.requireNonNull(description);
         }
 
@@ -141,7 +142,8 @@ public interface WorldManager {
          *
          * @return Result description
          */
-        @NotNull public String getDescription() {
+        @NonNull
+        public String getDescription() {
             return this.description;
         }
     }

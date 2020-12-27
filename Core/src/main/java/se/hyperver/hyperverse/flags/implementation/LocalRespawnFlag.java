@@ -17,8 +17,8 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
-import org.jetbrains.annotations.NotNull;
 
 public class LocalRespawnFlag extends BooleanFlag<LocalRespawnFlag> {
 
@@ -29,7 +29,8 @@ public class LocalRespawnFlag extends BooleanFlag<LocalRespawnFlag> {
         super(value, Messages.flagDescriptionLocalRespawn);
     }
 
-    @Override protected LocalRespawnFlag flagOf(@NotNull final Boolean value) {
+    @Override
+    protected LocalRespawnFlag flagOf(final @NonNull Boolean value) {
         return value ? RESPAWN_TRUE : RESPAWN_FALSE;
     }
 

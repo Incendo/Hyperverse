@@ -21,6 +21,8 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.minidigger.minimessage.bungee.MiniMessageParser;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
 import se.hyperver.hyperverse.flags.implementation.PveFlag;
@@ -32,29 +34,38 @@ import se.hyperver.hyperverse.world.WorldManager;
 /**
  * PlaceholderAPI expansion
  */
-class HyperverseExpansion extends PlaceholderExpansion {
+final class HyperverseExpansion extends PlaceholderExpansion {
 
-    @Override public String getIdentifier() {
+    @Override
+    public @NonNull String getIdentifier() {
         return "hyperverse";
     }
 
-    @Override public String getAuthor() {
+    @Override
+    public @NonNull String getAuthor() {
         return JavaPlugin.getPlugin(Hyperverse.class).getDescription().getAuthors().toString();
     }
 
-    @Override public String getVersion() {
+    @Override
+    public @NonNull String getVersion() {
         return JavaPlugin.getPlugin(Hyperverse.class).getDescription().getVersion();
     }
 
-    @Override public boolean persist() {
+    @Override
+    public boolean persist() {
         return true;
     }
 
-    @Override public boolean canRegister() {
+    @Override
+    public boolean canRegister() {
         return true;
     }
 
-    @Override public String onPlaceholderRequest(final Player player, final String identifier) {
+    @Override
+    public String onPlaceholderRequest(
+            final @Nullable Player player,
+            final @NonNull String identifier
+    ) {
         if (player == null) {
             return "";
         }

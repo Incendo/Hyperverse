@@ -61,7 +61,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
@@ -95,18 +95,24 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class EventListener implements Listener {
+public final class EventListener implements Listener {
 
     private final Cache<UUID, Long> teleportationTimeout =
-        CacheBuilder.newBuilder().expireAfterWrite(5L, TimeUnit.SECONDS).build();
+            CacheBuilder.newBuilder().expireAfterWrite(5L, TimeUnit.SECONDS).build();
     private final WorldManager worldManager;
     private final HyperDatabase hyperDatabase;
     private final HyperConfiguration hyperConfiguration;
     private final Hyperverse hyperverse;
     private final NMS nms;
 
-    @Inject public EventListener(final WorldManager worldManager, final HyperDatabase hyperDatabase,
-        final HyperConfiguration hyperConfiguration, final Hyperverse hyperverse, final NMS nms) {
+    @Inject
+    public EventListener(
+            final @NonNull WorldManager worldManager,
+            final @NonNull HyperDatabase hyperDatabase,
+            final @NonNull HyperConfiguration hyperConfiguration,
+            final @NonNull Hyperverse hyperverse,
+            final @NonNull NMS nms
+    ) {
         this.worldManager = worldManager;
         this.hyperDatabase = hyperDatabase;
         this.hyperConfiguration = hyperConfiguration;
@@ -115,11 +121,35 @@ public class EventListener implements Listener {
         // Register pre-spawn listeners
         if (PaperLib.isPaper()) {
             Bukkit.getPluginManager()
-                .registerEvents(new PaperListener(this.worldManager), hyperverse);
+                    .registerEvents(new PaperListener(this.worldManager), hyperverse);
         }
     }
 
-    @EventHandler public void onPlayerLogin(final AsyncPlayerPreLoginEvent event) {
+    /**
+     * Whether or not mob spawn should be cancelled
+     *
+     * @param world  World
+     * @param entity Entity
+     * @return {@code false} if the entity should be allowed to spawn, else {@code false}
+     */
+    public static boolean shouldCancelSpawn(
+            final @NonNull HyperWorld world,
+            final @NonNull Entity entity
+    ) {
+        if (!world.getFlag(CreatureSpawnFlag.class)) {
+            return entity instanceof IronGolem || entity instanceof Animals
+                    || entity instanceof WaterMob || entity instanceof Ambient || entity instanceof NPC;
+        }
+        if (!world.getFlag(MobSpawnFlag.class)) {
+            return entity instanceof Shulker || entity instanceof Monster || entity instanceof Boss
+                    || entity instanceof Slime || entity instanceof Ghast || entity instanceof Phantom
+                    || entity instanceof EnderCrystal;
+        }
+        return false;
+    }
+
+    @EventHandler
+    public void onPlayerLogin(final @NonNull AsyncPlayerPreLoginEvent event) {
         if (hyperConfiguration.shouldPersistLocations()) {
             try {
                 this.hyperDatabase.getLocations(event.getUniqueId()).get();
@@ -129,7 +159,8 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler public void onTeleport(final PlayerTeleportEvent event) {
+    @EventHandler
+    public void onTeleport(final @NonNull PlayerTeleportEvent event) {
         if (hyperConfiguration.shouldPersistLocations()) {
             final Location from = event.getFrom();
             final Location to = event.getTo();
@@ -142,16 +173,18 @@ public class EventListener implements Listener {
             // need to update
             final UUID uuid = event.getPlayer().getUniqueId();
             this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, from,
-                LocationType.PLAYER_LOCATION),true, false);
+                    LocationType.PLAYER_LOCATION
+            ), true, false);
             this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(uuid, to,
-                LocationType.PLAYER_LOCATION), true, false);
+                    LocationType.PLAYER_LOCATION
+            ), true, false);
 
             if (hyperConfiguration.shouldGroupProfiles()) {
                 final HyperWorld hyperWorld = this.worldManager.getWorld(from.getWorld());
                 if (hyperWorld != null) {
                     final Path oldWorldDirectory =
-                        hyperverse.getDataFolder().toPath().resolve("profiles")
-                            .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
+                            hyperverse.getDataFolder().toPath().resolve("profiles")
+                                    .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
                     if (!Files.exists(oldWorldDirectory)) {
                         try {
                             Files.createDirectories(oldWorldDirectory);
@@ -160,25 +193,29 @@ public class EventListener implements Listener {
                         }
                     }
                     nms.writePlayerData(event.getPlayer(), oldWorldDirectory.resolve(
-                        String.format("%s.nbt", event.getPlayer().getUniqueId().toString())));
+                            String.format("%s.nbt", event.getPlayer().getUniqueId().toString())));
                 }
             }
         }
     }
 
-    @EventHandler public void onPlayerQuit(final PlayerQuitEvent event) {
+    @EventHandler
+    public void onPlayerQuit(final @NonNull PlayerQuitEvent event) {
         if (hyperConfiguration.shouldPersistLocations()) {
             // Persist the locations when the player quits
             final UUID uuid = event.getPlayer().getUniqueId();
             this.hyperDatabase.storeLocation(
-                PersistentLocation.fromLocation(uuid, event.getPlayer().getLocation(),
-                    LocationType.PLAYER_LOCATION), false,
-                true);
+                    PersistentLocation.fromLocation(uuid, event.getPlayer().getLocation(),
+                            LocationType.PLAYER_LOCATION
+                    ), false,
+                    true
+            );
             this.hyperDatabase.clearLocations(uuid);
         }
     }
 
-    @EventHandler public void onWorldChange(final PlayerChangedWorldEvent event) {
+    @EventHandler
+    public void onWorldChange(final @NonNull PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
         final HyperWorld hyperWorld = this.worldManager.getWorld(player.getWorld());
         if (hyperWorld == null) {
@@ -188,10 +225,10 @@ public class EventListener implements Listener {
             final HyperWorld from = this.worldManager.getWorld(event.getFrom());
             // Only load player data if the worlds belong to different groups
             if (from == null || !from.getFlag(ProfileGroupFlag.class)
-                .equals(hyperWorld.getFlag(ProfileGroupFlag.class))) {
+                    .equals(hyperWorld.getFlag(ProfileGroupFlag.class))) {
                 final Path newWorldDirectory =
-                    hyperverse.getDataFolder().toPath().resolve("profiles")
-                        .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
+                        hyperverse.getDataFolder().toPath().resolve("profiles")
+                                .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
                 if (!Files.exists(newWorldDirectory)) {
                     try {
                         Files.createDirectories(newWorldDirectory);
@@ -200,24 +237,25 @@ public class EventListener implements Listener {
                     }
                 }
                 final Path playerData = newWorldDirectory
-                    .resolve(String.format("%s.nbt", player.getUniqueId().toString()));
+                        .resolve(String.format("%s.nbt", player.getUniqueId().toString()));
                 if (Files.exists(playerData)) {
                     final GameMode originalGameMode = player.getGameMode();
                     nms.readPlayerData(event.getPlayer(), playerData,
-                        () -> Bukkit.getScheduler().runTaskLater(hyperverse, () -> {
-                            // We need to trick Bukkit into updating the gamemode
-                            final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
-                            if (worldGameMode != GameMode.ADVENTURE) {
-                                player.setGameMode(GameMode.ADVENTURE);
-                            } else {
-                                player.setGameMode(GameMode.SURVIVAL);
-                            }
-                            player.setGameMode(GameMode.SPECTATOR);
-                            if (!this.setDefaultGameMode(player, hyperWorld)) {
-                                player.setGameMode(originalGameMode);
-                            }
-                            // Apply any other flags here
-                        }, 1L));
+                            () -> Bukkit.getScheduler().runTaskLater(hyperverse, () -> {
+                                // We need to trick Bukkit into updating the gamemode
+                                final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
+                                if (worldGameMode != GameMode.ADVENTURE) {
+                                    player.setGameMode(GameMode.ADVENTURE);
+                                } else {
+                                    player.setGameMode(GameMode.SURVIVAL);
+                                }
+                                player.setGameMode(GameMode.SPECTATOR);
+                                if (!this.setDefaultGameMode(player, hyperWorld)) {
+                                    player.setGameMode(originalGameMode);
+                                }
+                                // Apply any other flags here
+                            }, 1L)
+                    );
                 } else {
                     // The player has no stored data. Reset everything
                     player.setBedSpawnLocation(player.getWorld().getSpawnLocation(), true);
@@ -236,7 +274,7 @@ public class EventListener implements Listener {
                         if (attributeInstance != null) {
                             attributeInstance.setBaseValue(attributeInstance.getDefaultValue());
                             for (final AttributeModifier attributeModifier : attributeInstance
-                                .getModifiers()) {
+                                    .getModifiers()) {
                                 attributeInstance.removeModifier(attributeModifier);
                             }
                         }
@@ -249,11 +287,12 @@ public class EventListener implements Listener {
         }
     }
 
-    private boolean setDefaultGameMode(@NotNull final Player player, @NotNull final HyperWorld world) {
+    private boolean setDefaultGameMode(final @NonNull Player player, final @NonNull HyperWorld world) {
         if (player.hasPermission("hyperverse.override.gamemode")) {
             if (world.getFlag(GamemodeFlag.class) != player.getGameMode()) {
                 MessageUtil.sendMessage(player, Messages.messageGameModeOverride, "%mode%",
-                    world.getFlag(GamemodeFlag.class).name().toLowerCase());
+                        world.getFlag(GamemodeFlag.class).name().toLowerCase()
+                );
             }
             return false;
         }
@@ -261,7 +300,8 @@ public class EventListener implements Listener {
         return true;
     }
 
-    @EventHandler(priority = EventPriority.LOW) public void onRespawn(final PlayerRespawnEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void onRespawn(final @NonNull PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
         final HyperWorld hyperWorld = this.worldManager.getWorld(player.getWorld());
         if (hyperWorld == null) {
@@ -269,12 +309,12 @@ public class EventListener implements Listener {
         }
 
         if (hyperWorld.getConfiguration().getType() == WorldType.END
-            && event.getPlayer().getLocation().getBlock().getType() == Material.END_PORTAL) {
+                && event.getPlayer().getLocation().getBlock().getType() == Material.END_PORTAL) {
             final Location destination =
-                hyperWorld.getTeleportationManager().endDestination(event.getPlayer());
+                    hyperWorld.getTeleportationManager().endDestination(event.getPlayer());
             if (destination != null) {
                 final boolean allowedEntry = hyperWorld.getTeleportationManager()
-                    .allowedTeleport(event.getPlayer(), destination).getNow(false);
+                        .allowedTeleport(event.getPlayer(), destination).getNow(false);
                 if (!allowedEntry) {
                     MessageUtil.sendMessage(event.getPlayer(), Messages.messageNotPermittedEntry);
                 } else {
@@ -305,7 +345,8 @@ public class EventListener implements Listener {
         event.setRespawnLocation(seekSpawnEvent.getRespawnLocation());
     }
 
-    @EventHandler public void onEntityDamageEvent(final EntityDamageByEntityEvent event) {
+    @EventHandler
+    public void onEntityDamageEvent(final @NonNull EntityDamageByEntityEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getEntity().getWorld());
         if (hyperWorld == null) {
             return;
@@ -325,17 +366,19 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler public void onPlayerPortalEvent(final PlayerPortalEvent event) {
+    @EventHandler
+    public void onPlayerPortalEvent(final @NonNull PlayerPortalEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {
             this.hyperverse.getLogger().warning(String.format(
-                "(PlayerPortalEvent) Player %s entered world '%s' but no world could be found",
-                event.getPlayer().getName(), event.getPlayer().getWorld().getName()));
+                    "(PlayerPortalEvent) Player %s entered world '%s' but no world could be found",
+                    event.getPlayer().getName(), event.getPlayer().getWorld().getName()
+            ));
             return;
         }
 
         final Long lastTeleportion =
-            this.teleportationTimeout.getIfPresent(event.getPlayer().getUniqueId());
+                this.teleportationTimeout.getIfPresent(event.getPlayer().getUniqueId());
         if (lastTeleportion != null && (System.currentTimeMillis() - lastTeleportion) < 5000L) {
             event.setCancelled(true);
             return;
@@ -346,7 +389,7 @@ public class EventListener implements Listener {
 
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
             destination = hyperWorld.getTeleportationManager()
-                .netherDestination(event.getPlayer(), event.getFrom());
+                    .netherDestination(event.getPlayer(), event.getFrom());
             isNether = true;
         } else if (event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
             Location portalLocation;
@@ -366,66 +409,70 @@ public class EventListener implements Listener {
 
         if (destination != null) {
             final boolean allowedEntry =
-                hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
-                    .getNow(false);
+                    hyperWorld.getTeleportationManager().allowedTeleport(event.getPlayer(), destination)
+                            .getNow(false);
             if (!allowedEntry) {
                 MessageUtil.sendMessage(event.getPlayer(), Messages.messageNotPermittedEntry);
             } else {
                 event.setTo(destination);
                 this.teleportationTimeout
-                    .put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
+                        .put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
             }
         } else {
             final String flag =
-                isNether ? hyperWorld.getFlag(NetherFlag.class) : hyperWorld.getFlag(EndFlag.class);
+                    isNether ? hyperWorld.getFlag(NetherFlag.class) : hyperWorld.getFlag(EndFlag.class);
             if (!flag.isEmpty()) {
                 event.setCancelled(
-                    true); // We do not want to allow default teleportation unless it has
+                        true); // We do not want to allow default teleportation unless it has
                 // been configured
                 MessageUtil.sendMessage(event.getPlayer(), Messages.messagePortalNotLinked);
             }
         }
     }
 
-    @EventHandler public void onEntityPortalEnter(final EntityPortalEnterEvent event) {
+    @EventHandler
+    public void onEntityPortalEnter(final @NonNull EntityPortalEnterEvent event) {
         if (event.getEntityType() == EntityType.PLAYER) {
             return;
         }
 
         final HyperWorld hyperWorld =
-            this.worldManager.getWorld(Objects.requireNonNull(event.getLocation().getWorld()));
+                this.worldManager.getWorld(Objects.requireNonNull(event.getLocation().getWorld()));
         if (hyperWorld == null) {
             return;
         }
 
         final Long lastTeleportion =
-            this.teleportationTimeout.getIfPresent(event.getEntity().getUniqueId());
+                this.teleportationTimeout.getIfPresent(event.getEntity().getUniqueId());
         if (lastTeleportion != null && (System.currentTimeMillis() - lastTeleportion) < 5000L) {
             return;
         }
 
         if (event.getLocation().getBlock().getType() == Material.NETHER_PORTAL && !hyperWorld
-            .getFlag(NetherFlag.class).isEmpty()) {
+                .getFlag(NetherFlag.class).isEmpty()) {
             final Location destination = hyperWorld.getTeleportationManager()
-                .netherDestination(event.getEntity(), event.getLocation());
+                    .netherDestination(event.getEntity(), event.getLocation());
             if (destination != null) {
                 // Destination is the location from which we want to search, now we need to find the
                 // actual portal destination
                 final Location location =
-                    nms.getOrCreateNetherPortal(event.getEntity(), destination);
+                        nms.getOrCreateNetherPortal(event.getEntity(), destination);
                 if (location != null) {
                     this.teleportationTimeout
-                        .put(event.getEntity().getUniqueId(), System.currentTimeMillis());
+                            .put(event.getEntity().getUniqueId(), System.currentTimeMillis());
                     PaperLib.teleportAsync(event.getEntity(), location,
-                        PlayerTeleportEvent.TeleportCause.COMMAND);
+                            PlayerTeleportEvent.TeleportCause.COMMAND
+                    );
                 } else {
                     hyperverse.getLogger().warning(String
-                        .format("Failed to find/create a portal surrounding %s",
-                            destination.toString()));
+                            .format(
+                                    "Failed to find/create a portal surrounding %s",
+                                    destination.toString()
+                            ));
                 }
             }
         } else if (event.getLocation().getBlock().getType() == Material.END_PORTAL && !hyperWorld
-            .getFlag(EndFlag.class).isEmpty()) {
+                .getFlag(EndFlag.class).isEmpty()) {
             Location portalLocation;
             final Location current = event.getLocation();
             final DragonBattle battle = current.getWorld().getEnderDragonBattle();
@@ -436,35 +483,38 @@ public class EventListener implements Listener {
                 }
             }
             final Location destination =
-                hyperWorld.getTeleportationManager().endDestination(event.getEntity());
+                    hyperWorld.getTeleportationManager().endDestination(event.getEntity());
             if (destination != null) {
                 PaperLib.teleportAsync(event.getEntity(), destination,
-                    PlayerTeleportEvent.TeleportCause.COMMAND);
+                        PlayerTeleportEvent.TeleportCause.COMMAND
+                );
             }
         }
     }
 
-    @EventHandler public void onEntityPortalEvent(final EntityPortalEvent event) {
+    @EventHandler
+    public void onEntityPortalEvent(final @NonNull EntityPortalEvent event) {
         if (event.getEntityType() == EntityType.PLAYER) {
             return;
         }
 
         final HyperWorld hyperWorld =
-            this.worldManager.getWorld(Objects.requireNonNull(event.getFrom().getWorld()));
+                this.worldManager.getWorld(Objects.requireNonNull(event.getFrom().getWorld()));
         if (hyperWorld == null) {
             return;
         }
 
         if (event.getFrom().getBlock().getType() == Material.NETHER_PORTAL && !hyperWorld
-            .getFlag(NetherFlag.class).isEmpty()) {
+                .getFlag(NetherFlag.class).isEmpty()) {
             event.setCancelled(true);
         } else if (event.getFrom().getBlock().getType() == Material.END_PORTAL && !hyperWorld
-            .getFlag(EndFlag.class).isEmpty()) {
+                .getFlag(EndFlag.class).isEmpty()) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler public void onEntityPreSpawn(final CreatureSpawnEvent event) {
+    @EventHandler
+    public void onEntityPreSpawn(final @NonNull CreatureSpawnEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getLocation().getWorld());
         if (hyperWorld == null) {
             return;
@@ -478,7 +528,8 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler public void onChunkGeneration(final ChunkLoadEvent event) {
+    @EventHandler
+    public void onChunkGeneration(final @NonNull ChunkLoadEvent event) {
         if (!event.isNewChunk()) {
             return;
         }
@@ -494,15 +545,15 @@ public class EventListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onSleep(final PlayerBedEnterEvent event) {
+    public void onSleep(final @NonNull PlayerBedEnterEvent event) {
         if (!hyperConfiguration.shouldPersistLocations()) {
             return;
         }
 
         final PlayerBedEnterEvent.BedEnterResult bedEnterResult = event.getBedEnterResult();
         if ((event.useBed() == Event.Result.DEFAULT && (bedEnterResult == PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE ||
-            bedEnterResult == PlayerBedEnterEvent.BedEnterResult.TOO_FAR_AWAY ||
-            bedEnterResult == PlayerBedEnterEvent.BedEnterResult.OTHER_PROBLEM)) || event.useBed() == Event.Result.DENY) {
+                bedEnterResult == PlayerBedEnterEvent.BedEnterResult.TOO_FAR_AWAY ||
+                bedEnterResult == PlayerBedEnterEvent.BedEnterResult.OTHER_PROBLEM)) || event.useBed() == Event.Result.DENY) {
             return;
         }
 
@@ -517,19 +568,8 @@ public class EventListener implements Listener {
         }
 
         this.hyperDatabase.storeLocation(PersistentLocation.fromLocation(event.getPlayer().getUniqueId(),
-            event.getBed().getLocation(), LocationType.BED_SPAWN), true, false);
-    }
-
-    public static boolean shouldCancelSpawn(final HyperWorld world, final Entity entity) {
-        if (!world.getFlag(CreatureSpawnFlag.class)) {
-            return entity instanceof IronGolem || entity instanceof Animals
-                || entity instanceof WaterMob || entity instanceof Ambient || entity instanceof NPC;
-        } if (!world.getFlag(MobSpawnFlag.class)) {
-            return entity instanceof Shulker || entity instanceof Monster || entity instanceof Boss
-                || entity instanceof Slime || entity instanceof Ghast || entity instanceof Phantom
-                || entity instanceof EnderCrystal;
-        }
-        return false;
+                event.getBed().getLocation(), LocationType.BED_SPAWN
+        ), true, false);
     }
 
 }

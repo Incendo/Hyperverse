@@ -20,10 +20,14 @@ package se.hyperver.hyperverse.database;
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.Hyperverse;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -36,7 +40,10 @@ public abstract class HyperDatabase {
     private final Hyperverse hyperverse;
     private final EnumMap<LocationType, Table<UUID, String, PersistentLocation>> locations;
 
-    protected HyperDatabase(final TaskFactory taskFactory, final Hyperverse hyperverse) {
+    protected HyperDatabase(
+            final @NonNull TaskFactory taskFactory,
+            final @NonNull Hyperverse hyperverse
+    ) {
         this.taskFactory = taskFactory;
         this.hyperverse = hyperverse;
         this.locations = new EnumMap<>(LocationType.class);
@@ -64,18 +71,21 @@ public abstract class HyperDatabase {
      * @param updateTable        Whether or not the internal table should be updated
      * @param clear              Whether or not the internal table should be cleared
      */
-    public abstract void storeLocation(@NotNull final PersistentLocation persistentLocation,
-        final boolean updateTable, final boolean clear);
+    public abstract void storeLocation(
+            final @NonNull PersistentLocation persistentLocation,
+            final boolean updateTable,
+            final boolean clear
+    );
 
     /**
      * Remove all stored locations for a specific UUID
      *
      * @param uuid Player UUID
      */
-    public void clearLocations(@NotNull final UUID uuid) {
+    public void clearLocations(final @NonNull UUID uuid) {
         for (final LocationType locationType : LocationType.values()) {
             final Collection<String> keys =
-                new HashSet<>(this.locations.get(locationType).columnKeySet());
+                    new HashSet<>(this.locations.get(locationType).columnKeySet());
             for (final String key : keys) {
                 this.locations.get(locationType).remove(uuid, key);
             }
@@ -88,7 +98,7 @@ public abstract class HyperDatabase {
      * @param uuid Player UUID
      * @return Future that will complete with the locations
      */
-    public abstract CompletableFuture<Collection<PersistentLocation>> getLocations(@NotNull final UUID uuid);
+    public abstract @NonNull CompletableFuture<Collection<PersistentLocation>> getLocations(final @NonNull UUID uuid);
 
     /**
      * Get a stored persistent location for a given UUID
@@ -99,8 +109,11 @@ public abstract class HyperDatabase {
      * @param locationType The location type
      * @return Optional containing the location, if it was stored
      */
-    @NotNull public Optional<PersistentLocation> getLocation(@NotNull final UUID uuid,
-        @NotNull final String world, @NotNull final LocationType locationType) {
+    @NonNull
+    public Optional<PersistentLocation> getLocation(
+            final @NonNull UUID uuid,
+            final @NonNull String world, final @NonNull LocationType locationType
+    ) {
         return Optional.ofNullable(this.locations.get(locationType).get(uuid, world));
     }
 
@@ -109,17 +122,18 @@ public abstract class HyperDatabase {
      *
      * @param worldName World to remove
      */
-    public abstract void clearWorld(@NotNull final String worldName);
+    public abstract void clearWorld(final @NonNull String worldName);
 
-    @NotNull protected TaskFactory getTaskFactory() {
+    protected @NonNull TaskFactory getTaskFactory() {
         return this.taskFactory;
     }
 
-    @NotNull protected Hyperverse getHyperverse() {
+    protected @NonNull Hyperverse getHyperverse() {
         return this.hyperverse;
     }
 
-    @NotNull protected EnumMap<LocationType, Table<UUID, String, PersistentLocation>> getLocations() {
+    protected @NonNull EnumMap<@NonNull LocationType, @NonNull Table<UUID, String, PersistentLocation>> getLocations() {
         return this.locations;
     }
+
 }

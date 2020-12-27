@@ -47,15 +47,18 @@ public class HyperverseModule extends AbstractModule {
 
     private static final @NonNull String CRAFTSERVER_CLASS_NAME = Bukkit.getServer().getClass().getName();
     private static final @NonNull String PACKAGE_VERSION =
-        CRAFTSERVER_CLASS_NAME.substring("org.bukkit.craftbukkit.".length(),
-            CRAFTSERVER_CLASS_NAME.indexOf('.', "org.bukkit.craftbukkit.".length()));
+            CRAFTSERVER_CLASS_NAME.substring(
+                    "org.bukkit.craftbukkit.".length(),
+                    CRAFTSERVER_CLASS_NAME.indexOf('.', "org.bukkit.craftbukkit.".length())
+            );
 
-    @Override protected void configure() {
+    @Override
+    protected void configure() {
         // Resolve the NMS implementation
         try {
             bind(NMS.class)
-                .to((Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.spigotnms." + PACKAGE_VERSION + ".NMSImpl"))
-                .in(Singleton.class);
+                    .to((Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.spigotnms." + PACKAGE_VERSION + ".NMSImpl"))
+                    .in(Singleton.class);
         } catch (final ClassNotFoundException ex) {
             throw new RuntimeException("Server version unsupported", ex);
         }
@@ -66,13 +69,15 @@ public class HyperverseModule extends AbstractModule {
         bind(GlobalWorldFlagContainer.class).toInstance(new GlobalWorldFlagContainer());
         bind(ServicePipeline.class).toInstance(Hyperverse.getApi().getServicePipeline());
         install(new FactoryModuleBuilder().implement(WorldCreator.class, HyperWorldCreator.class)
-            .build(HyperWorldCreatorFactory.class));
+                .build(HyperWorldCreatorFactory.class));
         install(new FactoryModuleBuilder().implement(HyperWorld.class, SimpleWorld.class)
-            .build(HyperWorldFactory.class));
+                .build(HyperWorldFactory.class));
         install(new FactoryModuleBuilder().implement(FlagContainer.class, WorldFlagContainer.class)
-            .build(FlagContainerFactory.class));
-        install(new FactoryModuleBuilder().implement(TeleportationManager.class,
-            SimpleTeleportationManager.class).build(TeleportationManagerFactory.class));
+                .build(FlagContainerFactory.class));
+        install(new FactoryModuleBuilder().implement(
+                TeleportationManager.class,
+                SimpleTeleportationManager.class
+        ).build(TeleportationManagerFactory.class));
     }
 
     @Provides
@@ -80,4 +85,5 @@ public class HyperverseModule extends AbstractModule {
     boolean shouldGroupProfiles(final @NonNull HyperConfiguration configuration) {
         return configuration.shouldGroupProfiles();
     }
+
 }

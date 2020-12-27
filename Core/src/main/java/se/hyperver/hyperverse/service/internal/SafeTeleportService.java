@@ -22,8 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A {@link Service} used to find safe teleportation locations
@@ -35,7 +34,7 @@ public interface SafeTeleportService extends Service<Location, Location> {
      *
      * @return Default implementation
      */
-    @NotNull static SafeTeleportService defaultService() {
+    static @NonNull SafeTeleportService defaultService() {
         return new DefaultSafeTeleportService();
     }
 
@@ -43,16 +42,17 @@ public interface SafeTeleportService extends Service<Location, Location> {
      * Default {@link SafeTeleportService} implementation that just scans
      * for safe locations in a vertical column
      */
-    class DefaultSafeTeleportService implements SafeTeleportService {
+    final class DefaultSafeTeleportService implements SafeTeleportService {
 
-        @Nullable @Override public Location handle(@NotNull final Location location) {
+        @Override
+        public @NonNull Location handle(final @NonNull Location location) {
             Block locationBlock = location.getBlock();
             do {
                 if (locationBlock.getRelative(BlockFace.DOWN).getType().isSolid()) {
                     return locationBlock.getLocation();
                 }
             } while (locationBlock.getY() > 0
-                && (locationBlock = locationBlock.getRelative(BlockFace.DOWN)).getType() != Material.VOID_AIR);
+                    && (locationBlock = locationBlock.getRelative(BlockFace.DOWN)).getType() != Material.VOID_AIR);
             return location;
         }
 

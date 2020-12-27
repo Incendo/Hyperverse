@@ -19,8 +19,8 @@ package se.hyperver.hyperverse.flags;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -43,14 +43,17 @@ public class WorldFlagContainer implements FlagContainer {
      * of the parent-child hierarchy must be the {@link GlobalWorldFlagContainer}
      * (or an equivalent top level flag container).
      *
-     * @param parentContainer       Parent container. The top level flag container should not have a parent,
-     *                              and can set this parameter to null. If this is not a top level
-     *                              flag container, the parent should not be null.
+     * @param parentContainer        Parent container. The top level flag container should not have a parent,
+     *                               and can set this parameter to null. If this is not a top level
+     *                               flag container, the parent should not be null.
      * @param worldFlagUpdateHandler Event handler that will be called whenever a world flag is
-     *                              added, removed or updated in this flag container.
+     *                               added, removed or updated in this flag container.
      */
-    @Inject public WorldFlagContainer(final GlobalWorldFlagContainer parentContainer,
-        @Assisted WorldFlagUpdateHandler worldFlagUpdateHandler) {
+    @Inject
+    public WorldFlagContainer(
+            final GlobalWorldFlagContainer parentContainer,
+            @Assisted final @NonNull WorldFlagUpdateHandler worldFlagUpdateHandler
+    ) {
         this.parentContainer = parentContainer;
         this.worldFlagUpdateHandler = worldFlagUpdateHandler;
         if (parentContainer != null) {
@@ -68,29 +71,36 @@ public class WorldFlagContainer implements FlagContainer {
      * @param <T>  Flag type
      * @return Casted flag
      */
-    @SuppressWarnings("ALL") public static <V, T extends WorldFlag<V, ?>> T castUnsafe(
-        final WorldFlag<?, ?> flag) {
+    @SuppressWarnings("ALL")
+    public static <V, T extends WorldFlag<V, ?>> T castUnsafe(
+            final @NonNull WorldFlag<?, ?> flag
+    ) {
         return (T) flag;
     }
 
-    @Override @Nullable public FlagContainer getParentContainer() {
+    @Override
+    public @Nullable FlagContainer getParentContainer() {
         return this.parentContainer;
     }
 
-    @Override public void setParentContainer(final FlagContainer parentContainer) {
+    @Override
+    public void setParentContainer(final @NonNull FlagContainer parentContainer) {
         this.parentContainer = parentContainer;
     }
 
-    @Override @SuppressWarnings("unused")
-    public Map<Class<?>, WorldFlag<?, ?>> getInternalPlotFlagMap() {
+    @Override
+    @SuppressWarnings("unused")
+    public @NonNull Map<Class<?>, WorldFlag<?, ?>> getInternalWorldFlagMap() {
         return this.flagMap;
     }
 
-    @Override public Map<Class<?>, WorldFlag<?, ?>> getFlagMap() {
+    @Override
+    public @NonNull Map<Class<?>, WorldFlag<?, ?>> getFlagMap() {
         return ImmutableMap.<Class<?>, WorldFlag<?, ?>>builder().putAll(this.flagMap).build();
     }
 
-    @Override public <V, T extends WorldFlag<V, ?>> void addFlag(final T flag) {
+    @Override
+    public <V, T extends WorldFlag<V, ?>> void addFlag(final @NonNull T flag) {
         final WorldFlag<?, ?> oldInstance = this.flagMap.put(flag.getClass(), flag);
         final WorldFlagUpdateType worldFlagUpdateType;
         if (oldInstance != null) {
@@ -104,13 +114,15 @@ public class WorldFlagContainer implements FlagContainer {
         this.updateSubscribers.forEach(subscriber -> subscriber.handle(flag, worldFlagUpdateType));
     }
 
-    @Override public <V, T extends WorldFlag<V, ?>> V removeFlag(final T flag) {
+    @Override
+    @SuppressWarnings("all")
+    public <V, T extends WorldFlag<V, ?>> @Nullable V removeFlag(final @NonNull T flag) {
         final Object value = this.flagMap.remove(flag.getClass());
         if (this.worldFlagUpdateHandler != null) {
             this.worldFlagUpdateHandler.handle(flag, WorldFlagUpdateType.FLAG_REMOVED);
         }
         this.updateSubscribers
-            .forEach(subscriber -> subscriber.handle(flag, WorldFlagUpdateType.FLAG_REMOVED));
+                .forEach(subscriber -> subscriber.handle(flag, WorldFlagUpdateType.FLAG_REMOVED));
         if (value == null) {
             return null;
         } else {
@@ -118,32 +130,38 @@ public class WorldFlagContainer implements FlagContainer {
         }
     }
 
-    @Override public void addAll(final Collection<WorldFlag<?, ?>> flags) {
+    @Override
+    public void addAll(final @NonNull Collection<WorldFlag<?, ?>> flags) {
         for (final WorldFlag<?, ?> flag : flags) {
             this.addFlag(flag);
         }
     }
 
-    @Override public void addAll(final FlagContainer container) {
+    @Override
+    public void addAll(final @NonNull FlagContainer container) {
         this.addAll(container.getFlagMap().values());
     }
 
-    @Override public void clearLocal() {
+    @Override
+    public void clearLocal() {
         this.flagMap.clear();
     }
 
-    @Override public Collection<WorldFlag<?, ?>> getRecognizedPlotFlags() {
+    @Override
+    public @NonNull Collection<WorldFlag<?, ?>> getRecognizedPlotFlags() {
         return this.getHighestClassContainer().getFlagMap().values();
     }
 
-    @Override public final FlagContainer getHighestClassContainer() {
+    @Override
+    public final @NonNull FlagContainer getHighestClassContainer() {
         if (this.getParentContainer() != null) {
             return this.getParentContainer();
         }
         return this;
     }
 
-    @Override public WorldFlag<?, ?> getFlagErased(Class<?> flagClass) {
+    @Override
+    public @Nullable WorldFlag<?, ?> getFlagErased(final @NonNull Class<?> flagClass) {
         final WorldFlag<?, ?> flag = this.flagMap.get(flagClass);
         if (flag != null) {
             return flag;
@@ -155,7 +173,8 @@ public class WorldFlagContainer implements FlagContainer {
         return null;
     }
 
-    @Override public <V, T extends WorldFlag<V, ?>> T getFlag(final Class<? extends T> flagClass) {
+    @Override
+    public @Nullable <V, T extends WorldFlag<V, ?>> T getFlag(final @NonNull Class<? extends T> flagClass) {
         final WorldFlag<?, ?> flag = this.flagMap.get(flagClass);
         if (flag != null) {
             return castUnsafe(flag);
@@ -167,7 +186,8 @@ public class WorldFlagContainer implements FlagContainer {
         return null;
     }
 
-    @Override @Nullable public <V, T extends WorldFlag<V, ?>> T queryLocal(final Class<?> flagClass) {
+    @Override
+    public @Nullable <V, T extends WorldFlag<V, ?>> T queryLocal(final @NonNull Class<?> flagClass) {
         final WorldFlag<?, ?> localFlag = this.flagMap.get(flagClass);
         if (localFlag == null) {
             return null;
@@ -176,15 +196,20 @@ public class WorldFlagContainer implements FlagContainer {
         }
     }
 
-    @Override public void subscribe(
-        @NotNull final FlagContainer.WorldFlagUpdateHandler worldFlagUpdateHandler) {
+    @Override
+    public void subscribe(
+            final FlagContainer.@NonNull WorldFlagUpdateHandler worldFlagUpdateHandler
+    ) {
         this.updateSubscribers.add(worldFlagUpdateHandler);
     }
 
-    @Override public void handleUnknowns(final WorldFlag<?, ?> flag,
-        final WorldFlagUpdateType worldFlagUpdateType) {
+    @Override
+    public void handleUnknowns(
+            final @NonNull WorldFlag<?, ?> flag,
+            final @NonNull WorldFlagUpdateType worldFlagUpdateType
+    ) {
         if (worldFlagUpdateType != WorldFlagUpdateType.FLAG_REMOVED && this.unknownFlags
-            .containsKey(flag.getName())) {
+                .containsKey(flag.getName())) {
             final String value = this.unknownFlags.remove(flag.getName());
             if (value != null) {
                 try {
@@ -195,7 +220,11 @@ public class WorldFlagContainer implements FlagContainer {
         }
     }
 
-    @Override public void addUnknownFlag(final String flagName, final String value) {
+    @Override
+    public void addUnknownFlag(
+            final @NonNull String flagName,
+            final @NonNull String value
+    ) {
         this.unknownFlags.put(flagName.toLowerCase(Locale.ENGLISH), value);
     }
 

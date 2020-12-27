@@ -17,10 +17,10 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,9 +29,9 @@ import java.util.Locale;
 public abstract class BooleanFlag<F extends WorldFlag<Boolean, F>> extends WorldFlag<Boolean, F> {
 
     private static final Collection<String> positiveValues =
-        Arrays.asList("1", "yes", "allow", "true");
+            Arrays.asList("1", "yes", "allow", "true");
     private static final Collection<String> negativeValues =
-        Arrays.asList("0", "no", "deny", "disallow", "false");
+            Arrays.asList("0", "no", "deny", "disallow", "false");
 
     /**
      * Construct a new flag instance.
@@ -40,7 +40,7 @@ public abstract class BooleanFlag<F extends WorldFlag<Boolean, F>> extends World
      * @param description Flag description
      */
     protected BooleanFlag(final boolean value, final Message description) {
-        super(value,  description);
+        super(value, description);
     }
 
     /**
@@ -53,7 +53,8 @@ public abstract class BooleanFlag<F extends WorldFlag<Boolean, F>> extends World
         this(false, description);
     }
 
-    @Override public F parse(@NotNull String input) throws FlagParseException {
+    @Override
+    public F parse(@NonNull String input) throws FlagParseException {
         if (positiveValues.contains(input.toLowerCase(Locale.ENGLISH))) {
             return this.flagOf(true);
         } else if (negativeValues.contains(input.toLowerCase(Locale.ENGLISH))) {
@@ -63,19 +64,24 @@ public abstract class BooleanFlag<F extends WorldFlag<Boolean, F>> extends World
         }
     }
 
-    @Override public F merge(@NotNull Boolean newValue) {
+    @Override
+    public F merge(@NonNull Boolean newValue) {
         return this.flagOf(getValue() || newValue);
     }
 
-    @Override public String getExample() {
+    @Override
+    public String getExample() {
         return "true";
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return this.getValue().toString();
     }
 
-    @Override public Collection<String> getTabCompletions() {
+    @Override
+    public Collection<String> getTabCompletions() {
         return Arrays.asList("true", "false");
     }
+
 }

@@ -17,6 +17,7 @@
 
 package se.hyperver.hyperverse.modules;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 
@@ -24,6 +25,6 @@ import java.util.UUID;
 
 public interface HyperWorldFactory {
 
-    HyperWorld create(final UUID uuid, final WorldConfiguration worldConfiguration);
+    @NonNull HyperWorld create(@NonNull UUID uuid, @NonNull WorldConfiguration worldConfiguration);
 
 }

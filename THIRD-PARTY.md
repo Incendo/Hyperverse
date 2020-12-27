@@ -23,7 +23,6 @@ Lists of 29 third-party dependencies.
 - (The BSD 3-Clause License) [BungeeCord-Chat (net.md-5:bungeecord-chat:1.15-20200422.221048-64)](https://github.com/SpigotMC/BungeeCord/bungeecord-chat)
 - (The GNU Lesser General Public License v3.0) [bstats-bukkit (org.bstats:bstats-bukkit:1.7)](https://bstats.org/bstats-bukkit/)
 - (GNU General Public License, version 2 (GPL2), with the classpath exception)- (The MIT License) [Checker Qual (org.checkerframework:checker-qual:2.4.0)](https://checkerframework.org)
-- (The Apache Software License, Version 2.0) [JetBrains Java Annotations (org.jetbrains:annotations:19.0.0)](https://github.com/JetBrains/java-annotations)
 - (GNU General Public License v3.0) [Spigot-API (org.spigotmc:spigot-api:1.15.2-R0.1-20200423.014400-96)](https://www.spigotmc.org/)
 - (Apache License, Version 2.0) [configurate-core (org.spongepowered:configurate-core:3.6.1)](https://github.com/SpongePowered/configurate/)
 - (Apache License, Version 2.0) [configurate-hocon (org.spongepowered:configurate-hocon:3.6.1)](https://github.com/SpongePowered/configurate/)

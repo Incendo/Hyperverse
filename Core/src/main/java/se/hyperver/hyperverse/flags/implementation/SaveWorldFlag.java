@@ -17,19 +17,20 @@
 
 package se.hyperver.hyperverse.flags.implementation;
 
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 
 public class SaveWorldFlag extends BooleanFlag<SaveWorldFlag> {
 
-    public static final SaveWorldFlag SAVE_WORLD_TRUE  = new SaveWorldFlag(true);
+    public static final SaveWorldFlag SAVE_WORLD_TRUE = new SaveWorldFlag(true);
     public static final SaveWorldFlag SAVE_WORLD_FALSE = new SaveWorldFlag(false);
 
     private SaveWorldFlag(final boolean value) {
         super(value, Messages.flagDescriptionIgnoreBeds);
     }
 
-    @Override protected SaveWorldFlag flagOf(@NotNull final Boolean value) {
+    @Override
+    protected SaveWorldFlag flagOf(final @NonNull Boolean value) {
         return value ? SAVE_WORLD_TRUE : SAVE_WORLD_FALSE;
     }
 
