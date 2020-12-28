@@ -68,7 +68,10 @@ public class NMSImpl implements NMS {
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
     @Inject
-    public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean shouldGroupProfiles) {
+    public NMSImpl(
+            final @NonNull TaskFactory taskFactory,
+            final @HyperConfigShouldGroupProfiles boolean shouldGroupProfiles
+    ) {
         this.taskFactory = taskFactory;
         if (shouldGroupProfiles) {
             try {
@@ -143,8 +146,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location getDimensionSpawn(final @NonNull Location origin) {
+    public @Nullable Location getDimensionSpawn(final @NonNull Location origin) {
         final WorldServer worldServer = ((CraftWorld) origin.getWorld()).getHandle();
         final BlockPosition dimensionSpawn = worldServer.getDimensionSpawn();
         if (dimensionSpawn != null) {
@@ -154,7 +156,10 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    public void writePlayerData(final @NonNull Player player, final @NonNull Path file) {
+    public void writePlayerData(
+            final @NonNull Player player,
+            final @NonNull Path file
+    ) {
         final NBTTagCompound playerTag = new NBTTagCompound();
         final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         entityPlayer.save(playerTag);
@@ -176,7 +181,11 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    public void readPlayerData(final @NonNull Player player, final @NonNull Path file, final @NonNull Runnable whenDone) {
+    public void readPlayerData(
+            final @NonNull Player player,
+            final @NonNull Path file,
+            final @NonNull Runnable whenDone
+    ) {
         final Location originLocation = player.getLocation().clone();
         taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try (final InputStream inputStream = Files.newInputStream(file)) {
@@ -260,8 +269,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location findBedRespawn(final @NonNull Location spawnLocation) {
+    public @Nullable Location findBedRespawn(final @NonNull Location spawnLocation) {
         final CraftWorld craftWorld = (CraftWorld) spawnLocation.getWorld();
         if (craftWorld == null) {
             return null;

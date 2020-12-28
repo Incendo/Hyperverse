@@ -65,7 +65,9 @@ public class NMSImpl implements NMS {
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
     @Inject
-    public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
+    public NMSImpl(
+            final @NonNull TaskFactory taskFactory,
+            final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
         this.taskFactory = taskFactory;
         if (hyperConfiguration) {
             try {
@@ -96,8 +98,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location getOrCreateNetherPortal(
+    public @Nullable Location getOrCreateNetherPortal(
             final @NonNull Entity entity,
             final @NonNull Location origin
     ) {
@@ -236,8 +237,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location findBedRespawn(final @NonNull Location spawnLocation) {
+    public @Nullable Location findBedRespawn(final @NonNull Location spawnLocation) {
         final CraftWorld craftWorld = (CraftWorld) spawnLocation.getWorld();
         if (craftWorld == null) {
             return null;

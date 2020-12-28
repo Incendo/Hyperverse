@@ -32,21 +32,20 @@ public interface NMS {
 
     @Nullable
     Location getOrCreateNetherPortal(
-            final @NonNull Entity entity,
-            final @NonNull Location origin
+            @NonNull Entity entity,
+            @NonNull Location origin
     );
 
-    @Nullable
-    Location getDimensionSpawn(final @NonNull Location origin);
+    @Nullable Location getDimensionSpawn(@NonNull Location origin);
 
-    @Nullable
-    Location findBedRespawn(final @NonNull Location spawnLocation);
+    @Nullable Location findBedRespawn(@NonNull Location spawnLocation);
 
-    void writePlayerData(final @NonNull Player player, final @NonNull Path file);
+    void writePlayerData(@NonNull Player player, @NonNull Path file);
 
     void readPlayerData(
-            final @NonNull Player player, final @NonNull Path file,
-            final @NonNull Runnable whenDone
+            @NonNull Player player,
+            @NonNull Path file,
+            @NonNull Runnable whenDone
     );
 
 }

@@ -68,7 +68,9 @@ public class NMSImpl implements NMS {
     private Logger worldServerLogger;
 
     @Inject
-    public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean shouldGroupProfiles) {
+    public NMSImpl(
+            final @NonNull TaskFactory taskFactory,
+            final @HyperConfigShouldGroupProfiles boolean shouldGroupProfiles) {
         this.taskFactory = taskFactory;
         if (shouldGroupProfiles) {
             try {
@@ -99,8 +101,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location getOrCreateNetherPortal(
+    public @Nullable Location getOrCreateNetherPortal(
             final @NonNull Entity entity,
             final @NonNull Location origin
     ) {
@@ -145,8 +146,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location getDimensionSpawn(final @NonNull Location origin) {
+    public @Nullable Location getDimensionSpawn(final @NonNull Location origin) {
         final WorldServer worldServer = ((CraftWorld) origin.getWorld()).getHandle();
         final BlockPosition dimensionSpawn = worldServer.getDimensionSpawn();
         if (dimensionSpawn != null) {
@@ -262,8 +262,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location findBedRespawn(final @NonNull Location spawnLocation) {
+    public @Nullable Location findBedRespawn(final @NonNull Location spawnLocation) {
         final CraftWorld craftWorld = (CraftWorld) spawnLocation.getWorld();
         if (craftWorld == null) {
             return null;
