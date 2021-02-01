@@ -1,0 +1,77 @@
+name: Hyperverse
+version: "${version}"
+main: se.hyperver.hyperverse.Hyperverse
+api-version: "1.14"
+authors: [ Citymonstret, andrewandy ]
+description: A minecraft world management plugin
+softdepend:
+  - Essentials
+  - Multiverse
+  - MyWorlds
+permissions:
+  hyperverse.worlds:
+    description: Allows players to use the Hyperverse command
+    default: op
+  hyperverse.reload:
+    description: Allows players to reload the configuration and messages used by hyperverse.
+    default: op
+  hyperverse.create:
+    description: Allows players to create new worlds
+    default: op
+  hyperverse.list:
+    description: Allows players to list worlds
+    default: op
+  hyperverse.teleport:
+    description: Allows players to teleport between worlds
+    default: op
+  hyperverse.teleport.other:
+    description: Allows players to teleport other players between worlds.
+    default: op
+  hyperverse.teleportgroup:
+    description: Allows players to teleport to their last location in a given profile group
+    default: op
+  hyperverse.info:
+    description: Allows players to view world info
+    default: op
+  hyperverse.unload:
+    description: Allows players to unload worlds
+    default: op
+  hyperverse.load:
+    description: Allows players to load worlds
+    default: op
+  hyperverse.import:
+    description: Allows players to import worlds
+    default: op
+  hyperverse.find:
+    description: Allows players to find the current world of another player
+    default: op
+  hyperverse.flag.list:
+    description: Allows player to list available flags
+    default: op
+  hyperverse.flag.set:
+    description: Allows players to set world flags
+    default: op
+  hyperverse.flag.info:
+    description: Allows players to view information regarding a flag in a given world.
+    default: op
+  hyperverse.gamerule.set:
+    description: Allow players to world gamerules
+    default: op
+  hyperverse.delete:
+    description: Allow players to delete worlds
+    default: op
+  hyperverse.debugpaste:
+    description: Allows players to create debug pastes
+    default: op
+  hyperverse.who:
+    description: Allows players to list players
+    default: op
+  hyperverse.plugin.import:
+    description: Allows players to import configurations from external plugins.
+    default: op
+  hyperverse.regenerate:
+    description: Allows players to regenerate worlds
+    default: op
+  hyperverse.override.gamemode:
+    description: Allows players to override world gamemode
+    default: false
