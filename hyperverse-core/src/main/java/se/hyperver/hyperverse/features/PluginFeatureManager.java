@@ -59,7 +59,7 @@ public final class PluginFeatureManager {
             throw new IllegalArgumentException("The class needs a public no-args constructor");
         }
         this.registeredFeatures.put(pluginName, featureClass);
-        if (this.loaded && isPluginPresent(pluginName)) {
+        if (this.loaded && this.isPluginPresent(pluginName)) {
             this.loadFeature(pluginName);
         }
     }
@@ -72,7 +72,7 @@ public final class PluginFeatureManager {
                 Integer.toString(this.registeredFeatures.size())
         );
         for (final String feature : this.registeredFeatures.keySet()) {
-            if (isPluginPresent(feature)) {
+            if (this.isPluginPresent(feature)) {
                 this.loadFeature(feature);
             }
         }
@@ -115,7 +115,7 @@ public final class PluginFeatureManager {
     }
 
     public @NonNull Collection<String> getRegisteredFeatures() {
-        return new HashSet<>(registeredFeatures.keySet());
+        return new HashSet<>(this.registeredFeatures.keySet());
     }
 
 }

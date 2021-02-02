@@ -173,8 +173,8 @@ public class WorldFlagContainer implements FlagContainer {
         if (flag != null) {
             return flag;
         } else {
-            if (getParentContainer() != null) {
-                return getParentContainer().getFlagErased(flagClass);
+            if (this.getParentContainer() != null) {
+                return this.getParentContainer().getFlagErased(flagClass);
             }
         }
         return null;
@@ -196,8 +196,8 @@ public class WorldFlagContainer implements FlagContainer {
         if (flag != null) {
             return castUnsafe(flag);
         } else {
-            if (getParentContainer() != null) {
-                return getParentContainer().getFlag(flagClass);
+            if (this.getParentContainer() != null) {
+                return this.getParentContainer().getFlag(flagClass);
             }
         }
         return null;

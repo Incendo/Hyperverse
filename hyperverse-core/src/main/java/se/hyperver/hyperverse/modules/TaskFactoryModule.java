@@ -42,7 +42,7 @@ public final class TaskFactoryModule extends AbstractModule {
     @Provides
     @Singleton
     public TaskFactory provideTaskFactory() {
-        return new TaskFactory(new BukkitSynchronizer(javaPlugin));
+        return new TaskFactory(new BukkitSynchronizer(this.javaPlugin));
     }
 
 }

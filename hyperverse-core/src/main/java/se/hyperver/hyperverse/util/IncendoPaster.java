@@ -156,7 +156,7 @@ public final class IncendoPaster {
         final HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setDoOutput(true);
-        final byte[] content = toJsonString().getBytes(Charsets.UTF_8);
+        final byte[] content = this.toJsonString().getBytes(Charsets.UTF_8);
         httpURLConnection.setFixedLengthStreamingMode(content.length);
         httpURLConnection.setRequestProperty("Content-Type", "application/json");
         httpURLConnection.setRequestProperty("Accept", "*/*");

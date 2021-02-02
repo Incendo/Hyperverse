@@ -40,7 +40,7 @@ public final class WorldPermissionFlag extends WorldFlag<String, WorldPermission
             return WORLD_PERMISSION_FLAG_DEFAULT;
         }
         if (PERMISSION_PATTERN.matcher(input).matches()) {
-            return flagOf(input);
+            return this.flagOf(input);
         }
         throw new FlagParseException(this, input, "A permission node may only contain alphanumerical characters,"
                 + " -, . and _");
@@ -48,7 +48,7 @@ public final class WorldPermissionFlag extends WorldFlag<String, WorldPermission
 
     @Override
     public WorldPermissionFlag merge(final @NonNull String newValue) {
-        return flagOf(newValue);
+        return this.flagOf(newValue);
     }
 
     @Override

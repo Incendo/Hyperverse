@@ -141,14 +141,14 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         }
 
         // Setup services, load in default implementations.
-        if (!loadServices()) {
+        if (!this.loadServices()) {
             getLogger().severe("Failed to load internal services. Disabling.");
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         // Load plugin features.
-        if (!registerDefaultFeatures()) {
+        if (!this.registerDefaultFeatures()) {
             getLogger().warning("Failed to load external plugin features.");
             return;
         }
@@ -183,7 +183,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         if (!this.loadWorldManager()) {
             getLogger().severe("Failed to load world manager. Disabling!");
             try {
-                this.worldManager = injector.getInstance(WorldManager.class);
+                this.worldManager = this.injector.getInstance(WorldManager.class);
                 this.worldManager.loadWorlds();
             } catch (final Exception e) {
                 e.printStackTrace();
@@ -193,23 +193,23 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         // Register events
         try {
             this.getServer().getPluginManager()
-                    .registerEvents(injector.getInstance(WorldListener.class), this);
+                    .registerEvents(this.injector.getInstance(WorldListener.class), this);
             this.getServer().getPluginManager()
-                    .registerEvents(injector.getInstance(EventListener.class), this);
+                    .registerEvents(this.injector.getInstance(EventListener.class), this);
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
         // Create the command manager instance
         try {
-            injector.getInstance(HyperCommandManager.class);
+            this.injector.getInstance(HyperCommandManager.class);
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
         // Get API classes
         try {
-            this.worldFactory = injector.getInstance(HyperWorldFactory.class);
+            this.worldFactory = this.injector.getInstance(HyperWorldFactory.class);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -227,7 +227,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         // Unload the worlds with save-world=false without saving before the server does it.
         // Also kick everyone from there showing the shutdown message.
         // This will only make sense if this isn't a /reload or an unloadplugin/disableplugin. If it is, I feel really, really sorry for the server.
-        worldManager.getWorlds().forEach(hyperWorld -> {
+        this.worldManager.getWorlds().forEach(hyperWorld -> {
             if (hyperWorld.isLoaded() && !hyperWorld.getFlag(SaveWorldFlag.class)) {
                 hyperWorld.getBukkitWorld().getPlayers().forEach(player -> player.kickPlayer(Bukkit.getShutdownMessage()));
                 hyperWorld.unloadWorld(false);
@@ -263,7 +263,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     private boolean loadWorldManager() {
         try {
-            this.worldManager = injector.getInstance(WorldManager.class);
+            this.worldManager = this.injector.getInstance(WorldManager.class);
             this.worldManager.loadWorlds();
         } catch (final Exception e) {
             e.printStackTrace();
@@ -289,8 +289,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
     private void logHookInformation() {
         final Logger logger = getLogger();
         logger.info("§6Hyperverse Plugin Hooks (Registered)");
-        if (!pluginFeatureManager.getRegisteredFeatures().isEmpty()) {
-            for (String feature : pluginFeatureManager.getRegisteredFeatures()) {
+        if (!this.pluginFeatureManager.getRegisteredFeatures().isEmpty()) {
+            for (String feature : this.pluginFeatureManager.getRegisteredFeatures()) {
                 logger.info("- " + feature);
             }
         } else {
@@ -310,7 +310,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         // Register default plugin features
         try {
             this.pluginFeatureManager.registerFeature("PlaceholderAPI", PlaceholderAPIFeature.class);
-            if (hyperConfiguration.shouldHookEssentials()) {
+            if (this.hyperConfiguration.shouldHookEssentials()) {
                 this.pluginFeatureManager.registerFeature("Essentials", EssentialsFeature.class);
             }
         } catch (Exception e) {
@@ -322,7 +322,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     private boolean loadDatabase() {
         try {
-            this.hyperDatabase = injector.getInstance(HyperDatabase.class);
+            this.hyperDatabase = this.injector.getInstance(HyperDatabase.class);
             if (!this.hyperDatabase.attemptConnect()) {
                 getLogger().severe("Failed to connect to database...");
                 return false;
@@ -344,7 +344,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
      */
     public boolean reloadConfiguration(final @Nullable CommandSender invoker) {
         ((FileHyperConfiguration) this.hyperConfiguration).loadConfiguration();
-        final boolean reloadMessages = loadMessages(this.hyperConfiguration.getLanguageCode());
+        final boolean reloadMessages = this.loadMessages(this.hyperConfiguration.getLanguageCode());
         if (invoker != null) {
             MessageUtil.sendMessage(invoker, reloadMessages
                     ? Messages.messageMessagesReloaded
@@ -490,7 +490,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
     @EventHandler
     public void onServerLoaded(final @NonNull ServerLoadEvent event) {
         this.pluginFeatureManager.loadFeatures();
-        logHookInformation();
+        this.logHookInformation();
     }
 
     @Override

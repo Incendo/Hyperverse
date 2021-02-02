@@ -40,14 +40,14 @@ public final class NetherFlag extends WorldFlag<String, NetherFlag> {
     @Override
     public NetherFlag parse(final @NonNull String input) throws FlagParseException {
         if (WorldUtil.validateName(input)) {
-            return flagOf(input);
+            return this.flagOf(input);
         }
         throw new FlagParseException(this, input, "A world name may only contain (up to) 16 alphanumerical characters, - and _");
     }
 
     @Override
     public NetherFlag merge(final @NonNull String newValue) {
-        return flagOf(newValue);
+        return this.flagOf(newValue);
     }
 
     @Override

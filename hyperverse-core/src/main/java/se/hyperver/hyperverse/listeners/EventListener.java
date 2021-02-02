@@ -150,7 +150,7 @@ public final class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerLogin(final @NonNull AsyncPlayerPreLoginEvent event) {
-        if (hyperConfiguration.shouldPersistLocations()) {
+        if (this.hyperConfiguration.shouldPersistLocations()) {
             try {
                 this.hyperDatabase.getLocations(event.getUniqueId()).get();
             } catch (InterruptedException | ExecutionException e) {
@@ -161,7 +161,7 @@ public final class EventListener implements Listener {
 
     @EventHandler
     public void onTeleport(final @NonNull PlayerTeleportEvent event) {
-        if (hyperConfiguration.shouldPersistLocations()) {
+        if (this.hyperConfiguration.shouldPersistLocations()) {
             final Location from = event.getFrom();
             final Location to = event.getTo();
             if (Objects.equals(from.getWorld(), Objects.requireNonNull(to).getWorld())) {
@@ -179,11 +179,11 @@ public final class EventListener implements Listener {
                     LocationType.PLAYER_LOCATION
             ), true, false);
 
-            if (hyperConfiguration.shouldGroupProfiles()) {
+            if (this.hyperConfiguration.shouldGroupProfiles()) {
                 final HyperWorld hyperWorld = this.worldManager.getWorld(from.getWorld());
                 if (hyperWorld != null) {
                     final Path oldWorldDirectory =
-                            hyperverse.getDataFolder().toPath().resolve("profiles")
+                            this.hyperverse.getDataFolder().toPath().resolve("profiles")
                                     .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
                     if (!Files.exists(oldWorldDirectory)) {
                         try {
@@ -192,7 +192,7 @@ public final class EventListener implements Listener {
                             e.printStackTrace();
                         }
                     }
-                    nms.writePlayerData(event.getPlayer(), oldWorldDirectory.resolve(
+                    this.nms.writePlayerData(event.getPlayer(), oldWorldDirectory.resolve(
                             String.format("%s.nbt", event.getPlayer().getUniqueId().toString())));
                 }
             }
@@ -201,7 +201,7 @@ public final class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(final @NonNull PlayerQuitEvent event) {
-        if (hyperConfiguration.shouldPersistLocations()) {
+        if (this.hyperConfiguration.shouldPersistLocations()) {
             // Persist the locations when the player quits
             final UUID uuid = event.getPlayer().getUniqueId();
             this.hyperDatabase.storeLocation(
@@ -221,13 +221,13 @@ public final class EventListener implements Listener {
         if (hyperWorld == null) {
             return;
         }
-        if (hyperConfiguration.shouldGroupProfiles()) {
+        if (this.hyperConfiguration.shouldGroupProfiles()) {
             final HyperWorld from = this.worldManager.getWorld(event.getFrom());
             // Only load player data if the worlds belong to different groups
             if (from == null || !from.getFlag(ProfileGroupFlag.class)
                     .equals(hyperWorld.getFlag(ProfileGroupFlag.class))) {
                 final Path newWorldDirectory =
-                        hyperverse.getDataFolder().toPath().resolve("profiles")
+                        this.hyperverse.getDataFolder().toPath().resolve("profiles")
                                 .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
                 if (!Files.exists(newWorldDirectory)) {
                     try {
@@ -240,8 +240,8 @@ public final class EventListener implements Listener {
                         .resolve(String.format("%s.nbt", player.getUniqueId().toString()));
                 if (Files.exists(playerData)) {
                     final GameMode originalGameMode = player.getGameMode();
-                    nms.readPlayerData(event.getPlayer(), playerData,
-                            () -> Bukkit.getScheduler().runTaskLater(hyperverse, () -> {
+                    this.nms.readPlayerData(event.getPlayer(), playerData,
+                            () -> Bukkit.getScheduler().runTaskLater(this.hyperverse, () -> {
                                 // We need to trick Bukkit into updating the gamemode
                                 final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
                                 if (worldGameMode != GameMode.ADVENTURE) {
@@ -456,7 +456,7 @@ public final class EventListener implements Listener {
                 // Destination is the location from which we want to search, now we need to find the
                 // actual portal destination
                 final Location location =
-                        nms.getOrCreateNetherPortal(event.getEntity(), destination);
+                        this.nms.getOrCreateNetherPortal(event.getEntity(), destination);
                 if (location != null) {
                     this.teleportationTimeout
                             .put(event.getEntity().getUniqueId(), System.currentTimeMillis());
@@ -464,7 +464,7 @@ public final class EventListener implements Listener {
                             PlayerTeleportEvent.TeleportCause.COMMAND
                     );
                 } else {
-                    hyperverse.getLogger().warning(String
+                    this.hyperverse.getLogger().warning(String
                             .format(
                                     "Failed to find/create a portal surrounding %s",
                                     destination.toString()
@@ -546,7 +546,7 @@ public final class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSleep(final @NonNull PlayerBedEnterEvent event) {
-        if (!hyperConfiguration.shouldPersistLocations()) {
+        if (!this.hyperConfiguration.shouldPersistLocations()) {
             return;
         }
 

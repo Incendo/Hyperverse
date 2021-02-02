@@ -124,7 +124,7 @@ public abstract class WorldFlag<T, F extends WorldFlag<T, F>> {
      * @return The created flag instance
      */
     public final F createFlagInstance(final @NonNull T value) {
-        return flagOf(Preconditions.checkNotNull(value));
+        return this.flagOf(Preconditions.checkNotNull(value));
     }
 
     /**

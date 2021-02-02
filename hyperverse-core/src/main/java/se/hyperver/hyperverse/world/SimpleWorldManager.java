@@ -103,12 +103,12 @@ public final class SimpleWorldManager implements WorldManager, Listener {
                                 ));
                     } else {
                         final HyperWorld hyperWorld =
-                                hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
+                                this.hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
                         this.registerWorld(hyperWorld);
                     }
                 });
             } catch (IOException e) {
-                hyperverse.getLogger().severe("Failed to load world configurations");
+                this.hyperverse.getLogger().severe("Failed to load world configurations");
                 e.printStackTrace();
             }
         }
@@ -153,7 +153,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
                             "%world%", hyperWorld.getConfiguration().getName(),
                             "%generator%", hyperWorld.getConfiguration().getGenerator()
                     );
-                    waitingForPlugin.put(hyperWorld.getConfiguration().getGenerator().toLowerCase(), hyperWorld);
+                    this.waitingForPlugin.put(hyperWorld.getConfiguration().getGenerator().toLowerCase(), hyperWorld);
                 } else {
                     this.attemptCreate(hyperWorld);
                 }
@@ -223,7 +223,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
                 }
             }
         }
-        final HyperWorld hyperWorld = hyperWorldFactory.create(world.getUID(), worldConfiguration);
+        final HyperWorld hyperWorld = this.hyperWorldFactory.create(world.getUID(), worldConfiguration);
         hyperWorld.setBukkitWorld(world);
         this.addWorld(hyperWorld);
         return WorldImportResult.SUCCESS;

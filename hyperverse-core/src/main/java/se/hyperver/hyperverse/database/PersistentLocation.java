@@ -84,7 +84,7 @@ public final class PersistentLocation {
     }
 
     public @NonNull Location toLocation() {
-        return new Location(Bukkit.getWorld(world), x, y, z);
+        return new Location(Bukkit.getWorld(this.world), this.x, this.y, this.z);
     }
 
 }
