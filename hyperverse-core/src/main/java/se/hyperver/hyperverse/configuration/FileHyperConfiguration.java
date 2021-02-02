@@ -50,10 +50,10 @@ public final class FileHyperConfiguration implements HyperConfiguration {
     }
 
     public void loadConfiguration() {
-        final File configFile = new File(hyperverse.getDataFolder(), "hyperverse.conf");
+        final File configFile = new File(this.hyperverse.getDataFolder(), "hyperverse.conf");
         final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                 .builder()
-                .setParseOptions(ConfigParseOptions.defaults().setClassLoader(hyperverse.getClass().getClassLoader()))
+                .setParseOptions(ConfigParseOptions.defaults().setClassLoader(this.hyperverse.getClass().getClassLoader()))
                 .setRenderOptions(ConfigRenderOptions
                         .defaults()
                         .setComments(true)

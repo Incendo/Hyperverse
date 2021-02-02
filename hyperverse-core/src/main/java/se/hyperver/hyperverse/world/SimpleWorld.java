@@ -104,7 +104,7 @@ public final class SimpleWorld implements HyperWorld {
         this.teleportationManager = Objects.requireNonNull(teleportationManagerFactory).create(this);
         this.globalWorldFlagContainer = Objects.requireNonNull(globalFlagContainer);
         this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag, type) -> {
-            if (flagsInitialized) {
+            if (this.flagsInitialized) {
                 if (type == FlagContainer.WorldFlagUpdateType.FLAG_REMOVED) {
                     this.configuration.setFlagValue(flag.getName(), null);
                 } else {
@@ -135,7 +135,7 @@ public final class SimpleWorld implements HyperWorld {
     public void saveConfiguration() {
         this.taskFactory.recipe().begin(Optional.empty())
                 .asynchronous((unused) -> {
-                    getConfiguration().writeToFile(this.worldManager.getWorldDirectory().
+                    this.getConfiguration().writeToFile(this.worldManager.getWorldDirectory().
                             resolve(String.format("%s.json", this.getConfiguration().getName())));
                 }).execute();
     }
@@ -164,7 +164,7 @@ public final class SimpleWorld implements HyperWorld {
             // but we don't delete the actual world folder
             Bukkit.unloadWorld(this.bukkitWorld, true);
         }
-        taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
+        this.taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
             try {
                 Files.delete(this.worldManager.getWorldDirectory().
                         resolve(String.format("%s.json", this.getConfiguration().getName())));
@@ -183,7 +183,7 @@ public final class SimpleWorld implements HyperWorld {
 
     @Override
     public @NonNull WorldUnloadResult unloadWorld() {
-        return unloadWorld(true);
+        return this.unloadWorld(true);
     }
 
     @Override
@@ -213,34 +213,34 @@ public final class SimpleWorld implements HyperWorld {
     public void sendWorldInfo(final @NonNull CommandSender sender) {
         MessageUtil
                 .sendMessage(sender, Messages.messageWorldProperty, "%property%", "name", "%value%",
-                        configuration.getName()
+                        this.configuration.getName()
                 );
-        if (!getFlag(AliasFlag.class).isEmpty()) {
+        if (!this.getFlag(AliasFlag.class).isEmpty()) {
             MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "alias", "%value%",
-                    getDisplayName()
+                    this.getDisplayName()
             );
         }
         MessageUtil
                 .sendMessage(sender, Messages.messageWorldProperty, "%property%", "type", "%value%",
-                        configuration.getType().name()
+                        this.configuration.getType().name()
                 );
         MessageUtil
                 .sendMessage(sender, Messages.messageWorldProperty, "%property%", "seed", "%value%",
-                        Long.toString(configuration.getSeed())
+                        Long.toString(this.configuration.getSeed())
                 );
         MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "structures",
-                "%value%", Boolean.toString(configuration.isGenerateStructures())
+                "%value%", Boolean.toString(this.configuration.isGenerateStructures())
         );
         MessageUtil
                 .sendMessage(sender, Messages.messageWorldProperty, "%property%", "settings", "%value%",
-                        configuration.getSettings()
+                        this.configuration.getSettings()
                 );
         MessageUtil.sendMessage(sender, Messages.messageWorldProperty, "%property%", "generator",
-                "%value%", configuration.getGenerator()
+                "%value%", this.configuration.getGenerator()
         );
         MessageUtil
                 .sendMessage(sender, Messages.messageWorldProperty, "%property%", "generator arg",
-                        "%value%", configuration.getGeneratorArg()
+                        "%value%", this.configuration.getGeneratorArg()
                 );
         String loadedChunks;
         try {
@@ -393,17 +393,17 @@ public final class SimpleWorld implements HyperWorld {
             return false;
         }
         final HyperWorld that = (HyperWorld) o;
-        return com.google.common.base.Objects.equal(getWorldUUID(), that.getWorldUUID());
+        return com.google.common.base.Objects.equal(this.getWorldUUID(), that.getWorldUUID());
     }
 
     @Override
     public int hashCode() {
-        return com.google.common.base.Objects.hashCode(getWorldUUID());
+        return com.google.common.base.Objects.hashCode(this.getWorldUUID());
     }
 
     @Override
     public @NonNull String toString() {
-        return "HyperWorld{" + "worldUUID=" + worldUUID + ", configuration=" + configuration + '}';
+        return "HyperWorld{" + "worldUUID=" + this.worldUUID + ", configuration=" + this.configuration + '}';
     }
 
     @Override

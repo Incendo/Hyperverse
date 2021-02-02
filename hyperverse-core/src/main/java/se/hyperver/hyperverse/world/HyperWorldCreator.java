@@ -50,7 +50,7 @@ public final class HyperWorldCreator extends WorldCreator {
         if (!worldConfiguration.getGenerator().isEmpty()
                 && !worldConfiguration.getGenerator().equalsIgnoreCase("vanilla")) {
             final ChunkGenerator chunkGenerator =
-                    getGeneratorForName(worldConfiguration.getName(), getJoinedName(),
+                    getGeneratorForName(worldConfiguration.getName(), this.getJoinedName(),
                             NullRouteCommandSender.getInstance()
                     );
             if (chunkGenerator == null) {
@@ -74,7 +74,7 @@ public final class HyperWorldCreator extends WorldCreator {
         this.generatorSettings(worldConfiguration.getSettings());
         this.seed(worldConfiguration.getSeed());
         this.generateStructures(worldConfiguration.isGenerateStructures());
-        this.generator(getJoinedName(), NullRouteCommandSender.getInstance());
+        this.generator(this.getJoinedName(), NullRouteCommandSender.getInstance());
     }
 
     private @NonNull String getJoinedName() {

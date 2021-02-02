@@ -104,7 +104,7 @@ public final class GlobalWorldFlagContainer extends WorldFlagContainer {
         if (flagClass == null) {
             return null;
         }
-        return getFlagErased(flagClass);
+        return this.getFlagErased(flagClass);
     }
 
 }

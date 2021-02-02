@@ -31,12 +31,12 @@ public final class AliasFlag extends WorldFlag<String, AliasFlag> {
 
     @Override
     public AliasFlag parse(final @NonNull String input) {
-        return flagOf(input.replaceAll("&[A-Za-z0-9]", ""));
+        return this.flagOf(input.replaceAll("&[A-Za-z0-9]", ""));
     }
 
     @Override
     public AliasFlag merge(final @NonNull String newValue) {
-        return flagOf(newValue);
+        return this.flagOf(newValue);
     }
 
     @Override

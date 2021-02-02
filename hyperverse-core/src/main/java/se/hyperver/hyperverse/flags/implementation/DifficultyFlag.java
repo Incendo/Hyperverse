@@ -42,13 +42,13 @@ public final class DifficultyFlag extends WorldFlag<Difficulty, DifficultyFlag> 
     public DifficultyFlag parse(final @NonNull String input) throws FlagParseException {
         switch (input.toLowerCase()) {
             case "peaceful":
-                return flagOf(Difficulty.PEACEFUL);
+                return this.flagOf(Difficulty.PEACEFUL);
             case "easy":
-                return flagOf(Difficulty.EASY);
+                return this.flagOf(Difficulty.EASY);
             case "normal":
-                return flagOf(Difficulty.NORMAL);
+                return this.flagOf(Difficulty.NORMAL);
             case "hard":
-                return flagOf(Difficulty.HARD);
+                return this.flagOf(Difficulty.HARD);
             default:
                 throw new FlagParseException(this, input,
                         "Invalid difficulty. Available values are: peaceful, easy, normal and hard"
@@ -58,7 +58,7 @@ public final class DifficultyFlag extends WorldFlag<Difficulty, DifficultyFlag> 
 
     @Override
     public DifficultyFlag merge(final @NonNull Difficulty newValue) {
-        return flagOf(Objects.requireNonNull(Difficulty.getByValue(Math.max(
+        return this.flagOf(Objects.requireNonNull(Difficulty.getByValue(Math.max(
                 this.getValue().getValue(),
                 newValue.getValue()
         ))));

@@ -48,7 +48,7 @@ public abstract class HyperDatabase {
         this.hyperverse = hyperverse;
         this.locations = new EnumMap<>(LocationType.class);
         for (final LocationType type : LocationType.values()) {
-            locations.put(type, HashBasedTable.create());
+            this.locations.put(type, HashBasedTable.create());
         }
     }
 

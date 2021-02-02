@@ -343,9 +343,9 @@ public final class WorldConfiguration implements Cloneable {
 
     @Override
     public @NonNull String toString() {
-        return "WorldConfiguration{" + "name='" + name + '\'' + ", type=" + type + ", settings='"
-                + settings + '\'' + ", seed=" + seed + ", generateStructures=" + generateStructures
-                + ", generator='" + generator + '\'' + ", generatorArg='" + generatorArg + '\'' + '}';
+        return "WorldConfiguration{" + "name='" + this.name + '\'' + ", type=" + this.type + ", settings='"
+                + this.settings + '\'' + ", seed=" + this.seed + ", generateStructures=" + this.generateStructures
+                + ", generator='" + this.generator + '\'' + ", generatorArg='" + this.generatorArg + '\'' + '}';
     }
 
 }

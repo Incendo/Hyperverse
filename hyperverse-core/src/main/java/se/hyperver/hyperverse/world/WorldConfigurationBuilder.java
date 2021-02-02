@@ -128,9 +128,9 @@ public class WorldConfigurationBuilder {
      * @return Created instance
      */
     public @NonNull WorldConfiguration createWorldConfiguration() {
-        return new WorldConfiguration(name, type, worldFeatures, settings, seed,
-                generateStructures == WorldStructureSetting.GENERATE_STRUCTURES,
-                generator, generatorArg
+        return new WorldConfiguration(this.name, this.type, this.worldFeatures, this.settings, this.seed,
+                this.generateStructures == WorldStructureSetting.GENERATE_STRUCTURES,
+                this.generator, this.generatorArg
         );
     }
 

@@ -62,7 +62,7 @@ public final class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
 
     @Override
     public GamemodeFlag merge(final @NonNull GameMode newValue) {
-        return flagOf(newValue);
+        return this.flagOf(newValue);
     }
 
     @Override
