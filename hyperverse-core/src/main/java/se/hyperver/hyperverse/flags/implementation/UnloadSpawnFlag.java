@@ -25,7 +25,7 @@ public final class UnloadSpawnFlag extends BooleanFlag<UnloadSpawnFlag> {
     public static final UnloadSpawnFlag UNLOAD_SPAWN_FALSE = new UnloadSpawnFlag(false);
     public static final UnloadSpawnFlag UNLOAD_SPAWN_TRUE = new UnloadSpawnFlag(true);
 
-    protected UnloadSpawnFlag(final boolean value) {
+    public UnloadSpawnFlag(final boolean value) {
         super(value, Messages.flagDescriptionUnloadSpawn);
     }
 
