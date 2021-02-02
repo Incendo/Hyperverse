@@ -29,6 +29,8 @@ import se.hyperver.hyperverse.world.WorldConfiguration;
  */
 public final class HyperWorldCreationException extends Exception {
 
+    private static final long serialVersionUID = 7739603214208515388L;
+
     private final HyperWorldCreator.ValidationResult validationResult;
     private final WorldConfiguration configuration;
 

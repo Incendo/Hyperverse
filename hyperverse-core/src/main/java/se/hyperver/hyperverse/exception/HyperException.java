@@ -27,6 +27,8 @@ import java.util.Objects;
  */
 public class HyperException extends Exception {
 
+    private static final long serialVersionUID = 4059156250285134733L;
+
     private final HyperWorld world;
 
     public HyperException(
