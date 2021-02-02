@@ -25,7 +25,6 @@ import se.hyperver.hyperverse.flags.WorldFlag;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Objects;
 
 public final class DifficultyFlag extends WorldFlag<Difficulty, DifficultyFlag> {
 
@@ -58,10 +57,7 @@ public final class DifficultyFlag extends WorldFlag<Difficulty, DifficultyFlag> 
 
     @Override
     public DifficultyFlag merge(final @NonNull Difficulty newValue) {
-        return this.flagOf(Objects.requireNonNull(Difficulty.getByValue(Math.max(
-                this.getValue().getValue(),
-                newValue.getValue()
-        ))));
+        return this.flagOf(newValue);
     }
 
     @Override
