@@ -21,6 +21,8 @@ import se.hyperver.hyperverse.util.MessageUtil;
 
 public class FlagParseException extends Exception {
 
+    private static final long serialVersionUID = 3442434713845764748L;
+
     private final WorldFlag<?, ?> flag;
     private final String value;
     private final String errorMessage;
@@ -70,7 +72,7 @@ public class FlagParseException extends Exception {
      * @return Error message.
      */
     public String getErrorMessage() {
-        return errorMessage;
+        return this.errorMessage;
     }
 
 }
