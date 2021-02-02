@@ -72,7 +72,7 @@ public class WorldFlagContainer implements FlagContainer {
      * @param <T>  Flag type
      * @return Casted flag
      */
-    @SuppressWarnings("ALL")
+    @SuppressWarnings("unchecked")
     public static <V, T extends WorldFlag<V, ?>> T castUnsafe(
             final @NonNull WorldFlag<?, ?> flag
     ) {
