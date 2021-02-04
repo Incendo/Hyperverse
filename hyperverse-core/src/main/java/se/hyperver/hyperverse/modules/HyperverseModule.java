@@ -33,6 +33,7 @@ import se.hyperver.hyperverse.database.SQLiteDatabase;
 import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlagContainer;
+import se.hyperver.hyperverse.spigotnms.unsupported.NMSImpl;
 import se.hyperver.hyperverse.teleportation.SimpleTeleportationManager;
 import se.hyperver.hyperverse.teleportation.TeleportationManager;
 import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
@@ -43,6 +44,8 @@ import se.hyperver.hyperverse.world.SimpleWorld;
 import se.hyperver.hyperverse.world.SimpleWorldManager;
 import se.hyperver.hyperverse.world.WorldManager;
 
+import java.util.logging.Logger;
+
 public final class HyperverseModule extends AbstractModule {
 
     private static final @NonNull String CRAFTSERVER_CLASS_NAME = Bukkit.getServer().getClass().getName();
@@ -52,17 +55,27 @@ public final class HyperverseModule extends AbstractModule {
                     CRAFTSERVER_CLASS_NAME.indexOf('.', "org.bukkit.craftbukkit.".length())
             );
 
+    private final Logger logger;
+
+    public HyperverseModule(final @NonNull Logger logger) {
+        this.logger = logger;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     protected void configure() {
         // Resolve the NMS implementation
+        Class<? extends  NMS> nmsAdapter;
         try {
-            bind(NMS.class)
-                    .to((Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.spigotnms." + PACKAGE_VERSION + ".NMSImpl"))
-                    .in(Singleton.class);
+            nmsAdapter = (Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.spigotnms." + PACKAGE_VERSION + ".NMSImpl");
         } catch (final ClassNotFoundException ex) {
-            throw new RuntimeException("Server version unsupported", ex);
+            new RuntimeException("Server version unsupported", ex).printStackTrace();
+            this.logger.severe(
+                    "Could not find a compatible NMS adapter. Some of Hyperverse's functionality will fail exceptionally."
+            );
+            nmsAdapter = NMSImpl.class;
         }
+        bind(NMS.class).to(nmsAdapter).in(Singleton.class);
         bind(Hyperverse.class).toInstance(Hyperverse.getPlugin(Hyperverse.class));
         bind(HyperDatabase.class).to(SQLiteDatabase.class).in(Singleton.class);
         bind(HyperConfiguration.class).to(FileHyperConfiguration.class).in(Singleton.class);

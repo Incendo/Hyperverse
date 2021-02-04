@@ -25,16 +25,18 @@ dependencies {
         exclude("com.google.guava", "guava")
     }
     implementation("org.bstats:bstats-bukkit:1.7")
-    implementation("me.minidigger:minimessage-bungee:2.0.4")
     implementation("org.spongepowered:configurate-hocon:3.7.1")
     implementation("cloud.commandframework:cloud-paper:1.4.0")
     implementation("cloud.commandframework:cloud-minecraft-extras:1.4.0")
     implementation("cloud.commandframework:cloud-annotations:1.4.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT")
+    implementation("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
 
     implementation(project(":hyperverse-nms-1-14-4"))
     implementation(project(":hyperverse-nms-1-15-2"))
     implementation(project(":hyperverse-nms-1-16-3"))
     implementation(project(":hyperverse-nms-1-16-4"))
+    implementation(project(":hyperverse-nms-unsupported"))
 }
 
 tasks {
@@ -60,7 +62,6 @@ tasks {
         relocate("co.aikar.locales", "se.hyperver.hyperverse.libs.aikar.locales")
         relocate("co.aikar.util", "se.hyperver.hyperverse.libs.aikar.util")
         relocate("net.jodah.expiringmap", "se.hyperver.hyperverse.libs.expiringmap")
-        relocate("me.minidigger.minimessage", "se.hyperver.hyperverse.libs.minimessage")
         relocate("net.kyori", "se.hyperver.hyperverse.libs.kyori")
         relocate("cloud.commandframework", "se.hyperver.hyperverse.libs.cloud")
         relocate("ninja.leaping.configurate", "se.hyperver.hyperverse.libs.configurate")

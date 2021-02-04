@@ -17,12 +17,13 @@
 
 package se.hyperver.hyperverse.util;
 
-import me.minidigger.minimessage.bungee.MiniMessageParser;
-import me.minidigger.minimessage.bungee.MiniMessageSerializer;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.Message;
 import se.hyperver.hyperverse.configuration.Messages;
 
@@ -32,6 +33,9 @@ import java.util.Objects;
  * Message utility methods
  */
 public final class MessageUtil {
+
+    private static final BukkitAudiences AUDIENCES = BukkitAudiences.create(JavaPlugin.getPlugin(Hyperverse.class));
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.get();
 
     private MessageUtil() {
     }
@@ -78,17 +82,16 @@ public final class MessageUtil {
             return;
         }
         if (replacedMessage.contains("<") && replacedMessage.contains(">")) {
+            final String prefixedMessage;
             if (replacedMessage.contains(ChatColor.COLOR_CHAR + "")) {
-                final String prefixedMessage = ChatColor.translateAlternateColorCodes(
+                prefixedMessage = ChatColor.translateAlternateColorCodes(
                         '&',
                         Messages.messagePrefix.toString() + replacedMessage
                 );
-                final String fixedMessage = MiniMessageSerializer.serialize(TextComponent.fromLegacyText(prefixedMessage));
-                recipient.spigot().sendMessage(MiniMessageParser.parseFormat(fixedMessage));
             } else {
-                final String prefixedMessage = Messages.messagePrefixFancy.toString() + replacedMessage;
-                recipient.spigot().sendMessage(MiniMessageParser.parseFormat(prefixedMessage));
+                prefixedMessage = Messages.messagePrefixFancy.toString() + replacedMessage;
             }
+            AUDIENCES.sender(recipient).sendMessage(MINI_MESSAGE.parse(prefixedMessage));
         } else {
             final String prefixedMessage = ChatColor.translateAlternateColorCodes(
                     '&',

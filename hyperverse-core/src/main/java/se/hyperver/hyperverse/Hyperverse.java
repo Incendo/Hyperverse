@@ -123,7 +123,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         }
 
         try {
-            this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(),
+            this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(getLogger()),
                     new TaskFactoryModule(this)
             );
         } catch (final Exception e) {
