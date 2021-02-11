@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.spigotnms.v1_16_R3;
 
-import cloud.commandframework.tasks.TaskFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -60,15 +60,15 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public class NMSImpl implements NMS {
 
-    private final TaskFactory taskFactory;
+    private final TaskChainFactory taskChainFactory;
     private Field entitiesByUUID;
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
     @Inject
     public NMSImpl(
-            final @NonNull TaskFactory taskFactory,
+            final @NonNull TaskChainFactory taskChainFactory,
             final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
-        this.taskFactory = taskFactory;
+        this.taskChainFactory = taskChainFactory;
         if (hyperConfiguration) {
             try {
                 final Field field = WorldServer.class.getDeclaredField("LOGGER");
@@ -121,8 +121,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location getDimensionSpawn(final @NonNull Location origin) {
+    public @Nullable Location getDimensionSpawn(final @NonNull Location origin) {
         if (Objects.requireNonNull(origin.getWorld()).getEnvironment()
                 == World.Environment.THE_END) {
             return new Location(origin.getWorld(), 100, 50, 0);
@@ -143,8 +142,8 @@ public class NMSImpl implements NMS {
         hyperverse.setLong("writeTime", System.currentTimeMillis());
         hyperverse.setString("version", Bukkit.getPluginManager().getPlugin("Hyperverse").getDescription().getVersion());
 
-        taskFactory.recipe().begin(file).asynchronous(passedFile -> {
-            try (final OutputStream outputStream = Files.newOutputStream(passedFile)) {
+        this.taskChainFactory.newChain().async(() -> {
+            try (final OutputStream outputStream = Files.newOutputStream(file)) {
                 NBTCompressedStreamTools.a(playerTag, outputStream);
             } catch (final Exception e) {
                 e.printStackTrace();
@@ -156,14 +155,14 @@ public class NMSImpl implements NMS {
     @SuppressWarnings("unchecked")
     public void readPlayerData(final @NonNull Player player, final @NonNull Path file, final @NonNull Runnable whenDone) {
         final Location originLocation = player.getLocation().clone();
-        taskFactory.recipe().begin(Optional.empty()).asynchronous(unused -> {
+        this.taskChainFactory.newChain().asyncFirst(() -> {
             try (final InputStream inputStream = Files.newInputStream(file)) {
                 return Optional.of(NBTCompressedStreamTools.a(inputStream));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
             return Optional.empty();
-        }).synchronous((optionalCompound) -> {
+        }).syncLast((optionalCompound) -> {
             if (!optionalCompound.isPresent()) {
                 return;
             }
@@ -218,7 +217,7 @@ public class NMSImpl implements NMS {
                         this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
                         this.entitiesByUUID.setAccessible(true);
                     }
-                    final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
+                    final Map<UUID, Entity> map = (Map<UUID, Entity>) this.entitiesByUUID.get(worldServer);
                     map.remove(entityPlayer.getUniqueID());
                 } catch (final NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();

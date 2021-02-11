@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.spigotnms.v1_14_R1;
 
-import cloud.commandframework.tasks.TaskFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.lib.PaperLib;
@@ -63,16 +63,16 @@ import java.util.UUID;
 @Singleton
 public class NMSImpl implements NMS {
 
-    private final TaskFactory taskFactory;
+    private final TaskChainFactory taskChainFactory;
     private Field entitiesByUUID;
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
     @Inject
     public NMSImpl(
-            final @NonNull TaskFactory taskFactory,
+            final @NonNull TaskChainFactory taskChainFactory,
             final @HyperConfigShouldGroupProfiles boolean shouldGroupProfiles
     ) {
-        this.taskFactory = taskFactory;
+        this.taskChainFactory = taskChainFactory;
         if (shouldGroupProfiles) {
             try {
                 final Field field = WorldServer.class.getDeclaredField("LOGGER");
@@ -173,7 +173,7 @@ public class NMSImpl implements NMS {
                 .requireNonNull(Bukkit.getPluginManager().getPlugin("Hyperverse"))
                 .getDescription().getVersion());
 
-        taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
+        this.taskChainFactory.newChain().async(() -> {
             try (final OutputStream outputStream = Files.newOutputStream(file)) {
                 NBTCompressedStreamTools.a(playerTag, outputStream);
             } catch (final Exception e) {
@@ -190,14 +190,14 @@ public class NMSImpl implements NMS {
             final @NonNull Runnable whenDone
     ) {
         final Location originLocation = player.getLocation().clone();
-        taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
+        this.taskChainFactory.newChain().asyncFirst(() -> {
             try (final InputStream inputStream = Files.newInputStream(file)) {
                 return Optional.of(NBTCompressedStreamTools.a(inputStream));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
             return Optional.empty();
-        }).synchronous(optionalCompound -> {
+        }).syncLast(optionalCompound -> {
             if (!optionalCompound.isPresent()) {
                 return;
             }
@@ -252,7 +252,7 @@ public class NMSImpl implements NMS {
                         this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
                         this.entitiesByUUID.setAccessible(true);
                     }
-                    final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
+                    final Map<UUID, Entity> map = (Map<UUID, Entity>) this.entitiesByUUID.get(worldServer);
                     map.remove(entityPlayer.getUniqueID());
                 } catch (final NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();

@@ -40,8 +40,7 @@ public class NMSImpl implements NMS {
     }
 
     @Override
-    @Nullable
-    public Location getDimensionSpawn(final @NonNull Location origin) {
+    public @Nullable Location getDimensionSpawn(final @NonNull Location origin) {
         if (Objects.requireNonNull(origin.getWorld()).getEnvironment()
                 == World.Environment.THE_END) {
             return new Location(origin.getWorld(), 100, 50, 0);

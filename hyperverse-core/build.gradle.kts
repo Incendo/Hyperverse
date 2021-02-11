@@ -9,7 +9,7 @@ apply {
 dependencies {
     api(project(":hyperverse-nms-common"))
 
-    compileOnlyApi("com.destroystokyo.paper:paper-api:1.16.3-R0.1-SNAPSHOT")
+    compileOnlyApi("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT")
 
     compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.2.2")
     compileOnly("com.bergerkiller.bukkit:MyWorlds:1.15.2-v1")
@@ -17,6 +17,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.10.9")
 
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
+    implementation("co.aikar:taskchain-bukkit:3.7.2")
     implementation("io.papermc:paperlib:1.0.5")
     implementation("com.google.inject:guice:4.2.3") {
         exclude("com.google.guava", "guava")
