@@ -17,7 +17,6 @@
 
 package se.hyperver.hyperverse.commands;
 
-import cloud.commandframework.tasks.TaskFactory;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.commands.BukkitMessageFormatter;
@@ -34,6 +33,7 @@ import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
@@ -108,14 +108,14 @@ public final class HyperCommandManager extends BaseCommand {
     private final FileHyperConfiguration fileHyperConfiguration;
     private final HyperWorldFactory hyperWorldFactory;
     private final GlobalWorldFlagContainer globalFlagContainer;
-    private final TaskFactory taskChainFactory;
+    private final TaskChainFactory taskChainFactory;
 
     @Inject
     @SuppressWarnings("deprecation")
     public HyperCommandManager(
             final Hyperverse hyperverse, final WorldManager worldManager,
             final HyperWorldFactory hyperWorldFactory, final GlobalWorldFlagContainer globalFlagContainer,
-            final TaskFactory taskFactory, final FileHyperConfiguration hyperConfiguration
+            final TaskChainFactory taskFactory, final FileHyperConfiguration hyperConfiguration
     ) {
         this.worldManager = Objects.requireNonNull(worldManager);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
@@ -1039,7 +1039,7 @@ public final class HyperCommandManager extends BaseCommand {
     @CommandPermission("hyperverse.debugpaste")
     @Description("{@@command.debugpaste}")
     public void doDebugPaste(final CommandSender sender) {
-        this.taskChainFactory.recipe().begin(java.util.Optional.empty()).asynchronous((unused) -> {
+        this.taskChainFactory.newChain().async(() -> {
             try {
                 final Hyperverse hyperverse = Hyperverse.getPlugin(Hyperverse.class);
 

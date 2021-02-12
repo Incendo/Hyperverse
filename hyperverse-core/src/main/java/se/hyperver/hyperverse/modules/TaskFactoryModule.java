@@ -17,8 +17,8 @@
 
 package se.hyperver.hyperverse.modules;
 
-import cloud.commandframework.bukkit.BukkitSynchronizer;
-import cloud.commandframework.tasks.TaskFactory;
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -41,8 +41,8 @@ public final class TaskFactoryModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public TaskFactory provideTaskFactory() {
-        return new TaskFactory(new BukkitSynchronizer(this.javaPlugin));
+    public TaskChainFactory provideTaskChainFactory() {
+        return BukkitTaskChainFactory.create(this.javaPlugin);
     }
 
 }

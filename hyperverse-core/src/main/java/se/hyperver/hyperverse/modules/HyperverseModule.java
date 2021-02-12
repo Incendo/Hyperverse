@@ -56,9 +56,11 @@ public final class HyperverseModule extends AbstractModule {
             );
 
     private final Logger logger;
+    private final Hyperverse hyperverse;
 
-    public HyperverseModule(final @NonNull Logger logger) {
+    public HyperverseModule(final @NonNull Logger logger, final @NonNull Hyperverse hyperverse) {
         this.logger = logger;
+        this.hyperverse = hyperverse;
     }
 
     @Override
@@ -76,7 +78,7 @@ public final class HyperverseModule extends AbstractModule {
             nmsAdapter = NMSImpl.class;
         }
         bind(NMS.class).to(nmsAdapter).in(Singleton.class);
-        bind(Hyperverse.class).toInstance(Hyperverse.getPlugin(Hyperverse.class));
+        bind(Hyperverse.class).toInstance(this.hyperverse);
         bind(HyperDatabase.class).to(SQLiteDatabase.class).in(Singleton.class);
         bind(HyperConfiguration.class).to(FileHyperConfiguration.class).in(Singleton.class);
         bind(WorldManager.class).to(SimpleWorldManager.class).in(Singleton.class);

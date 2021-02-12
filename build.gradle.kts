@@ -107,7 +107,7 @@ subprojects {
         maven("https://oss.sonatype.org/content/repositories/releases")
         maven("https://repo.codemc.org/repository/maven-public")
         maven("https://repo.spongepowered.org/maven")
-        maven("http://repo.onarandombox.com/content/repositories/multiverse/")
+        maven("https://repo.onarandombox.com/content/repositories/multiverse/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://ci.ender.zone/plugin/repository/everything/")
         maven("https://nexus.proximyst.com/repository/maven-public/")
@@ -118,6 +118,6 @@ subprojects {
         TEST_IMPLEMENTATION_CONFIGURATION_NAME("org.junit.jupiter", "junit-jupiter-engine", "5.7.0")
         "errorprone"("com.google.errorprone", "error_prone_core", "2.5.1")
         COMPILE_ONLY_API_CONFIGURATION_NAME("com.google.errorprone", "error_prone_annotations", "2.5.1")
-        org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME("org.jetbrains", "annotations", "20.1.0")
+        COMPILE_ONLY_API_CONFIGURATION_NAME("org.jetbrains", "annotations", "20.1.0")
     }
 }

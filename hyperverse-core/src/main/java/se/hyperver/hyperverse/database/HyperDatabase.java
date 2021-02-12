@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.database;
 
-import cloud.commandframework.tasks.TaskFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -36,15 +36,15 @@ import java.util.concurrent.CompletableFuture;
  */
 public abstract class HyperDatabase {
 
-    private final TaskFactory taskFactory;
+    private final TaskChainFactory taskChainFactory;
     private final Hyperverse hyperverse;
     private final EnumMap<LocationType, Table<UUID, String, PersistentLocation>> locations;
 
     protected HyperDatabase(
-            final @NonNull TaskFactory taskFactory,
+            final @NonNull TaskChainFactory taskChainFactory,
             final @NonNull Hyperverse hyperverse
     ) {
-        this.taskFactory = taskFactory;
+        this.taskChainFactory = taskChainFactory;
         this.hyperverse = hyperverse;
         this.locations = new EnumMap<>(LocationType.class);
         for (final LocationType type : LocationType.values()) {
@@ -124,8 +124,8 @@ public abstract class HyperDatabase {
      */
     public abstract void clearWorld(final @NonNull String worldName);
 
-    protected final @NonNull TaskFactory getTaskFactory() {
-        return this.taskFactory;
+    protected final @NonNull TaskChainFactory getTaskChainFactory() {
+        return this.taskChainFactory;
     }
 
     protected final @NonNull Hyperverse getHyperverse() {

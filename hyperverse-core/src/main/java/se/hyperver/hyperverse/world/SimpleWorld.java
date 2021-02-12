@@ -17,7 +17,7 @@
 
 package se.hyperver.hyperverse.world;
 
-import cloud.commandframework.tasks.TaskFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.bukkit.Bukkit;
@@ -58,7 +58,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -72,7 +71,7 @@ public final class SimpleWorld implements HyperWorld {
     private final WorldConfiguration configuration;
     private final HyperWorldCreatorFactory hyperWorldCreatorFactory;
     private final WorldManager worldManager;
-    private final TaskFactory taskFactory;
+    private final TaskChainFactory taskChainFactory;
     private final FlagContainer flagContainer;
     private final HyperDatabase hyperDatabase;
     private final HyperConfiguration hyperConfiguration;
@@ -87,7 +86,7 @@ public final class SimpleWorld implements HyperWorld {
             @Assisted final WorldConfiguration configuration,
             final @NonNull HyperWorldCreatorFactory hyperWorldCreatorFactory,
             final @NonNull WorldManager worldManager,
-            final @NonNull TaskFactory taskFactory,
+            final @NonNull TaskChainFactory taskChainFactory,
             final @NonNull GlobalWorldFlagContainer globalFlagContainer,
             final @NonNull FlagContainerFactory flagContainerFactory,
             final @NonNull HyperDatabase hyperDatabase,
@@ -98,7 +97,7 @@ public final class SimpleWorld implements HyperWorld {
         this.configuration = Objects.requireNonNull(configuration);
         this.hyperWorldCreatorFactory = Objects.requireNonNull(hyperWorldCreatorFactory);
         this.worldManager = Objects.requireNonNull(worldManager);
-        this.taskFactory = Objects.requireNonNull(taskFactory);
+        this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
         this.hyperDatabase = Objects.requireNonNull(hyperDatabase);
         this.hyperConfiguration = Objects.requireNonNull(hyperConfiguration);
         this.teleportationManager = Objects.requireNonNull(teleportationManagerFactory).create(this);
@@ -133,11 +132,8 @@ public final class SimpleWorld implements HyperWorld {
 
     @Override
     public void saveConfiguration() {
-        this.taskFactory.recipe().begin(Optional.empty())
-                .asynchronous((unused) -> {
-                    this.getConfiguration().writeToFile(this.worldManager.getWorldDirectory().
-                            resolve(String.format("%s.json", this.getConfiguration().getName())));
-                }).execute();
+        this.taskChainFactory.newChain().async(() -> this.getConfiguration().writeToFile(this.worldManager.getWorldDirectory().
+                resolve(String.format("%s.json", this.getConfiguration().getName())))).execute();
     }
 
     @Override
@@ -164,14 +160,14 @@ public final class SimpleWorld implements HyperWorld {
             // but we don't delete the actual world folder
             Bukkit.unloadWorld(this.bukkitWorld, true);
         }
-        this.taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
+        this.taskChainFactory.newChain().async(() -> {
             try {
                 Files.delete(this.worldManager.getWorldDirectory().
                         resolve(String.format("%s.json", this.getConfiguration().getName())));
             } catch (final IOException e) {
                 e.printStackTrace();
             }
-        }).synchronous((unused) -> {
+        }).sync(() -> {
             this.worldManager.unregisterWorld(this);
             // Delete world in the database
             this.hyperDatabase.clearWorld(this.configuration.getName());
