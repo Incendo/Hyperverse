@@ -110,7 +110,7 @@ subprojects {
         maven("https://repo.onarandombox.com/content/repositories/multiverse/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://ci.ender.zone/plugin/repository/everything/")
-        maven("https://nexus.proximyst.com/repository/maven-public/")
+        maven("https://ci.athion.net/plugin/repository/tools/")
     }
 
     dependencies {

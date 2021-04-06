@@ -9,24 +9,25 @@ apply {
 dependencies {
     api(project(":hyperverse-nms-common"))
 
-    compileOnlyApi("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT")
+    compileOnlyApi("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
 
     compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.2.2")
     compileOnly("com.bergerkiller.bukkit:MyWorlds:1.15.2-v1")
-    compileOnly("net.ess3:EssentialsX:2.17.2")
+    compileOnly("net.ess3:EssentialsX:2.18.2")
     compileOnly("me.clip:placeholderapi:2.10.9")
 
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
     implementation("co.aikar:taskchain-bukkit:3.7.2")
-    implementation("io.papermc:paperlib:1.0.5")
-    implementation("com.google.inject:guice:4.2.3") {
+    implementation("io.papermc:paperlib:1.0.6")
+    implementation("com.google.inject:guice:5.0.1") {
         exclude("com.google.guava", "guava")
     }
-    implementation("com.google.inject.extensions:guice-assistedinject:4.2.3") {
+    implementation("com.google.inject.extensions:guice-assistedinject:5.0.1") {
         exclude("com.google.guava", "guava")
     }
-    implementation("org.bstats:bstats-bukkit:1.7")
-    implementation("org.spongepowered:configurate-hocon:3.7.1")
+    implementation("org.bstats:bstats-bukkit:1.8")
+    implementation("org.spongepowered:configurate-hocon:4.0.0")
+    implementation("com.typesafe:config:1.4.1")
     implementation("cloud.commandframework:cloud-paper:1.4.0")
     implementation("cloud.commandframework:cloud-minecraft-extras:1.4.0")
     implementation("cloud.commandframework:cloud-annotations:1.4.0")
@@ -35,8 +36,7 @@ dependencies {
 
     implementation(project(":hyperverse-nms-1-14-4"))
     implementation(project(":hyperverse-nms-1-15-2"))
-    implementation(project(":hyperverse-nms-1-16-3"))
-    implementation(project(":hyperverse-nms-1-16-4"))
+    implementation(project(":hyperverse-nms-1-16-5"))
     implementation(project(":hyperverse-nms-unsupported"))
 }
 

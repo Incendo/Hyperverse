@@ -1,4 +1,4 @@
 dependencies {
     compileOnly(project(":hyperverse-nms-common"))
-    compileOnly("org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
 }

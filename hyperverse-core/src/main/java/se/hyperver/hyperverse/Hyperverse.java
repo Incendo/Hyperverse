@@ -22,16 +22,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
-import com.typesafe.config.ConfigParseOptions;
-import com.typesafe.config.ConfigRenderOptions;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import io.papermc.lib.PaperLib;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -42,6 +35,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 import se.hyperver.hyperverse.commands.HyperCommandManager;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
@@ -358,20 +356,20 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         // Message configuration
         final Path messagePath =
                 this.getDataFolder().toPath().resolve(String.format("messages_%s.conf", language));
-        final AbstractConfigurationLoader<CommentedConfigurationNode> loader =
-                HoconConfigurationLoader.builder().setParseOptions(
-                        ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
-                        .setRenderOptions(
-                                ConfigRenderOptions.defaults().setComments(true).setFormatted(true)
-                                        .setOriginComments(false).setJson(false))
-                        .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
+        final ConfigurationLoader<CommentedConfigurationNode> loader =
+                HoconConfigurationLoader.builder()
+                        .emitComments(true)
+                        .prettyPrinting(true)
+                        .emitJsonCompatible(false)
+                        .path(messagePath)
+                        .build();
 
         ConfigurationNode translationNode;
         try {
             translationNode = loader.load();
         } catch (IOException e) {
             e.printStackTrace();
-            translationNode = loader.createEmptyNode();
+            translationNode = loader.createNode();
         }
 
         if (!Files.exists(messagePath)) {
@@ -386,9 +384,13 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         final Map<String, String> messages = Messages.getConfiguredMessages();
         final Collection<String> messageKeys = new ArrayList<>(messages.keySet());
         for (final String key : messageKeys) {
-            final ConfigurationNode messageNode = translationNode.getNode(key);
-            if (messageNode.isVirtual()) {
-                messageNode.setValue(messages.get(key));
+            final ConfigurationNode messageNode = translationNode.node(key);
+            if (messageNode.virtual()) {
+                try {
+                    messageNode.set(messages.get(key));
+                } catch (SerializationException ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 messages.put(key, messageNode.getString());
             }

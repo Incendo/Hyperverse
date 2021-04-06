@@ -17,9 +17,10 @@
 
 package se.hyperver.hyperverse.configuration;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 /**
  * Data holder class that is instantiated in
@@ -28,25 +29,30 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @ConfigSerializable
 public final class FileConfigurationObject {
 
-    @Setting(value = "import-automatically",
-            comment = "Whether or not worlds should be automatically imported into Hyperverse on load")
+    @Setting(value = "import-automatically")
+    @Comment(value = "Whether or not worlds should be automatically imported into Hyperverse on load")
     private boolean importAutomatically = true;
-    @Setting(value = "persist-locations",
-            comment = "Whether or not player locations should be saved to the database,"
+    @Setting(value = "persist-locations")
+    @Comment(value = "Whether or not player locations should be saved to the database,"
                     + " and be used when a player teleports between worlds")
     private boolean persistLocations = true;
-    @Setting(value = "keep-loaded", comment = "Whether or not world spawn chunks"
-            + " should be kept in memory")
+    @Setting(value = "keep-loaded")
+    @Comment(value = "Whether or not world spawn chunks should be kept in memory")
     private boolean keepSpawnLoaded = true;
-    @Setting(value = "grouped-inventories", comment = "Whether or player profile groups are enabled")
+    @Setting(value = "grouped-inventories")
+    @Comment(value = "Whether or player profile groups are enabled")
     private boolean groupedProfiles = false;
-    @Setting(value = "language-code", comment = "Language code used to resolve translations. Currently supported: en, sv, de, cn")
+    @Setting(value = "language-code")
+    @Comment(value = "Language code used to resolve translations. Currently supported: en, sv, de, cn")
     private String languageCode = "en";
-    @Setting(value = "safe-teleport", comment = "Whether or not safe teleportation should be enforced")
+    @Setting(value = "safe-teleport")
+    @Comment(value = "Whether or not safe teleportation should be enforced")
     private boolean safeTeleport = true;
-    @Setting(value = "hook-essentials", comment = "Whether or not Hyperverse should attempt to utilize Essentials' specific features.")
+    @Setting(value = "hook-essentials")
+    @Comment(value = "Whether or not Hyperverse should attempt to utilize Essentials' specific features.")
     private boolean hookEssentials = true;
-    @Setting(value = "debug", comment = "Whether or not Hyperverse should print verbose debugging messages")
+    @Setting(value = "debug")
+    @Comment(value = "Whether or not Hyperverse should print verbose debugging messages")
     private boolean debug = false;
 
     boolean isImportAutomatically() {
