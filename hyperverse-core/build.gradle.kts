@@ -27,7 +27,6 @@ dependencies {
     }
     implementation("org.bstats:bstats-bukkit:1.8")
     implementation("org.spongepowered:configurate-hocon:4.0.0")
-    implementation("com.typesafe:config:1.4.1")
     implementation("cloud.commandframework:cloud-paper:1.4.0")
     implementation("cloud.commandframework:cloud-minecraft-extras:1.4.0")
     implementation("cloud.commandframework:cloud-annotations:1.4.0")

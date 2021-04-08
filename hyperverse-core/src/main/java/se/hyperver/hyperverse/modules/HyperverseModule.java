@@ -22,8 +22,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.internal.ProviderMethodsModule;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.WorldCreator;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
@@ -57,15 +60,27 @@ public final class HyperverseModule extends AbstractModule {
 
     private final Logger logger;
     private final Hyperverse hyperverse;
+    private final ServicePipeline servicePipeline;
+    private final Server server;
 
-    public HyperverseModule(final @NonNull Logger logger, final @NonNull Hyperverse hyperverse) {
+    public HyperverseModule(
+            final @NonNull Logger logger,
+            final @NonNull ServicePipeline servicePipeline,
+            final @NonNull Server server,
+            final @NonNull Hyperverse hyperverse
+    ) {
         this.logger = logger;
         this.hyperverse = hyperverse;
+        this.servicePipeline = servicePipeline;
+        this.server = server;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     protected void configure() {
+        // Install the bukkit module
+        install(new BukkitModule(this.server));
+        install(ProviderMethodsModule.forModule(this));
         // Resolve the NMS implementation
         Class<? extends  NMS> nmsAdapter;
         try {
@@ -78,12 +93,13 @@ public final class HyperverseModule extends AbstractModule {
             nmsAdapter = NMSImpl.class;
         }
         bind(NMS.class).to(nmsAdapter).in(Singleton.class);
+        bind(Plugin.class).toInstance(this.hyperverse);
         bind(Hyperverse.class).toInstance(this.hyperverse);
         bind(HyperDatabase.class).to(SQLiteDatabase.class).in(Singleton.class);
         bind(HyperConfiguration.class).to(FileHyperConfiguration.class).in(Singleton.class);
         bind(WorldManager.class).to(SimpleWorldManager.class).in(Singleton.class);
         bind(GlobalWorldFlagContainer.class).toInstance(new GlobalWorldFlagContainer());
-        bind(ServicePipeline.class).toInstance(Hyperverse.getApi().getServicePipeline());
+        bind(ServicePipeline.class).toInstance(this.servicePipeline);
         install(new FactoryModuleBuilder().implement(WorldCreator.class, HyperWorldCreator.class)
                 .build(HyperWorldCreatorFactory.class));
         install(new FactoryModuleBuilder().implement(HyperWorld.class, SimpleWorld.class)

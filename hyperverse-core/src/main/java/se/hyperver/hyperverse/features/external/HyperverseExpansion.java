@@ -20,6 +20,7 @@ package se.hyperver.hyperverse.features.external;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -36,6 +37,18 @@ import se.hyperver.hyperverse.world.WorldManager;
  */
 final class HyperverseExpansion extends PlaceholderExpansion {
 
+    private final Hyperverse plugin;
+
+    private final String author;
+    private final String version;
+
+    public HyperverseExpansion() {
+        this.plugin = JavaPlugin.getPlugin(Hyperverse.class);
+        final PluginDescriptionFile descriptionFile = this.plugin.getDescription();
+        this.author = descriptionFile.getAuthors().toString();
+        this.version = descriptionFile.getVersion();
+    }
+
     @Override
     public @NonNull String getIdentifier() {
         return "hyperverse";
@@ -43,12 +56,12 @@ final class HyperverseExpansion extends PlaceholderExpansion {
 
     @Override
     public @NonNull String getAuthor() {
-        return JavaPlugin.getPlugin(Hyperverse.class).getDescription().getAuthors().toString();
+        return this.author;
     }
 
     @Override
     public @NonNull String getVersion() {
-        return JavaPlugin.getPlugin(Hyperverse.class).getDescription().getVersion();
+        return this.version;
     }
 
     @Override
@@ -62,7 +75,7 @@ final class HyperverseExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onPlaceholderRequest(
+    public @Nullable String onPlaceholderRequest(
             final @Nullable Player player,
             final @NonNull String identifier
     ) {
@@ -70,7 +83,7 @@ final class HyperverseExpansion extends PlaceholderExpansion {
             return "";
         }
 
-        final WorldManager worldManager = Hyperverse.getApi().getWorldManager();
+        final WorldManager worldManager = this.plugin.getWorldManager();
 
         final HyperWorld hyperWorld = worldManager.getWorld(player.getWorld());
         if (hyperWorld == null) {

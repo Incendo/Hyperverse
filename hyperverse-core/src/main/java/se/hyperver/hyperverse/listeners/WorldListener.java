@@ -18,7 +18,7 @@
 package se.hyperver.hyperverse.listeners;
 
 import com.google.inject.Inject;
-import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,12 +39,15 @@ public final class WorldListener implements Listener {
 
     private final SimpleWorldManager worldManager;
     private final HyperConfiguration hyperConfiguration;
+    private final Server server;
 
     @Inject
     public WorldListener(
             final @NonNull SimpleWorldManager worldManager,
-            final @NonNull HyperConfiguration hyperConfiguration
+            final @NonNull HyperConfiguration hyperConfiguration,
+            final @NonNull Server server
     ) {
+        this.server = server;
         this.worldManager = worldManager;
         this.hyperConfiguration = hyperConfiguration;
     }
@@ -56,7 +59,7 @@ public final class WorldListener implements Listener {
         if (this.worldManager.shouldIgnore(world.getName())) {
             return;
         }
-        MessageUtil.sendMessage(Bukkit.getConsoleSender(),
+        MessageUtil.sendMessage(this.server.getConsoleSender(),
                 Messages.messageWorldLoadDetected, "%world%", world.getName()
         );
         HyperWorld hyperWorld = this.worldManager.getWorld(world);
@@ -75,7 +78,7 @@ public final class WorldListener implements Listener {
                     this.worldManager.importWorld(world, false, null);
             if (result == WorldManager.WorldImportResult.SUCCESS) {
                 MessageUtil
-                        .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportedOnLoad,
+                        .sendMessage(this.server.getConsoleSender(), Messages.messageWorldImportedOnLoad,
                                 "%world%", world.getName(), "%generator%",
                                 Objects.requireNonNull(this.worldManager.getWorld(world)).getConfiguration()
                                         .getGenerator()
@@ -87,7 +90,7 @@ public final class WorldListener implements Listener {
                 }
             } else {
                 MessageUtil
-                        .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
+                        .sendMessage(this.server.getConsoleSender(), Messages.messageWorldImportFailure,
                                 "%world%", world.getName(), "%result%", result.getDescription()
                         );
             }

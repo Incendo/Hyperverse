@@ -22,18 +22,10 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Objects;
-
 public final class TaskFactoryModule extends AbstractModule {
-
-    private final JavaPlugin javaPlugin;
-
-    public TaskFactoryModule(final @NonNull JavaPlugin javaPlugin) {
-        this.javaPlugin = Objects.requireNonNull(javaPlugin);
-    }
 
     @Override
     protected void configure() {
@@ -41,8 +33,8 @@ public final class TaskFactoryModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public TaskChainFactory provideTaskChainFactory() {
-        return BukkitTaskChainFactory.create(this.javaPlugin);
+    public @NonNull TaskChainFactory provideTaskChainFactory(final @NonNull Plugin plugin) {
+        return BukkitTaskChainFactory.create(plugin);
     }
 
 }

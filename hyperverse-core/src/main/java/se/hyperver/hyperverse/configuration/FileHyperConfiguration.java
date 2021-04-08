@@ -20,6 +20,7 @@ package se.hyperver.hyperverse.configuration;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
@@ -27,7 +28,6 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
-import se.hyperver.hyperverse.Hyperverse;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,17 +38,17 @@ import java.io.IOException;
 @Singleton
 public final class FileHyperConfiguration implements HyperConfiguration {
 
-    private final Hyperverse hyperverse;
+    private final Plugin plugin;
     private FileConfigurationObject fileConfigurationObject;
 
     @Inject
-    public FileHyperConfiguration(final @NonNull Hyperverse hyperverse) {
-        this.hyperverse = hyperverse;
+    public FileHyperConfiguration(final @NonNull Plugin plugin) {
+        this.plugin = plugin;
         this.loadConfiguration();
     }
 
     public void loadConfiguration() {
-        final File configFile = new File(this.hyperverse.getDataFolder(), "hyperverse.conf");
+        final File configFile = new File(this.plugin.getDataFolder(), "plugin.conf");
         final ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                 .builder()
                 .emitComments(true)

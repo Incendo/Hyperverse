@@ -119,10 +119,11 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
                 throw new RuntimeException("Could not create Hyperverse main directory");
             }
         }
-
         try {
-            this.injector = Guice.createInjector(Stage.PRODUCTION, new HyperverseModule(getLogger(), this),
-                    new TaskFactoryModule(this)
+            this.injector = Guice.createInjector(
+                    Stage.PRODUCTION,
+                    new HyperverseModule(getLogger(), this.servicePipeline, Bukkit.getServer(), this),
+                    new TaskFactoryModule()
             );
         } catch (final Exception e) {
             e.printStackTrace();

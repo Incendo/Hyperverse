@@ -64,20 +64,17 @@ public final class NullRouteCommandSender implements CommandSender {
     }
 
     @Override
-    @NonNull
-    public Server getServer() {
+    public @NonNull Server getServer() {
         return Bukkit.getServer();
     }
 
     @Override
-    @NonNull
-    public String getName() {
+    public @NonNull String getName() {
         return "null";
     }
 
     @Override
-    @NonNull
-    public Spigot spigot() {
+    public @NonNull Spigot spigot() {
         return new Spigot();
     }
 

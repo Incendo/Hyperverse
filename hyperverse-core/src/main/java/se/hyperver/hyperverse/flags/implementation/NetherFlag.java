@@ -24,10 +24,9 @@ import se.hyperver.hyperverse.flags.FlagParseException;
 import se.hyperver.hyperverse.flags.WorldFlag;
 import se.hyperver.hyperverse.util.WorldUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
-import se.hyperver.hyperverse.world.WorldConfiguration;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public final class NetherFlag extends WorldFlag<String, NetherFlag> {
 
@@ -67,8 +66,12 @@ public final class NetherFlag extends WorldFlag<String, NetherFlag> {
 
     @Override
     public Collection<String> getTabCompletions() {
-        return Hyperverse.getApi().getWorldManager().getWorlds().stream()
-                .map(HyperWorld::getConfiguration).map(WorldConfiguration::getName).collect(Collectors.toList());
+        final Collection<HyperWorld> configurations = Hyperverse.getApi().getWorldManager().getWorlds();
+        final Collection<String> worldNames = new ArrayList<>(configurations.size());
+        for (final HyperWorld world : configurations) {
+            worldNames.add(world.getDisplayName());
+        }
+        return worldNames;
     }
 
 }

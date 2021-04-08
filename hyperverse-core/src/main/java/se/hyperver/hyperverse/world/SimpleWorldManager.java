@@ -23,14 +23,15 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.events.HyperWorldCreateEvent;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
@@ -43,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -59,19 +61,22 @@ public final class SimpleWorldManager implements WorldManager, Listener {
     private final Multimap<String, HyperWorld> waitingForPlugin = HashMultimap.create();
     private final Collection<String> ignoredWorlds = Lists.newLinkedList();
 
-    private final Hyperverse hyperverse;
+    private final Plugin hyperverse;
+    private final Server server;
     private final HyperWorldFactory hyperWorldFactory;
     private final Path worldDirectory;
 
     @Inject
     public SimpleWorldManager(
-            final @NonNull Hyperverse hyperverse,
+            final @NonNull Plugin hyperverse,
+            final @NonNull Server server,
             final @NonNull HyperWorldFactory hyperWorldFactory
     ) {
         this.hyperverse = Objects.requireNonNull(hyperverse);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
+        this.server = Objects.requireNonNull(server);
         // Register the listener
-        Bukkit.getPluginManager().registerEvents(this, hyperverse);
+        server.getPluginManager().registerEvents(this, hyperverse);
         // Create configuration file
         this.worldDirectory = this.hyperverse.getDataFolder().toPath().resolve("worlds");
     }
@@ -89,7 +94,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
         }
         if (Files.exists(worldsPath) && Files.isDirectory(worldsPath)) {
             MessageUtil
-                    .sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldsLoading, "%path%",
+                    .sendMessage(this.server.getConsoleSender(), Messages.messageWorldsLoading, "%path%",
                             worldsPath.toString()
                     );
             try (final Stream<Path> stream = Files.list(worldsPath)){
@@ -113,17 +118,18 @@ public final class SimpleWorldManager implements WorldManager, Listener {
             }
         }
         // Also loop over all other worlds to see if anything was loaded sneakily
-        for (final World world : Bukkit.getWorlds()) {
+        final List<World> worlds = this.server.getWorlds();
+        for (final World world : worlds) {
             if (!this.worldMap.containsKey(world.getName())) {
-                final WorldImportResult importResult = this.importWorld(world, world.equals(Bukkit.getWorlds().get(0)), "");
+                final WorldImportResult importResult = this.importWorld(world, world.equals(worlds.get(0)), "");
                 if (importResult != WorldImportResult.SUCCESS) {
-                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldImportFailure,
+                    MessageUtil.sendMessage(this.server.getConsoleSender(), Messages.messageWorldImportFailure,
                             "%world%", world.getName(), "%result%", importResult.getDescription()
                     );
                 }
             }
         }
-        MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldLoaded, "%num%",
+        MessageUtil.sendMessage(this.server.getConsoleSender(), Messages.messageWorldLoaded, "%num%",
                 Integer.toString(this.worldMap.size())
         );
         // Now create the worlds
@@ -134,7 +140,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
     public void createWorlds() {
         // Loop over all the worlds again to see if anything has been loaded while
         // we were idle
-        for (final World world : Bukkit.getWorlds()) {
+        for (final World world : this.server.getWorlds()) {
             final HyperWorld hyperWorld = this.getWorld(world.getName());
             if (hyperWorld != null && hyperWorld.getBukkitWorld() == null) {
                 hyperWorld.setBukkitWorld(world);
@@ -149,7 +155,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
             }
             if (hyperWorld.getBukkitWorld() == null) {
                 if (!GeneratorUtil.isGeneratorAvailable(hyperWorld.getConfiguration().getGenerator())) {
-                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorNotAvailable,
+                    MessageUtil.sendMessage(this.server.getConsoleSender(), Messages.messageGeneratorNotAvailable,
                             "%world%", hyperWorld.getConfiguration().getName(),
                             "%generator%", hyperWorld.getConfiguration().getGenerator()
                     );
@@ -166,7 +172,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
     @EventHandler
     public void onPluginLoad(final @NonNull PluginEnableEvent enableEvent) {
         for (final HyperWorld hyperWorld : this.waitingForPlugin.get(enableEvent.getPlugin().getName().toLowerCase())) {
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorAvailable,
+            MessageUtil.sendMessage(this.server.getConsoleSender(), Messages.messageGeneratorAvailable,
                     "%world%", hyperWorld.getConfiguration().getName()
             );
             this.attemptCreate(hyperWorld);
@@ -175,6 +181,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
     }
 
     private void attemptCreate(final @NonNull HyperWorld hyperWorld) {
+        final ConsoleCommandSender consoleSender = this.server.getConsoleSender();
         try {
             // A last check before it's too late
             if (hyperWorld.getBukkitWorld() != null) {
@@ -182,14 +189,14 @@ public final class SimpleWorldManager implements WorldManager, Listener {
             }
             this.ignoreWorld(hyperWorld.getConfiguration().getName());
             // Make sure to spam a little
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageWorldCreationStarted);
-            hyperWorld.sendWorldInfo(Bukkit.getConsoleSender());
+            MessageUtil.sendMessage(consoleSender, Messages.messageWorldCreationStarted);
+            hyperWorld.sendWorldInfo(consoleSender);
             // Here we go...
             hyperWorld.createBukkitWorld();
         } catch (final HyperWorldValidationException validationException) {
             switch (validationException.getValidationResult()) {
                 case UNKNOWN_GENERATOR:
-                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageGeneratorInvalid,
+                    MessageUtil.sendMessage(consoleSender, Messages.messageGeneratorInvalid,
                             "%world%", hyperWorld.getConfiguration().getName(),
                             "%generator%", hyperWorld.getConfiguration().getGenerator()
                     );
@@ -197,7 +204,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
                 case SUCCESS:
                     break;
                 default:
-                    MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageCreationUnknownFailure);
+                    MessageUtil.sendMessage(consoleSender, Messages.messageCreationUnknownFailure);
                     break;
             }
         }

@@ -20,7 +20,6 @@ package se.hyperver.hyperverse.listeners;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.papermc.lib.PaperLib;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -59,10 +58,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
@@ -102,26 +103,29 @@ public final class EventListener implements Listener {
     private final WorldManager worldManager;
     private final HyperDatabase hyperDatabase;
     private final HyperConfiguration hyperConfiguration;
-    private final Hyperverse hyperverse;
+    private final Plugin plugin;
     private final NMS nms;
+    private final BukkitScheduler scheduler;
 
     @Inject
     public EventListener(
             final @NonNull WorldManager worldManager,
             final @NonNull HyperDatabase hyperDatabase,
             final @NonNull HyperConfiguration hyperConfiguration,
-            final @NonNull Hyperverse hyperverse,
+            final @NonNull PluginManager pluginManager,
+            final @NonNull BukkitScheduler scheduler,
+            final @NonNull Plugin plugin,
             final @NonNull NMS nms
     ) {
         this.worldManager = worldManager;
         this.hyperDatabase = hyperDatabase;
         this.hyperConfiguration = hyperConfiguration;
-        this.hyperverse = hyperverse;
+        this.scheduler = scheduler;
+        this.plugin = plugin;
         this.nms = nms;
         // Register pre-spawn listeners
         if (PaperLib.isPaper()) {
-            Bukkit.getPluginManager()
-                    .registerEvents(new PaperListener(this.worldManager), hyperverse);
+            pluginManager.registerEvents(new PaperListener(this.worldManager), plugin);
         }
     }
 
@@ -183,7 +187,7 @@ public final class EventListener implements Listener {
                 final HyperWorld hyperWorld = this.worldManager.getWorld(from.getWorld());
                 if (hyperWorld != null) {
                     final Path oldWorldDirectory =
-                            this.hyperverse.getDataFolder().toPath().resolve("profiles")
+                            this.plugin.getDataFolder().toPath().resolve("profiles")
                                     .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
                     if (!Files.exists(oldWorldDirectory)) {
                         try {
@@ -227,7 +231,7 @@ public final class EventListener implements Listener {
             if (from == null || !from.getFlag(ProfileGroupFlag.class)
                     .equals(hyperWorld.getFlag(ProfileGroupFlag.class))) {
                 final Path newWorldDirectory =
-                        this.hyperverse.getDataFolder().toPath().resolve("profiles")
+                        this.plugin.getDataFolder().toPath().resolve("profiles")
                                 .resolve(hyperWorld.getFlag(ProfileGroupFlag.class));
                 if (!Files.exists(newWorldDirectory)) {
                     try {
@@ -241,7 +245,7 @@ public final class EventListener implements Listener {
                 if (Files.exists(playerData)) {
                     final GameMode originalGameMode = player.getGameMode();
                     this.nms.readPlayerData(event.getPlayer(), playerData,
-                            () -> Bukkit.getScheduler().runTaskLater(this.hyperverse, () -> {
+                            () -> this.scheduler.runTaskLater(this.plugin, () -> {
                                 // We need to trick Bukkit into updating the gamemode
                                 final GameMode worldGameMode = hyperWorld.getFlag(GamemodeFlag.class);
                                 if (worldGameMode != GameMode.ADVENTURE) {
@@ -288,7 +292,7 @@ public final class EventListener implements Listener {
     }
 
     private boolean setDefaultGameMode(final @NonNull Player player, final @NonNull HyperWorld world) {
-        if (player.hasPermission("hyperverse.override.gamemode")) {
+        if (player.hasPermission("plugin.override.gamemode")) {
             if (world.getFlag(GamemodeFlag.class) != player.getGameMode()) {
                 MessageUtil.sendMessage(player, Messages.messageGameModeOverride, "%mode%",
                         world.getFlag(GamemodeFlag.class).name().toLowerCase()
@@ -370,7 +374,7 @@ public final class EventListener implements Listener {
     public void onPlayerPortalEvent(final @NonNull PlayerPortalEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {
-            this.hyperverse.getLogger().warning(String.format(
+            this.plugin.getLogger().warning(String.format(
                     "(PlayerPortalEvent) Player %s entered world '%s' but no world could be found",
                     event.getPlayer().getName(), event.getPlayer().getWorld().getName()
             ));
@@ -464,7 +468,7 @@ public final class EventListener implements Listener {
                             PlayerTeleportEvent.TeleportCause.COMMAND
                     );
                 } else {
-                    this.hyperverse.getLogger().warning(String
+                    this.plugin.getLogger().warning(String
                             .format(
                                     "Failed to find/create a portal surrounding %s",
                                     destination.toString()
