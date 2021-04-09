@@ -31,11 +31,11 @@ import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.database.LocationType;
-import se.hyperver.hyperverse.database.PersistentLocation;
 import se.hyperver.hyperverse.flags.implementation.EndFlag;
 import se.hyperver.hyperverse.flags.implementation.IgnoreBedsFlag;
 import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
+import se.hyperver.hyperverse.modules.PersistentLocationTransformer;
 import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 import se.hyperver.hyperverse.util.NMS;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -56,6 +56,7 @@ public final class SimpleTeleportationManager implements TeleportationManager {
     private final HyperConfiguration configuration;
     private final HyperDatabase hyperDatabase;
     private final NMS nms;
+    private final PersistentLocationTransformer locationTransformer;
 
     @Inject
     public SimpleTeleportationManager(
@@ -64,7 +65,8 @@ public final class SimpleTeleportationManager implements TeleportationManager {
             final @NonNull WorldManager worldManager,
             final @NonNull NMS nms,
             final @NonNull HyperConfiguration configuration,
-            final @NonNull HyperDatabase hyperDatabase
+            final @NonNull HyperDatabase hyperDatabase,
+            final @NonNull PersistentLocationTransformer locationTransformer
     ) {
         this.hyperverse = hyperverse;
         this.hyperWorld = hyperWorld;
@@ -72,6 +74,7 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         this.nms = nms;
         this.configuration = configuration;
         this.hyperDatabase = hyperDatabase;
+        this.locationTransformer = locationTransformer;
     }
 
     private static boolean hasBedNearby(final @NonNull Location location) {
@@ -181,7 +184,7 @@ public final class SimpleTeleportationManager implements TeleportationManager {
         }
         final Location spawnLocation = this.hyperDatabase.getLocation(player.getUniqueId(), hyperWorld.getConfiguration().getName(),
                 LocationType.BED_SPAWN
-        ).map(PersistentLocation::toLocation).orElse(null);
+        ).map(this.locationTransformer::transform).orElse(null);
         if (spawnLocation != null && hasBedNearby(spawnLocation)) {
             final Location adjustedLocation = this.nms.findBedRespawn(spawnLocation);
             if (adjustedLocation != null) {

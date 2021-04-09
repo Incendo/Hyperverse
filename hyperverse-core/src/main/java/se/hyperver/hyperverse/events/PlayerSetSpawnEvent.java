@@ -17,7 +17,6 @@
 
 package se.hyperver.hyperverse.events;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -38,7 +37,7 @@ public final class PlayerSetSpawnEvent extends HyperPlayerEvent implements Cance
 
     private boolean cancelled;
 
-    private PlayerSetSpawnEvent(
+    PlayerSetSpawnEvent(
             final @NonNull Player player,
             final @NonNull HyperWorld world
     ) {
@@ -49,15 +48,6 @@ public final class PlayerSetSpawnEvent extends HyperPlayerEvent implements Cance
     @SuppressWarnings("unused")
     public static HandlerList getHandlerList() {
         return handlers;
-    }
-
-    public static @NonNull PlayerSetSpawnEvent callFor(
-            final @NonNull Player player,
-            final @NonNull HyperWorld world
-    ) {
-        final PlayerSetSpawnEvent playerSetSpawnEvent = new PlayerSetSpawnEvent(player, world);
-        Bukkit.getServer().getPluginManager().callEvent(playerSetSpawnEvent);
-        return playerSetSpawnEvent;
     }
 
     @Override

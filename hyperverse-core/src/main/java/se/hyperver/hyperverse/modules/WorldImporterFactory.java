@@ -15,33 +15,16 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.events;
+package se.hyperver.hyperverse.modules;
 
-import com.google.inject.assistedinject.Assisted;
-import org.bukkit.event.HandlerList;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.util.MultiverseImporter;
+import se.hyperver.hyperverse.util.MyWorldsImporter;
 
-/**
- * Called when a new {@link se.hyperver.hyperverse.world.HyperWorld} has been created
- * {@inheritDoc}
- */
-public final class HyperWorldCreateEvent extends HyperWorldEvent {
+public interface WorldImporterFactory {
 
-    private static final HandlerList handlers = new HandlerList();
+    @NonNull MultiverseImporter createMultiverseImporter(@NonNull HyperWorldFactory hyperWorldFactory);
 
-    HyperWorldCreateEvent(final @Assisted @NonNull HyperWorld world) {
-        super(world);
-    }
-
-    @SuppressWarnings("unused")
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    @Override
-    public @NonNull HandlerList getHandlers() {
-        return handlers;
-    }
+    @NonNull MyWorldsImporter createMyWorldsImporter(@NonNull HyperWorldFactory hyperWorldFactory);
 
 }

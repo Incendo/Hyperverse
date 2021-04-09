@@ -33,6 +33,8 @@ import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.database.SQLiteDatabase;
+import se.hyperver.hyperverse.database.SimpleLocationTransformer;
+import se.hyperver.hyperverse.events.SimpleHyperEventFactory;
 import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlagContainer;
@@ -44,7 +46,9 @@ import se.hyperver.hyperverse.util.NMS;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.SimpleWorld;
+import se.hyperver.hyperverse.world.SimpleWorldConfigurationFactory;
 import se.hyperver.hyperverse.world.SimpleWorldManager;
+import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
 
 import java.util.logging.Logger;
@@ -96,20 +100,26 @@ public final class HyperverseModule extends AbstractModule {
         bind(Plugin.class).toInstance(this.hyperverse);
         bind(Hyperverse.class).toInstance(this.hyperverse);
         bind(HyperDatabase.class).to(SQLiteDatabase.class).in(Singleton.class);
+        bind(PersistentLocationTransformer.class).to(SimpleLocationTransformer.class).in(Singleton.class);
         bind(HyperConfiguration.class).to(FileHyperConfiguration.class).in(Singleton.class);
         bind(WorldManager.class).to(SimpleWorldManager.class).in(Singleton.class);
         bind(GlobalWorldFlagContainer.class).toInstance(new GlobalWorldFlagContainer());
         bind(ServicePipeline.class).toInstance(this.servicePipeline);
+        bind(HyperEventFactory.class).to(SimpleHyperEventFactory.class).in(Singleton.class);
+        bind(WorldConfigurationFactory.class).to(SimpleWorldConfigurationFactory.class).in(Singleton.class);
         install(new FactoryModuleBuilder().implement(WorldCreator.class, HyperWorldCreator.class)
                 .build(HyperWorldCreatorFactory.class));
         install(new FactoryModuleBuilder().implement(HyperWorld.class, SimpleWorld.class)
                 .build(HyperWorldFactory.class));
+        install(new FactoryModuleBuilder().build(WorldImporterFactory.class));
         install(new FactoryModuleBuilder().implement(FlagContainer.class, WorldFlagContainer.class)
                 .build(FlagContainerFactory.class));
         install(new FactoryModuleBuilder().implement(
                 TeleportationManager.class,
                 SimpleTeleportationManager.class
         ).build(TeleportationManagerFactory.class));
+
+        requestStaticInjection(WorldConfiguration.class);
     }
 
     @Provides

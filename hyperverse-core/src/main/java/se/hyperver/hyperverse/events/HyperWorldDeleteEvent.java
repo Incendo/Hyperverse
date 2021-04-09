@@ -17,7 +17,6 @@
 
 package se.hyperver.hyperverse.events;
 
-import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -30,18 +29,13 @@ public final class HyperWorldDeleteEvent extends HyperWorldEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private HyperWorldDeleteEvent(final @NonNull HyperWorld world) {
+    HyperWorldDeleteEvent(final @NonNull HyperWorld world) {
         super(world);
     }
 
     @SuppressWarnings("unused")
     public static HandlerList getHandlerList() {
         return handlers;
-    }
-
-    public static void callFor(final @NonNull HyperWorld world) {
-        final HyperWorldDeleteEvent hyperWorldDeleteEvent = new HyperWorldDeleteEvent(world);
-        Bukkit.getServer().getPluginManager().callEvent(hyperWorldDeleteEvent);
     }
 
     @Override

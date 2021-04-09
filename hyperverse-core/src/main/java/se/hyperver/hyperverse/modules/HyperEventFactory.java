@@ -15,33 +15,31 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.events;
+package se.hyperver.hyperverse.modules;
 
-import com.google.inject.assistedinject.Assisted;
-import org.bukkit.event.HandlerList;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import se.hyperver.hyperverse.events.PlayerSeekSpawnEvent;
+import se.hyperver.hyperverse.events.PlayerSetSpawnEvent;
 import se.hyperver.hyperverse.world.HyperWorld;
 
-/**
- * Called when a new {@link se.hyperver.hyperverse.world.HyperWorld} has been created
- * {@inheritDoc}
- */
-public final class HyperWorldCreateEvent extends HyperWorldEvent {
+public interface HyperEventFactory {
 
-    private static final HandlerList handlers = new HandlerList();
+    void callWorldCreation(@NonNull HyperWorld hyperWorld);
 
-    HyperWorldCreateEvent(final @Assisted @NonNull HyperWorld world) {
-        super(world);
-    }
+    void callWorldDeletion(@NonNull HyperWorld hyperWorld);
 
-    @SuppressWarnings("unused")
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
+    @NonNull PlayerSeekSpawnEvent callPlayerSeekSpawn(
+            @NonNull Player player,
+            @NonNull HyperWorld world,
+            @NonNull Location respawnLocation
+    );
 
-    @Override
-    public @NonNull HandlerList getHandlers() {
-        return handlers;
-    }
+
+    @NonNull PlayerSetSpawnEvent callPlayerSetSpawn(
+            final @NonNull Player player,
+            final @NonNull HyperWorld world
+    );
 
 }

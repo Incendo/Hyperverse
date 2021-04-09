@@ -15,33 +15,23 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.events;
+package se.hyperver.hyperverse.modules;
 
-import com.google.inject.assistedinject.Assisted;
-import org.bukkit.event.HandlerList;
+import org.bukkit.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import se.hyperver.hyperverse.world.HyperWorld;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import se.hyperver.hyperverse.world.WorldConfiguration;
+import se.hyperver.hyperverse.world.WorldConfigurationBuilder;
 
-/**
- * Called when a new {@link se.hyperver.hyperverse.world.HyperWorld} has been created
- * {@inheritDoc}
- */
-public final class HyperWorldCreateEvent extends HyperWorldEvent {
+import java.nio.file.Path;
 
-    private static final HandlerList handlers = new HandlerList();
+public interface WorldConfigurationFactory {
 
-    HyperWorldCreateEvent(final @Assisted @NonNull HyperWorld world) {
-        super(world);
+    default WorldConfigurationBuilder builder() {
+        return new WorldConfigurationBuilder();
     }
+    @NonNull WorldConfiguration fromWorld(@NonNull World world);
 
-    @SuppressWarnings("unused")
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    @Override
-    public @NonNull HandlerList getHandlers() {
-        return handlers;
-    }
+    @Nullable WorldConfiguration fromFile(@NonNull Path file);
 
 }

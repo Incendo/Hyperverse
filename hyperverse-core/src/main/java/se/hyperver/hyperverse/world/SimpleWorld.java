@@ -20,10 +20,10 @@ package se.hyperver.hyperverse.world;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,8 +33,6 @@ import se.hyperver.hyperverse.configuration.HyperConfiguration;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.database.HyperDatabase;
 import se.hyperver.hyperverse.database.LocationType;
-import se.hyperver.hyperverse.database.PersistentLocation;
-import se.hyperver.hyperverse.events.HyperWorldDeleteEvent;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.FlagParseException;
@@ -46,7 +44,9 @@ import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
 import se.hyperver.hyperverse.flags.implementation.SaveWorldFlag;
 import se.hyperver.hyperverse.flags.implementation.UnloadSpawnFlag;
 import se.hyperver.hyperverse.modules.FlagContainerFactory;
+import se.hyperver.hyperverse.modules.HyperEventFactory;
 import se.hyperver.hyperverse.modules.HyperWorldCreatorFactory;
+import se.hyperver.hyperverse.modules.PersistentLocationTransformer;
 import se.hyperver.hyperverse.modules.TeleportationManagerFactory;
 import se.hyperver.hyperverse.teleportation.TeleportationManager;
 import se.hyperver.hyperverse.util.MessageUtil;
@@ -75,7 +75,10 @@ public final class SimpleWorld implements HyperWorld {
     private final FlagContainer flagContainer;
     private final HyperDatabase hyperDatabase;
     private final HyperConfiguration hyperConfiguration;
+    private final HyperEventFactory hyperEventFactory;
     private final TeleportationManager teleportationManager;
+    private final PersistentLocationTransformer locationTransformer;
+    private final Server server;
     private final GlobalWorldFlagContainer globalWorldFlagContainer;
     private boolean flagsInitialized = false;
     private World bukkitWorld;
@@ -91,7 +94,10 @@ public final class SimpleWorld implements HyperWorld {
             final @NonNull FlagContainerFactory flagContainerFactory,
             final @NonNull HyperDatabase hyperDatabase,
             final @NonNull HyperConfiguration hyperConfiguration,
-            final @NonNull TeleportationManagerFactory teleportationManagerFactory
+            final @NonNull HyperEventFactory hyperEventFactory,
+            final @NonNull TeleportationManagerFactory teleportationManagerFactory,
+            final @NonNull PersistentLocationTransformer locationTransformer,
+            final @NonNull Server server
     ) {
         this.worldUUID = Objects.requireNonNull(worldUUID);
         this.configuration = Objects.requireNonNull(configuration);
@@ -99,8 +105,11 @@ public final class SimpleWorld implements HyperWorld {
         this.worldManager = Objects.requireNonNull(worldManager);
         this.taskChainFactory = Objects.requireNonNull(taskChainFactory);
         this.hyperDatabase = Objects.requireNonNull(hyperDatabase);
+        this.hyperEventFactory = Objects.requireNonNull(hyperEventFactory);
         this.hyperConfiguration = Objects.requireNonNull(hyperConfiguration);
         this.teleportationManager = Objects.requireNonNull(teleportationManagerFactory).create(this);
+        this.locationTransformer = Objects.requireNonNull(locationTransformer);
+        this.server = Objects.requireNonNull(server);
         this.globalWorldFlagContainer = Objects.requireNonNull(globalFlagContainer);
         this.flagContainer = Objects.requireNonNull(flagContainerFactory).create((flag, type) -> {
             if (this.flagsInitialized) {
@@ -120,7 +129,7 @@ public final class SimpleWorld implements HyperWorld {
                     this.flagContainer.addFlag(flag.parse(entry.getValue()));
                 } catch (final FlagParseException e) {
                     MessageUtil
-                            .sendMessage(Bukkit.getConsoleSender(), Messages.messageFlagParseError,
+                            .sendMessage(this.server.getConsoleSender(), Messages.messageFlagParseError,
                                     "%flag%", e.getFlag().getName(), "%value%", e.getValue(), "%reason%",
                                     e.getErrorMessage()
                             );
@@ -144,7 +153,7 @@ public final class SimpleWorld implements HyperWorld {
     @Override
     public void deleteWorld(final @NonNull Consumer<@NonNull WorldUnloadResult> result) {
         if (this.bukkitWorld != null) {
-            if (Bukkit.getWorlds().get(0).equals(this.bukkitWorld)) {
+            if (this.server.getWorlds().get(0).equals(this.bukkitWorld)) {
                 result.accept(WorldUnloadResult.FAILURE_ONLY_WORLD);
                 return;
             }
@@ -152,13 +161,13 @@ public final class SimpleWorld implements HyperWorld {
                 result.accept(WorldUnloadResult.FAILURE_HAS_PLAYERS);
                 return;
             }
-            if (!Bukkit.unloadWorld(this.bukkitWorld, true)) {
+            if (!this.server.unloadWorld(this.bukkitWorld, true)) {
                 result.accept(WorldUnloadResult.FAILURE_OTHER);
                 return;
             }
             // We unload the world, then we remove the world file,
             // but we don't delete the actual world folder
-            Bukkit.unloadWorld(this.bukkitWorld, true);
+            this.server.unloadWorld(this.bukkitWorld, true);
         }
         this.taskChainFactory.newChain().async(() -> {
             try {
@@ -173,7 +182,7 @@ public final class SimpleWorld implements HyperWorld {
             this.hyperDatabase.clearWorld(this.configuration.getName());
             result.accept(WorldUnloadResult.SUCCESS);
             // Assuming everything went fine
-            HyperWorldDeleteEvent.callFor(this);
+            this.hyperEventFactory.callWorldDeletion(this);
         }).execute();
     }
 
@@ -187,13 +196,13 @@ public final class SimpleWorld implements HyperWorld {
         if (!this.isLoaded()) {
             return WorldUnloadResult.SUCCESS;
         }
-        if (Bukkit.getWorlds().get(0).equals(this.bukkitWorld)) {
+        if (this.server.getWorlds().get(0).equals(this.bukkitWorld)) {
             return WorldUnloadResult.FAILURE_ONLY_WORLD;
         }
         if (!this.bukkitWorld.getPlayers().isEmpty()) {
             return WorldUnloadResult.FAILURE_HAS_PLAYERS;
         }
-        if (!Bukkit.unloadWorld(this.bukkitWorld, saveWorld)) {
+        if (!this.server.unloadWorld(this.bukkitWorld, saveWorld)) {
             return WorldUnloadResult.FAILURE_OTHER;
         }
 
@@ -307,7 +316,7 @@ public final class SimpleWorld implements HyperWorld {
             throw new IllegalStateException("A bukkit world already exist");
         }
         // First check if the bukkit world already exists
-        World world = Bukkit.getWorld(this.worldUUID);
+        World world = this.server.getWorld(this.worldUUID);
         if (world != null) {
             this.bukkitWorld = world;
             this.refreshFlags();
@@ -321,7 +330,7 @@ public final class SimpleWorld implements HyperWorld {
             throw new HyperWorldValidationException(validationResult, this);
         }
         hyperWorldCreator.configure();
-        world = Bukkit.createWorld(hyperWorldCreator);
+        world = this.server.createWorld(hyperWorldCreator);
         if (world == null) {
             throw new IllegalStateException("Failed to create the world");
         }
@@ -346,7 +355,7 @@ public final class SimpleWorld implements HyperWorld {
             location = this.hyperDatabase.getLocation(player.getUniqueId(),
                     this.getConfiguration().getName(), LocationType.PLAYER_LOCATION
             )
-                    .map(PersistentLocation::toLocation)
+                    .map(this.locationTransformer::transform)
                     .orElse(Objects.requireNonNull(this.getSpawn()));
         } else {
             location = this.getSpawn();

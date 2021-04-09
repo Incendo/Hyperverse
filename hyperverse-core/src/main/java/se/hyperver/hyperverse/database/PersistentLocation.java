@@ -17,7 +17,6 @@
 
 package se.hyperver.hyperverse.database;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -81,10 +80,6 @@ public final class PersistentLocation {
 
     public @NonNull LocationType getLocationType() {
         return this.locationType;
-    }
-
-    public @NonNull Location toLocation() {
-        return new Location(Bukkit.getWorld(this.world), this.x, this.y, this.z);
     }
 
 }

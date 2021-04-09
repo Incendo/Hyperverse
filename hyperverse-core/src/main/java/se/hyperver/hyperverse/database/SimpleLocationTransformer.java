@@ -15,33 +15,28 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.events;
+package se.hyperver.hyperverse.database;
 
-import com.google.inject.assistedinject.Assisted;
-import org.bukkit.event.HandlerList;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.bukkit.Location;
+import org.bukkit.Server;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.modules.PersistentLocationTransformer;
 
-/**
- * Called when a new {@link se.hyperver.hyperverse.world.HyperWorld} has been created
- * {@inheritDoc}
- */
-public final class HyperWorldCreateEvent extends HyperWorldEvent {
+@Singleton
+public final class SimpleLocationTransformer implements PersistentLocationTransformer {
 
-    private static final HandlerList handlers = new HandlerList();
+    private final Server server;
 
-    HyperWorldCreateEvent(final @Assisted @NonNull HyperWorld world) {
-        super(world);
-    }
-
-    @SuppressWarnings("unused")
-    public static HandlerList getHandlerList() {
-        return handlers;
+    @Inject
+    SimpleLocationTransformer(final @NonNull Server server) {
+        this.server = server;
     }
 
     @Override
-    public @NonNull HandlerList getHandlers() {
-        return handlers;
+    public @NonNull Location transform(final @NonNull PersistentLocation persistent) {
+        return new Location(this.server.getWorld(persistent.getWorld()), persistent.getX(), persistent.getY(), persistent.getZ());
     }
 
 }

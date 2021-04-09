@@ -81,6 +81,7 @@ import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.flags.implementation.PveFlag;
 import se.hyperver.hyperverse.flags.implementation.PvpFlag;
 import se.hyperver.hyperverse.flags.implementation.RespawnWorldFlag;
+import se.hyperver.hyperverse.modules.HyperEventFactory;
 import se.hyperver.hyperverse.util.MessageUtil;
 import se.hyperver.hyperverse.util.NMS;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -106,12 +107,14 @@ public final class EventListener implements Listener {
     private final Plugin plugin;
     private final NMS nms;
     private final BukkitScheduler scheduler;
+    private final HyperEventFactory hyperEventFactory;
 
     @Inject
     public EventListener(
             final @NonNull WorldManager worldManager,
             final @NonNull HyperDatabase hyperDatabase,
             final @NonNull HyperConfiguration hyperConfiguration,
+            final @NonNull HyperEventFactory hyperEventFactory,
             final @NonNull PluginManager pluginManager,
             final @NonNull BukkitScheduler scheduler,
             final @NonNull Plugin plugin,
@@ -119,6 +122,7 @@ public final class EventListener implements Listener {
     ) {
         this.worldManager = worldManager;
         this.hyperDatabase = hyperDatabase;
+        this.hyperEventFactory = hyperEventFactory;
         this.hyperConfiguration = hyperConfiguration;
         this.scheduler = scheduler;
         this.plugin = plugin;
@@ -341,7 +345,11 @@ public final class EventListener implements Listener {
             }
         }
 
-        final PlayerSeekSpawnEvent seekSpawnEvent = PlayerSeekSpawnEvent.callFor(player, hyperWorld, spawnLocation);
+        final PlayerSeekSpawnEvent seekSpawnEvent = this.hyperEventFactory.callPlayerSeekSpawn(
+                player,
+                hyperWorld,
+                spawnLocation
+        );
         if (seekSpawnEvent.isCancelled()) {
             return;
         }
@@ -567,7 +575,7 @@ public final class EventListener implements Listener {
             return;
         }
 
-        final PlayerSetSpawnEvent playerSetSpawnEvent = PlayerSetSpawnEvent.callFor(event.getPlayer(), hyperWorld);
+        final PlayerSetSpawnEvent playerSetSpawnEvent = this.hyperEventFactory.callPlayerSetSpawn(event.getPlayer(), hyperWorld);
         if (playerSetSpawnEvent.isCancelled()) {
             return;
         }

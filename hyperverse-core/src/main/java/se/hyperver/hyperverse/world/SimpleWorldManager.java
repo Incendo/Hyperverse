@@ -33,9 +33,10 @@ import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import se.hyperver.hyperverse.configuration.Messages;
-import se.hyperver.hyperverse.events.HyperWorldCreateEvent;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
+import se.hyperver.hyperverse.modules.HyperEventFactory;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
+import se.hyperver.hyperverse.modules.WorldConfigurationFactory;
 import se.hyperver.hyperverse.util.GeneratorUtil;
 import se.hyperver.hyperverse.util.MessageUtil;
 
@@ -64,16 +65,22 @@ public final class SimpleWorldManager implements WorldManager, Listener {
     private final Plugin hyperverse;
     private final Server server;
     private final HyperWorldFactory hyperWorldFactory;
+    private final HyperEventFactory hyperEventFactory;
+    private final WorldConfigurationFactory worldConfigurationFactory;
     private final Path worldDirectory;
 
     @Inject
     public SimpleWorldManager(
             final @NonNull Plugin hyperverse,
             final @NonNull Server server,
-            final @NonNull HyperWorldFactory hyperWorldFactory
+            final @NonNull HyperWorldFactory hyperWorldFactory,
+            final @NonNull HyperEventFactory hyperEventFactory,
+            final @NonNull WorldConfigurationFactory worldConfigurationFactory
     ) {
         this.hyperverse = Objects.requireNonNull(hyperverse);
+        this.hyperEventFactory = Objects.requireNonNull(hyperEventFactory);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
+        this.worldConfigurationFactory = Objects.requireNonNull(worldConfigurationFactory);
         this.server = Objects.requireNonNull(server);
         // Register the listener
         server.getPluginManager().registerEvents(this, hyperverse);
@@ -99,7 +106,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
                     );
             try (final Stream<Path> stream = Files.list(worldsPath)){
                 stream.forEach(path -> {
-                    final WorldConfiguration worldConfiguration = WorldConfiguration.fromFile(path);
+                    final WorldConfiguration worldConfiguration = this.worldConfigurationFactory.fromFile(path);
                     if (worldConfiguration == null) {
                         this.hyperverse.getLogger().warning(String
                                 .format(
@@ -219,7 +226,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
         if (this.getWorld(world.getName()) != null) {
             return WorldImportResult.ALREADY_IMPORTED;
         }
-        final WorldConfiguration worldConfiguration = WorldConfiguration.fromWorld(world);
+        final WorldConfiguration worldConfiguration = this.worldConfigurationFactory.fromWorld(world);
         if (!vanilla) {
             final String worldGenerator = worldConfiguration.getGenerator();
             if (generator == null && worldGenerator == null) {
@@ -241,7 +248,7 @@ public final class SimpleWorldManager implements WorldManager, Listener {
         this.registerWorld(hyperWorld);
         hyperWorld.saveConfiguration();
         // Assuming everything went fine
-        HyperWorldCreateEvent.callFor(hyperWorld);
+        this.hyperEventFactory.callWorldCreation(hyperWorld);
     }
 
     @Override

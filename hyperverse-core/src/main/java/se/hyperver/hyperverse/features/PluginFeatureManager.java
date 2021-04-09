@@ -19,7 +19,8 @@ package se.hyperver.hyperverse.features;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.plugin.PluginManager;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.util.MessageUtil;
@@ -36,10 +37,14 @@ public final class PluginFeatureManager {
 
     private final Map<String, Class<? extends PluginFeature>> registeredFeatures;
     private final Collection<String> loadedFeatures;
+    private final PluginManager pluginManager;
+    private final Server server;
 
     private boolean loaded;
 
-    public PluginFeatureManager() {
+    public PluginFeatureManager(final @NonNull Server server) {
+        this.server = server;
+        this.pluginManager = server.getPluginManager();
         this.registeredFeatures = Maps.newHashMap();
         this.loadedFeatures = Sets.newHashSet();
         this.loaded = false;
@@ -68,7 +73,7 @@ public final class PluginFeatureManager {
      * Load all features
      */
     public void loadFeatures() {
-        MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageFeaturesLoading, "%num%",
+        MessageUtil.sendMessage(this.server.getConsoleSender(), Messages.messageFeaturesLoading, "%num%",
                 Integer.toString(this.registeredFeatures.size())
         );
         for (final String feature : this.registeredFeatures.keySet()) {
@@ -86,7 +91,7 @@ public final class PluginFeatureManager {
      * @return True if the plugin is present
      */
     public boolean isPluginPresent(final @NonNull String name) {
-        return Bukkit.getPluginManager().isPluginEnabled(name);
+        return this.pluginManager.isPluginEnabled(name);
     }
 
     /**
@@ -105,7 +110,7 @@ public final class PluginFeatureManager {
             final PluginFeature feature = featureConstructor.newInstance();
             feature.initializeFeature();
 
-            MessageUtil.sendMessage(Bukkit.getConsoleSender(), Messages.messageFeatureLoaded, "%plugin%", name,
+            MessageUtil.sendMessage(this.server.getConsoleSender(), Messages.messageFeatureLoaded, "%plugin%", name,
                     "%feature%", featureConstructor.getDeclaringClass().getSimpleName()
             );
         } catch (final Exception e) {

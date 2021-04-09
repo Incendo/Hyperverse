@@ -18,7 +18,6 @@
 package se.hyperver.hyperverse.util;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
@@ -35,6 +34,7 @@ import se.hyperver.hyperverse.flags.implementation.PvpFlag;
 import se.hyperver.hyperverse.flags.implementation.RespawnWorldFlag;
 import se.hyperver.hyperverse.flags.implementation.WorldPermissionFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
+import se.hyperver.hyperverse.modules.WorldConfigurationFactory;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
@@ -42,19 +42,21 @@ import se.hyperver.hyperverse.world.WorldManager;
 import java.util.Collection;
 import java.util.UUID;
 
-@Singleton
 @SuppressWarnings("GuiceAssistedInjectScoping")
 public final class MultiverseImporter {
 
     private final WorldManager worldManager;
     private final HyperWorldFactory hyperWorldFactory;
+    private final WorldConfigurationFactory worldConfigurationFactory;
 
     @Inject
     public MultiverseImporter(
             final @NonNull WorldManager worldManager,
+            final @NonNull WorldConfigurationFactory worldConfigurationFactory,
             @Assisted final @NonNull HyperWorldFactory hyperWorldFactory
     ) {
         this.worldManager = worldManager;
+        this.worldConfigurationFactory = worldConfigurationFactory;
         this.hyperWorldFactory = hyperWorldFactory;
     }
 
@@ -75,7 +77,7 @@ public final class MultiverseImporter {
                 MessageUtil.sendMessage(commandSender, Messages.messageImportPluginCreating,
                         "%world%", multiverseWorld.getName(), "%plugin%", "Multiverse"
                 );
-                final WorldConfiguration worldConfiguration = WorldConfiguration.fromWorld(multiverseWorld.getCBWorld());
+                final WorldConfiguration worldConfiguration = this.worldConfigurationFactory.fromWorld(multiverseWorld.getCBWorld());
                 final UUID uuid;
                 if (multiverseWorld.getCBWorld() != null) {
                     uuid = multiverseWorld.getCBWorld().getUID();

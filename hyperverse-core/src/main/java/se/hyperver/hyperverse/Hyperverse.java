@@ -83,9 +83,10 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
     public static final int BSTATS_ID = 7177;
 
     private static HyperverseAPI instance;
-    private final PluginFeatureManager pluginFeatureManager = new PluginFeatureManager();
 
+    private final PluginFeatureManager pluginFeatureManager = new PluginFeatureManager(Bukkit.getServer());
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
+
     private WorldManager worldManager;
     private Injector injector;
     private HyperDatabase hyperDatabase;

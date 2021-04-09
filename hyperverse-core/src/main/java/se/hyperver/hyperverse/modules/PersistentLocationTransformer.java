@@ -15,33 +15,20 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.events;
+package se.hyperver.hyperverse.modules;
 
-import com.google.inject.assistedinject.Assisted;
-import org.bukkit.event.HandlerList;
+import org.bukkit.Location;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import se.hyperver.hyperverse.world.HyperWorld;
+import se.hyperver.hyperverse.database.PersistentLocation;
 
 /**
- * Called when a new {@link se.hyperver.hyperverse.world.HyperWorld} has been created
- * {@inheritDoc}
+ * Transforms a {@link PersistentLocation} to a Bukkit {@link Location}.
+ * This class exists so that the {@link org.bukkit.Bukkit} static server singleton
+ * isn't used to lookup worlds.
  */
-public final class HyperWorldCreateEvent extends HyperWorldEvent {
+@FunctionalInterface
+public interface PersistentLocationTransformer {
 
-    private static final HandlerList handlers = new HandlerList();
-
-    HyperWorldCreateEvent(final @Assisted @NonNull HyperWorld world) {
-        super(world);
-    }
-
-    @SuppressWarnings("unused")
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    @Override
-    public @NonNull HandlerList getHandlers() {
-        return handlers;
-    }
+    @NonNull Location transform(@NonNull PersistentLocation persistentLocation);
 
 }

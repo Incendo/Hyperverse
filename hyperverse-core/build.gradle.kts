@@ -47,7 +47,12 @@ tasks {
     }
 
     shadowJar {
-        minimize()
+        minimize {
+            exclude(project(":hyperverse-nms-unsupported"))
+            exclude(project(":hyperverse-nms-1-14-4"))
+            exclude(project(":hyperverse-nms-1-15-2"))
+            exclude(project(":hyperverse-nms-1-16-5"))
+        }
         mergeServiceFiles()
 
         dependencies {

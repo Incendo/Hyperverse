@@ -62,10 +62,10 @@ import se.hyperver.hyperverse.flags.implementation.EndFlag;
 import se.hyperver.hyperverse.flags.implementation.NetherFlag;
 import se.hyperver.hyperverse.flags.implementation.ProfileGroupFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
+import se.hyperver.hyperverse.modules.WorldConfigurationFactory;
+import se.hyperver.hyperverse.modules.WorldImporterFactory;
 import se.hyperver.hyperverse.util.IncendoPaster;
 import se.hyperver.hyperverse.util.MessageUtil;
-import se.hyperver.hyperverse.util.MultiverseImporter;
-import se.hyperver.hyperverse.util.MyWorldsImporter;
 import se.hyperver.hyperverse.util.SeedUtil;
 import se.hyperver.hyperverse.util.WorldUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
@@ -107,18 +107,27 @@ public final class HyperCommandManager extends BaseCommand {
     private final WorldManager worldManager;
     private final FileHyperConfiguration fileHyperConfiguration;
     private final HyperWorldFactory hyperWorldFactory;
+    private final WorldImporterFactory worldImporterFactory;
+    private final WorldConfigurationFactory worldConfigurationFactory;
     private final GlobalWorldFlagContainer globalFlagContainer;
     private final TaskChainFactory taskChainFactory;
 
     @Inject
     @SuppressWarnings("deprecation")
     public HyperCommandManager(
-            final Hyperverse hyperverse, final WorldManager worldManager,
-            final HyperWorldFactory hyperWorldFactory, final GlobalWorldFlagContainer globalFlagContainer,
-            final TaskChainFactory taskFactory, final FileHyperConfiguration hyperConfiguration
+            final Hyperverse hyperverse,
+            final WorldManager worldManager,
+            final HyperWorldFactory hyperWorldFactory,
+            final WorldImporterFactory worldImporterFactory,
+            final WorldConfigurationFactory worldConfigurationFactory,
+            final GlobalWorldFlagContainer globalFlagContainer,
+            final TaskChainFactory taskFactory,
+            final FileHyperConfiguration hyperConfiguration
     ) {
         this.worldManager = Objects.requireNonNull(worldManager);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
+        this.worldImporterFactory = Objects.requireNonNull(worldImporterFactory);
+        this.worldConfigurationFactory = Objects.requireNonNull(worldConfigurationFactory);
         this.globalFlagContainer = Objects.requireNonNull(globalFlagContainer);
         this.taskChainFactory = Objects.requireNonNull(taskFactory);
         this.fileHyperConfiguration = Objects.requireNonNull(hyperConfiguration);
@@ -472,7 +481,7 @@ public final class HyperCommandManager extends BaseCommand {
 
         // Check if the generator is actually valid
         final WorldConfiguration worldConfiguration =
-                WorldConfiguration.builder().setName(world).setGenerator(actualGenerator).setType(type).setSeed(seed)
+                this.worldConfigurationFactory.builder().setName(world).setGenerator(actualGenerator).setType(type).setSeed(seed)
                         .setGenerateStructures(generateStructures).setSettings(settings).setWorldFeatures(features)
                         .setGeneratorArg(generatorArgs).createWorldConfiguration();
         final HyperWorld hyperWorld =
@@ -1145,8 +1154,7 @@ public final class HyperCommandManager extends BaseCommand {
     @Description("{@@command.multiverse}")
     public void doMultiverse(final CommandSender sender) {
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
-            new MultiverseImporter(this.worldManager, this.hyperWorldFactory)
-                    .performImport(sender);
+            this.worldImporterFactory.createMultiverseImporter(this.hyperWorldFactory).performImport(sender);
         } else {
             MessageUtil.sendMessage(sender, Messages.messageImportPluginMissing, "%plugin%", "Multiverse");
         }
@@ -1156,7 +1164,7 @@ public final class HyperCommandManager extends BaseCommand {
     @CommandPermission("hyperverse.plugin.import")
     public void doMyWorlds(final CommandSender sender) {
         if (Bukkit.getPluginManager().isPluginEnabled("My_Worlds")) {
-            new MyWorldsImporter(this.worldManager, this.hyperWorldFactory).performImport(sender);
+            this.worldImporterFactory.createMyWorldsImporter(this.hyperWorldFactory).performImport(sender);
         } else {
             MessageUtil
                     .sendMessage(sender, Messages.messageImportPluginMissing, "%plugin%", "MyWorlds");

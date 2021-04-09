@@ -20,7 +20,6 @@ package se.hyperver.hyperverse.util;
 
 import com.bergerkiller.bukkit.mw.WorldConfig;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -35,6 +34,7 @@ import se.hyperver.hyperverse.flags.implementation.LocalRespawnFlag;
 import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.PvpFlag;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
+import se.hyperver.hyperverse.modules.WorldConfigurationFactory;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldConfigurationBuilder;
@@ -45,19 +45,21 @@ import se.hyperver.hyperverse.world.WorldType;
 import java.util.Collection;
 import java.util.UUID;
 
-@Singleton
 @SuppressWarnings("GuiceAssistedInjectScoping")
 public final class MyWorldsImporter {
 
     private final WorldManager worldManager;
     private final HyperWorldFactory hyperWorldFactory;
+    private final WorldConfigurationFactory worldConfigurationFactory;
 
     @Inject
     public MyWorldsImporter(
             final WorldManager worldManager,
+            final WorldConfigurationFactory worldConfigurationFactory,
             @Assisted final HyperWorldFactory hyperWorldFactory
     ) {
         this.worldManager = worldManager;
+        this.worldConfigurationFactory = worldConfigurationFactory;
         this.hyperWorldFactory = hyperWorldFactory;
     }
 
@@ -73,9 +75,9 @@ public final class MyWorldsImporter {
             if (hyperWorld == null) {
                 final WorldConfiguration configuration;
                 if (bukkitWorld != null) {
-                    configuration = WorldConfiguration.fromWorld(bukkitWorld);
+                    configuration = this.worldConfigurationFactory.fromWorld(bukkitWorld);
                 } else {
-                    WorldConfigurationBuilder builder = WorldConfiguration.builder();
+                    WorldConfigurationBuilder builder = this.worldConfigurationFactory.builder();
                     builder.setName(config.worldname);
                     if (config.getChunkGeneratorName() != null) {
                         builder = builder.setGenerator(config.getChunkGeneratorName());

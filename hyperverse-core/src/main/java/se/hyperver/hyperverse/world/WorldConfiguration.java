@@ -18,16 +18,9 @@
 package se.hyperver.hyperverse.world;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import se.hyperver.hyperverse.util.GeneratorUtil;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +34,7 @@ import java.util.Objects;
  */
 public final class WorldConfiguration implements Cloneable {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = SimpleWorldConfigurationFactory.GSON;
 
     private String name;
     private WorldType type;
@@ -81,73 +74,9 @@ public final class WorldConfiguration implements Cloneable {
      *
      * @return New builder instance
      */
+    @Deprecated
     public static @NonNull WorldConfigurationBuilder builder() {
         return new WorldConfigurationBuilder();
-    }
-
-    /**
-     * Create a world configuration from a {@link World} instance. The generator name
-     * will be inferred from the {@link ChunkGenerator} instance
-     *
-     * @param world World instance
-     * @return The constructed configuration instance
-     */
-    @SuppressWarnings("deprecation")
-    public static @NonNull WorldConfiguration fromWorld(final @NonNull World world) {
-        Objects.requireNonNull(world);
-        final WorldConfigurationBuilder worldConfigurationBuilder = builder();
-        worldConfigurationBuilder.setName(world.getName());
-        if (world.getWorldType() != null) {
-            worldConfigurationBuilder.setWorldFeatures(Objects.requireNonNull(WorldFeatures
-                    .fromBukkitType(world.getWorldType())));
-        }
-        worldConfigurationBuilder.setType(WorldType.fromBukkit(world.getEnvironment()));
-        worldConfigurationBuilder.setSeed(world.getSeed());
-        worldConfigurationBuilder.setGenerateStructures(world.canGenerateStructures()
-                ? WorldStructureSetting.GENERATE_STRUCTURES : WorldStructureSetting.NO_STRUCTURES);
-        // Try to retrieve the generator
-        try {
-            if (Bukkit.getAllowNether() && world.getName().equalsIgnoreCase(Bukkit.getWorlds().get(0).getName() + "_nether")) {
-                worldConfigurationBuilder.setGenerator("");
-            } else if (Bukkit.getAllowNether() && world.getName().equalsIgnoreCase(Bukkit
-                    .getWorlds()
-                    .get(0)
-                    .getName() + "_the_end")) {
-                worldConfigurationBuilder.setGenerator("");
-            } else {
-                ChunkGenerator chunkGenerator = GeneratorUtil.getGenerator(world.getName());
-                if (chunkGenerator == null) {
-                    chunkGenerator = world.getGenerator();
-                }
-                if (chunkGenerator != null) {
-                    final JavaPlugin plugin = GeneratorUtil.matchGenerator(chunkGenerator);
-                    if (plugin != null) {
-                        worldConfigurationBuilder.setGenerator(plugin.getName());
-                    }
-                }
-            }
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return worldConfigurationBuilder.createWorldConfiguration();
-    }
-
-    /**
-     * Construct a configuration instance from a given file
-     *
-     * @param path File path
-     * @return Constructed configuration instance
-     */
-    public static @Nullable WorldConfiguration fromFile(final @NonNull Path path) {
-        if (!Files.exists(path)) {
-            return null;
-        }
-        try (final BufferedReader bufferedReader = Files.newBufferedReader(path)) {
-            return GSON.fromJson(GSON.newJsonReader(bufferedReader), WorldConfiguration.class);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**
