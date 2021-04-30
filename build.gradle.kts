@@ -8,7 +8,7 @@ import nl.javadude.gradle.plugins.license.LicenseExtension
 import org.gradle.api.plugins.JavaPlugin.*
 
 plugins {
-    val indraVersion = "1.2.1"
+    val indraVersion = "1.3.1"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion apply false
