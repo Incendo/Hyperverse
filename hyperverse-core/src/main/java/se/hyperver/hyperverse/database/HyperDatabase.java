@@ -23,9 +23,10 @@ import com.google.common.collect.Table;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.Hyperverse;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -83,11 +84,11 @@ public abstract class HyperDatabase {
      * @param uuid Player UUID
      */
     public void clearLocations(final @NonNull UUID uuid) {
-        for (final LocationType locationType : LocationType.values()) {
-            final Collection<String> keys =
-                    new HashSet<>(this.locations.get(locationType).columnKeySet());
+        for (final Map.Entry<LocationType, Table<UUID, String, PersistentLocation>> entry : this.locations.entrySet()) {
+            final Table<UUID, String, PersistentLocation> table = entry.getValue();
+            final Collection<String> keys = new ArrayList<>(table.columnKeySet());
             for (final String key : keys) {
-                this.locations.get(locationType).remove(uuid, key);
+                table.remove(uuid, key);
             }
         }
     }

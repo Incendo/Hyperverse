@@ -131,14 +131,16 @@ public final class SQLiteDatabase extends HyperDatabase {
     @Override
     public @NonNull CompletableFuture<Collection<PersistentLocation>> getLocations(final @NonNull UUID uuid) {
         final CompletableFuture<Collection<PersistentLocation>> future = new CompletableFuture<>();
+        final String uuidAsString = uuid.toString();
         this.getTaskChainFactory().newChain().async(() -> {
-            try (final PreparedStatement statement = this.connection.prepareStatement("SELECT * FROM `locations` WHERE `uuid` = ?")) {
-                statement.setString(1, uuid.toString());
+            try (final PreparedStatement statement = this.connection.prepareStatement(
+                    "SELECT `world`, `x`, `y`, `z`, `locationType` FROM `locations` WHERE `uuid` = ?")) {
+                statement.setString(1, uuidAsString);
                 final List<PersistentLocation> locationList = new ArrayList<>();
                 try (final ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         final PersistentLocation persistentLocation = new PersistentLocation(
-                                uuid.toString(),
+                                uuidAsString,
                                 resultSet.getString("world"),
                                 resultSet.getDouble("x"),
                                 resultSet.getDouble("y"),

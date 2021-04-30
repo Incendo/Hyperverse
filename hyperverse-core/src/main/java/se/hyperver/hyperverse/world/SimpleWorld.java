@@ -398,12 +398,12 @@ public final class SimpleWorld implements HyperWorld {
             return false;
         }
         final HyperWorld that = (HyperWorld) o;
-        return com.google.common.base.Objects.equal(this.getWorldUUID(), that.getWorldUUID());
+        return Objects.equals(this.getWorldUUID(), that.getWorldUUID());
     }
 
     @Override
     public int hashCode() {
-        return com.google.common.base.Objects.hashCode(this.getWorldUUID());
+        return Objects.hashCode(this.getWorldUUID());
     }
 
     @Override
