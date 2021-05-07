@@ -1,17 +1,20 @@
 import com.hierynomus.gradle.license.LicenseBasePlugin
 import com.hierynomus.gradle.license.tasks.LicenseCheck
 import net.kyori.indra.IndraExtension
-import net.kyori.indra.sonatypeSnapshots
+import net.kyori.indra.IndraPlugin
+import net.kyori.indra.IndraPublishingPlugin
+import net.kyori.indra.IndraCheckstylePlugin
+import net.kyori.indra.repository.sonatypeSnapshots
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
 import nl.javadude.gradle.plugins.license.LicenseExtension
 import org.gradle.api.plugins.JavaPlugin.*
 
 plugins {
-    val indraVersion = "1.3.1"
+    val indraVersion = "2.0.2"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
-    id("net.kyori.indra.publishing.sonatype") version indraVersion apply false
+    id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("com.github.hierynomus.license") version "0.16.1" apply false
     id("com.github.johnrengelman.shadow") version "6.1.0" apply false
     id("net.ltgt.errorprone") version "2.0.1" apply false
@@ -26,13 +29,13 @@ description = "Minecraft world management plugin"
 plugins.apply("idea")
 
 subprojects {
-    plugins.apply("net.kyori.indra")
-    plugins.apply("net.kyori.indra.publishing.sonatype")
+    apply<IndraPlugin>()
+    apply<IndraPublishingPlugin>()
     apply<ErrorPronePlugin>()
     apply<LicenseBasePlugin>()
 
     if (this.name.startsWith("hyperverse-nms").not()) {
-        plugins.apply("net.kyori.indra.checkstyle")
+        apply<IndraCheckstylePlugin>()
     }
 
     extensions.configure(LicenseExtension::class) {
@@ -44,14 +47,14 @@ subprojects {
 
     extensions.configure(IndraExtension::class) {
         github("Incendo", "Hyperverse") {
-            ci = true
+            ci(true)
         }
         gpl3OnlyLicense()
 
         javaVersions {
             testWith(8, 11, 15)
         }
-        checkstyle.set("8.39")
+        checkstyle("8.39")
 
         configurePublications {
             pom {
