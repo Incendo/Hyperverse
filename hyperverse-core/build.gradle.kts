@@ -9,7 +9,7 @@ apply {
 }
 
 dependencies {
-    api(project(":hyperverse-nms-common"))
+    api(projects.hyperverseNmsCommon)
 
     compileOnlyApi("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
 
@@ -35,10 +35,10 @@ dependencies {
     implementation("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT")
     implementation("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
 
-    implementation(project(":hyperverse-nms-1-14-4"))
-    implementation(project(":hyperverse-nms-1-15-2"))
-    implementation(project(":hyperverse-nms-1-16-5"))
-    implementation(project(":hyperverse-nms-unsupported"))
+    implementation(projects.hyperverseNms1144)
+    implementation(projects.hyperverseNms1152)
+    implementation(projects.hyperverseNms1165)
+    implementation(projects.hyperverseNmsUnsupported)
 }
 
 tasks {
