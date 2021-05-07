@@ -1,9 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+
 plugins {
     id("com.github.johnrengelman.shadow")
 }
 
 apply {
-    plugin<com.github.jengelman.gradle.plugins.shadow.ShadowPlugin>()
+    plugin<ShadowPlugin>()
 }
 
 dependencies {
