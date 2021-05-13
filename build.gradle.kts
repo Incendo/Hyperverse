@@ -11,12 +11,12 @@ import nl.javadude.gradle.plugins.license.LicenseExtension
 import org.gradle.api.plugins.JavaPlugin.*
 
 plugins {
-    val indraVersion = "2.0.2"
+    val indraVersion = "2.0.3"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("com.github.hierynomus.license") version "0.16.1" apply false
-    id("com.github.johnrengelman.shadow") version "6.1.0" apply false
+    id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("net.ltgt.errorprone") version "2.0.1" apply false
     id("com.github.ben-manes.versions") version "0.36.0"
     idea
@@ -52,7 +52,7 @@ subprojects {
         gpl3OnlyLicense()
 
         javaVersions {
-            testWith(8, 11, 15)
+            testWith(8, 11, 16)
         }
         checkstyle("8.39")
 
@@ -100,14 +100,16 @@ subprojects {
     repositories {
         mavenCentral()
         sonatypeSnapshots()
-        jcenter()
 
+        maven("https://oss.sonatype.org/content/repositories/releases") {
+            mavenContent {
+                releasesOnly()
+            }
+        }
         maven("https://mvn.intellectualsites.com/content/groups/public/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.aikar.co/content/groups/aikar/")
         maven("https://papermc.io/repo/repository/maven-public/")
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
-        maven("https://oss.sonatype.org/content/repositories/releases")
         maven("https://repo.codemc.org/repository/maven-public")
         maven("https://repo.spongepowered.org/maven")
         maven("https://repo.onarandombox.com/content/repositories/multiverse/")
