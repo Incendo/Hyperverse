@@ -9,6 +9,7 @@ import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
 import nl.javadude.gradle.plugins.license.LicenseExtension
 import org.gradle.api.plugins.JavaPlugin.*
+import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
     val indraVersion = "2.0.3"
@@ -75,6 +76,21 @@ subprojects {
 
     tasks {
         withType(JavaCompile::class) {
+            val compiler = serviceOf<JavaToolchainService>().compilerFor {
+                JavaLanguageVersion.of(8)
+            }
+            if (compiler.isPresent && compiler.get().metadata.languageVersion.asInt() > 9) {
+                /*
+                 * Attempt to use the release flag if compiler is Java 10 or newer.
+                 * A bug in Java 9 prevents the release flag from working properly and was patched in Java 10
+                 */
+                options.release.set(8)
+            } else {
+                /* fall back to using the legacy compiler flags */
+                sourceCompatibility = "1.8"
+                targetCompatibility = "1.8"
+            }
+
             options.errorprone {
                 /* These are just annoying */
                 disable(
@@ -119,7 +135,7 @@ subprojects {
     }
 
     dependencies {
-        COMPILE_ONLY_API_CONFIGURATION_NAME("org.checkerframework", "checker-qual",  "3.9.1")
+        COMPILE_ONLY_API_CONFIGURATION_NAME("org.checkerframework", "checker-qual", "3.9.1")
         TEST_IMPLEMENTATION_CONFIGURATION_NAME("org.junit.jupiter", "junit-jupiter-engine", "5.7.0")
         "errorprone"("com.google.errorprone", "error_prone_core", "2.5.1")
         COMPILE_ONLY_API_CONFIGURATION_NAME("com.google.errorprone", "error_prone_annotations", "2.5.1")
