@@ -25,10 +25,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPosition;
@@ -38,8 +36,11 @@ import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.dimension.DimensionManager;
+import net.minecraft.world.level.entity.EntityLookup;
+import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.portal.PortalTravelAgent;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
@@ -50,7 +51,6 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +61,8 @@ import se.hyperver.hyperverse.util.NMS;
 public class NMSImpl implements NMS {
 
     private final TaskFactory taskFactory;
-    private Field entitiesByUUID;
+    private Field entitySectionManager;
+    private Field entityLookup;
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
     @Inject public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
@@ -85,11 +86,11 @@ public class NMSImpl implements NMS {
         }
     }
 
-    @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final Entity entity,
+    @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final org.bukkit.entity.Entity entity,
         @NotNull final Location origin) {
         final WorldServer worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
         final PortalTravelAgent portalTravelAgent = Objects.requireNonNull(worldServer.getTravelAgent());
-        final net.minecraft.world.entity.Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
+        final Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
         final BlockPosition blockPosition = new BlockPosition(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
         Optional<BlockUtil.Rectangle> portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
                                                            .findPortal(Objects.requireNonNull(blockPosition, "position"), 128);
@@ -193,12 +194,16 @@ public class NMSImpl implements NMS {
                 // attempt to prevent the annoying "Force re-added" message
                 // from appearing
                 try {
-                    if (this.entitiesByUUID == null) {
-                        this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
-                        this.entitiesByUUID.setAccessible(true);
+                    if (this.entitySectionManager == null) {
+                        this.entitySectionManager = worldServer.getClass().getDeclaredField("entitySectionManager");
+                        this.entitySectionManager.setAccessible(true);
                     }
-                    final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
-                    map.remove(entityPlayer.getUniqueID());
+                    final PersistentEntitySectionManager<Entity> esm = (PersistentEntitySectionManager<Entity>) this.entitySectionManager.get(worldServer);
+                    if (this.entityLookup == null) {
+                        this.entityLookup = esm.getClass().getDeclaredField("e");
+                    }
+                    final EntityLookup<Entity> lookup = (EntityLookup<Entity>) this.entityLookup.get(esm);
+                    lookup.b(entityPlayer);
                 } catch (final NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
