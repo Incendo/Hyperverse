@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.DimensionManager;
+import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityHuman;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.EnumDirection;
@@ -51,7 +52,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,11 +87,11 @@ public class NMSImpl implements NMS {
         }
     }
 
-    @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final Entity entity,
+    @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final org.bukkit.entity.Entity entity,
         @NotNull final Location origin) {
         final WorldServer worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
         final PortalTravelAgent portalTravelAgent = Objects.requireNonNull(worldServer.getTravelAgent());
-        final net.minecraft.server.v1_15_R1.Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
+        final Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
         final BlockPosition blockPosition = new BlockPosition(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
         EnumDirection enumDirection = nmsEntity.getPortalDirection();
         if (enumDirection == null) {

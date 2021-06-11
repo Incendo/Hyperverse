@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>Nms-1_16_3</artifactId>
+  <artifactId>Nms-1_16_5</artifactId>
 
   <licenses>
     <license>
@@ -30,13 +30,13 @@
     <dependency>
       <groupId>com.destroystokyo.paper</groupId>
       <artifactId>paper-api</artifactId>
-      <version>1.16.3-R0.1-SNAPSHOT</version>
+      <version>1.16.5-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.16.3-R0.1-SNAPSHOT</version>
+      <version>1.16.5-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
