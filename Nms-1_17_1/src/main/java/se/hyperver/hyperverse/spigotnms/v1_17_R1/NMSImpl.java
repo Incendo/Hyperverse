@@ -29,19 +29,19 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.minecraft.BlockUtil;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.nbt.NBTCompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.level.WorldServer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.level.dimension.DimensionManager;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.entity.EntityLookup;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
-import net.minecraft.world.level.portal.PortalTravelAgent;
+import net.minecraft.world.level.portal.PortalForcer;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.RegexFilter;
@@ -69,7 +69,7 @@ public class NMSImpl implements NMS {
         this.taskFactory = taskFactory;
         if (hyperConfiguration) {
             try {
-                final Field field = WorldServer.class.getDeclaredField("z");
+                final Field field = ServerLevel.class.getDeclaredField("LOGGER");
                 field.setAccessible(true);
                 this.worldServerLogger = (Logger) field.get(null);
             } catch (final Exception e) {
@@ -88,21 +88,21 @@ public class NMSImpl implements NMS {
 
     @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final org.bukkit.entity.Entity entity,
         @NotNull final Location origin) {
-        final WorldServer worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
-        final PortalTravelAgent portalTravelAgent = Objects.requireNonNull(worldServer.getTravelAgent());
+        final ServerLevel worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
+        final PortalForcer portalTravelAgent = Objects.requireNonNull(worldServer.getPortalForcer());
         final Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
-        final BlockPosition blockPosition = new BlockPosition(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
-        Optional<BlockUtil.Rectangle> portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
+        final BlockPos blockPosition = new BlockPos(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
+        Optional<BlockUtil.FoundRectangle> portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
                                                            .findPortal(Objects.requireNonNull(blockPosition, "position"), 128);
         if (!portalShape.isPresent()) {
-            portalShape = portalTravelAgent.createPortal( blockPosition, nmsEntity.getDirection().n(),nmsEntity,  16);
+            portalShape = portalTravelAgent.createPortal(blockPosition, nmsEntity.getDirection().getAxis(), nmsEntity,  16);
         }
         if (!portalShape.isPresent()) {
             return null;
         }
-        final BlockUtil.Rectangle rectangle = portalShape.get();
-        return new Location(origin.getWorld(), rectangle.a.getX() + 1, rectangle.a.getY() - 1,
-            rectangle.a.getZ() + 1);
+        final BlockUtil.FoundRectangle rectangle = portalShape.get();
+        return new Location(origin.getWorld(), rectangle.minCorner.getX() + 1, rectangle.minCorner.getY() - 1,
+            rectangle.minCorner.getZ() + 1);
     }
 
     @Override @Nullable public Location getDimensionSpawn(@NotNull final Location origin) {
@@ -114,20 +114,20 @@ public class NMSImpl implements NMS {
     }
 
     @Override public void writePlayerData(@NotNull final Player player, @NotNull final Path file) {
-        final NBTTagCompound playerTag = new NBTTagCompound();
-        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        final CompoundTag playerTag = new CompoundTag();
+        final net.minecraft.world.entity.player.Player entityPlayer = ((CraftPlayer) player).getHandle();
         entityPlayer.save(playerTag);
 
-        if (!playerTag.hasKey("hyperverse")) {
-            playerTag.set("hyperverse", new NBTTagCompound());
+        if (!playerTag.contains("hyperverse")) {
+            playerTag.put("hyperverse", new CompoundTag());
         }
-        final NBTTagCompound hyperverse = playerTag.getCompound("hyperverse");
-        hyperverse.setLong("writeTime", System.currentTimeMillis());
-        hyperverse.setString("version", Bukkit.getPluginManager().getPlugin("Hyperverse").getDescription().getVersion());
+        final CompoundTag hyperverse = playerTag.getCompound("hyperverse");
+        hyperverse.putLong("writeTime", System.currentTimeMillis());
+        hyperverse.putString("version", Bukkit.getPluginManager().getPlugin("Hyperverse").getDescription().getVersion());
 
         taskFactory.recipe().begin(file).asynchronous(passedFile -> {
             try (final OutputStream outputStream = Files.newOutputStream(passedFile)) {
-                NBTCompressedStreamTools.a(playerTag, outputStream);
+                NbtIo.writeCompressed(playerTag, outputStream);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -138,7 +138,7 @@ public class NMSImpl implements NMS {
         final Location originLocation = player.getLocation().clone();
         taskFactory.recipe().begin(Optional.empty()).asynchronous(unused -> {
             try (final InputStream inputStream = Files.newInputStream(file)) {
-                return Optional.of(NBTCompressedStreamTools.a(inputStream));
+                return Optional.of(NbtIo.readCompressed(inputStream));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -147,7 +147,7 @@ public class NMSImpl implements NMS {
             if (!optionalCompound.isPresent()) {
                 return;
             }
-            final NBTTagCompound compound = (NBTTagCompound) optionalCompound.get();
+            final CompoundTag compound = (CompoundTag) optionalCompound.get();
             PaperLib.getChunkAtAsync(originLocation).thenAccept(chunk -> {
                 // Health and hunger don't update properly, so we
                 // give them a little help
@@ -162,15 +162,16 @@ public class NMSImpl implements NMS {
                 final Location spawnLocation = new Location(Bukkit.getWorld(spawnWorld), spawnX,
                     spawnY, spawnZ);
 
-                final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+                final ServerPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
                 // We re-write the extra Bukkit data as to not
                 // mess up the profile
                 ((CraftPlayer) player).setExtraData(compound);
                 // Set the position to the player's current position
-                compound.set("Pos", doubleList(entityPlayer.locX(), entityPlayer.locY(), entityPlayer.locZ()));
+                Vec3 pos = entityPlayer.position();
+                compound.put("Pos", doubleList(pos.x, pos.y, pos.z));
                 // Set the world to the player's current world
-                compound.setString("world", player.getWorld().getName());
+                compound.putString("world", player.getWorld().getName());
                 // Store persistent values
                 ((CraftPlayer) player).storeBukkitValues(compound);
 
@@ -182,33 +183,33 @@ public class NMSImpl implements NMS {
                 // entityPlayer.updateAbilities();
                 player.teleport(originLocation);
 
-                final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
-                final DimensionManager dimensionManager = worldServer.getDimensionManager();
+                final ServerLevel worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
+                final DimensionType dimensionManager = worldServer.dimensionType();
 
                 // Prevent annoying message
-                entityPlayer.decouple();
-                // Removal reason == "CHANGED_DIMENSION"
-                worldServer.a(entityPlayer, net.minecraft.world.entity.Entity.RemovalReason.e);
+                // Spigot-obf = decouple()
+                entityPlayer.unRide();
+                worldServer.removePlayerImmediately(entityPlayer, Entity.RemovalReason.CHANGED_DIMENSION);
                 // worldServer.removePlayer above should remove the player from the
                 // map, but that doesn't always happen. This is a last effort
                 // attempt to prevent the annoying "Force re-added" message
                 // from appearing
                 try {
                     if (this.entitySectionManager == null) {
-                        this.entitySectionManager = worldServer.getClass().getDeclaredField("entitySectionManager");
+                        this.entitySectionManager = worldServer.getClass().getDeclaredField("entityManager");
                         this.entitySectionManager.setAccessible(true);
                     }
                     final PersistentEntitySectionManager<Entity> esm = (PersistentEntitySectionManager<Entity>) this.entitySectionManager.get(worldServer);
                     if (this.entityLookup == null) {
-                        this.entityLookup = esm.getClass().getDeclaredField("e");
+                        this.entityLookup = esm.getClass().getDeclaredField("visibleEntityStorage");
                     }
                     final EntityLookup<Entity> lookup = (EntityLookup<Entity>) this.entityLookup.get(esm);
-                    lookup.b(entityPlayer);
+                    lookup.remove(entityPlayer);
                 } catch (final NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
 
-                entityPlayer.c.getPlayerList().moveToWorld(entityPlayer, worldServer,
+                entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, worldServer,
                     true, originLocation, true);
 
                 // Apply health and foodLevel
@@ -225,18 +226,18 @@ public class NMSImpl implements NMS {
         if (craftWorld == null) {
             return null;
         }
-        return EntityHuman.getBed(craftWorld.getHandle(), new BlockPosition(spawnLocation.getBlockX(),
+        return net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(craftWorld.getHandle(), new BlockPos(spawnLocation.getBlockX(),
                                                                             spawnLocation.getBlockY(), spawnLocation.getBlockZ()), 0, true, false)
-                          .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.getX(), vec3D.getY(), vec3D.getZ()))
+                          .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.x(), vec3D.y(), vec3D.z()))
                           .orElse(null);
     }
 
-    private static NBTTagList doubleList(final double... values) {
-        final NBTTagList nbttaglist = new NBTTagList();
+    private static ListTag doubleList(final double... values) {
+        final ListTag tagList = new ListTag();
         for (final double d : values) {
-            nbttaglist.add(NBTTagDouble.a(d));
+            tagList.add(DoubleTag.valueOf(d));
         }
-        return nbttaglist;
+        return tagList;
     }
 
 }
