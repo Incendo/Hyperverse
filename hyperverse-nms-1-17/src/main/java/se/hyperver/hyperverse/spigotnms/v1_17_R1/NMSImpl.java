@@ -40,6 +40,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
+import net.minecraft.BlockUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.entity.EntityLookup;
+import net.minecraft.world.level.entity.PersistentEntitySectionManager;
+import net.minecraft.world.level.portal.PortalForcer;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.RegexFilter;
@@ -96,12 +110,12 @@ public class NMSImpl implements NMS {
         @NotNull final Location origin) {
         final ServerLevel worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
         final PortalForcer portalTravelAgent = Objects.requireNonNull(worldServer.getPortalForcer());
-        final net.minecraft.world.entity.Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
+        final Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
         final BlockPos blockPosition = new BlockPos(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
         Optional<BlockUtil.FoundRectangle> portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
                                                            .findPortal(Objects.requireNonNull(blockPosition, "position"), 128);
         if (!portalShape.isPresent()) {
-            portalShape = portalTravelAgent.createPortal( blockPosition, nmsEntity.getDirection().getAxis(), nmsEntity,  16);
+            portalShape = portalTravelAgent.createPortal(blockPosition, nmsEntity.getDirection().getAxis(), nmsEntity,  16);
         }
         if (!portalShape.isPresent()) {
             return null;
@@ -200,12 +214,12 @@ public class NMSImpl implements NMS {
                 // from appearing
                 try {
                     if (this.entitySectionManager == null) {
-                        this.entitySectionManager = worldServer.getClass().getDeclaredField("entitySectionManager");
+                        this.entitySectionManager = worldServer.getClass().getDeclaredField("entityManager");
                         this.entitySectionManager.setAccessible(true);
                     }
                     final PersistentEntitySectionManager<Entity> esm = (PersistentEntitySectionManager<Entity>) this.entitySectionManager.get(worldServer);
                     if (this.entityLookup == null) {
-                        this.entityLookup = esm.getClass().getDeclaredField("e");
+                        this.entityLookup = esm.getClass().getDeclaredField("visibleEntityStorage");
                     }
                     final EntityLookup<Entity> lookup = (EntityLookup<Entity>) this.entityLookup.get(esm);
                     lookup.remove(entityPlayer);
