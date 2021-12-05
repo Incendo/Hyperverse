@@ -20,7 +20,7 @@ dependencies {
 
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
     implementation("co.aikar:taskchain-bukkit:3.7.2")
-    implementation("io.papermc:paperlib:1.0.6")
+    implementation("io.papermc:paperlib:1.0.7")
     implementation("com.google.inject:guice:5.0.1") {
         exclude("com.google.guava", "guava")
     }
