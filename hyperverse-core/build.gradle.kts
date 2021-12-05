@@ -11,11 +11,11 @@ apply {
 dependencies {
     api(projects.hyperverseNmsCommon)
 
-    compileOnlyApi("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
+    compileOnlyApi("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
 
     compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.2.2")
-    compileOnly("com.bergerkiller.bukkit:MyWorlds:1.15.2-v1")
-    compileOnly("net.ess3:EssentialsX:2.18.2")
+    compileOnly("com.bergerkiller.bukkit:MyWorlds:1.17.1-v2")
+    compileOnly("net.essentialsx:EssentialsX:2.19.0")
     compileOnly("me.clip:placeholderapi:2.10.9")
 
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
@@ -27,17 +27,16 @@ dependencies {
     implementation("com.google.inject.extensions:guice-assistedinject:5.0.1") {
         exclude("com.google.guava", "guava")
     }
-    implementation("org.bstats:bstats-bukkit:1.8")
-    implementation("org.spongepowered:configurate-hocon:4.0.0")
-    implementation("cloud.commandframework:cloud-paper:1.4.0")
-    implementation("cloud.commandframework:cloud-minecraft-extras:1.4.0")
-    implementation("cloud.commandframework:cloud-annotations:1.4.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT")
+    implementation("org.bstats:bstats-bukkit:2.2.1")
+    implementation("org.spongepowered:configurate-hocon:4.1.2")
+    implementation("cloud.commandframework:cloud-paper:1.6.0")
+    implementation("cloud.commandframework:cloud-minecraft-extras:1.6.0")
+    implementation("cloud.commandframework:cloud-annotations:1.6.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.0.0")
     implementation("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
 
-    implementation(projects.hyperverseNms1144)
-    implementation(projects.hyperverseNms1152)
-    implementation(projects.hyperverseNms1165)
+    implementation(projects.hyperverseNms117)
+    implementation(projects.hyperverseNms118)
     implementation(projects.hyperverseNmsUnsupported)
 }
 
@@ -51,9 +50,8 @@ tasks {
     shadowJar {
         minimize {
             exclude(project(":hyperverse-nms-unsupported"))
-            exclude(project(":hyperverse-nms-1-14-4"))
-            exclude(project(":hyperverse-nms-1-15-2"))
-            exclude(project(":hyperverse-nms-1-16-5"))
+            exclude(project(":hyperverse-nms-1-17"))
+            exclude(project(":hyperverse-nms-1-18"))
         }
         mergeServiceFiles()
 

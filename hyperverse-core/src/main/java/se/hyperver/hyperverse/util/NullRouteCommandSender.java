@@ -17,6 +17,7 @@
 
 package se.hyperver.hyperverse.util;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -26,6 +27,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Set;
@@ -71,6 +73,11 @@ public final class NullRouteCommandSender implements CommandSender {
     @Override
     public @NonNull String getName() {
         return "null";
+    }
+
+    @Override
+    public @NotNull Component name() {
+        return Component.text("null");
     }
 
     @Override
