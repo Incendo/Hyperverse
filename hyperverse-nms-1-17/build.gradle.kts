@@ -1,8 +1,4 @@
-repositories {
-    mavenLocal()
-}
-
 dependencies {
-    compileOnly("org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmcv1_17_r1_2:spigotmcv1_17_r1_2:1_17_r1_2")
     compileOnly(projects.hyperverseNmsCommon)
 }
