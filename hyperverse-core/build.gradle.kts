@@ -14,7 +14,7 @@ dependencies {
     compileOnlyApi("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
 
     compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.2.2")
-    compileOnly("com.bergerkiller.bukkit:MyWorlds:1.17.1-v2")
+    compileOnly("com.bergerkiller.bukkit:MyWorlds:1.18.1-v2")
     compileOnly("net.essentialsx:EssentialsX:2.19.2")
     compileOnly("me.clip:placeholderapi:2.10.9")
 
