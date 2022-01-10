@@ -1,4 +1,17 @@
+plugins {
+    id("io.papermc.paperweight.userdev") version "1.3.3"
+}
+
 dependencies {
-    compileOnly("org.spigotmcv1_17_r1_2:spigotmcv1_17_r1_2:1_17_r1_2")
+    paperDevBundle("1.17.1-R0.1-SNAPSHOT")
     compileOnly(projects.hyperverseNmsCommon)
+}
+
+tasks {
+    reobfJar {
+        outputJar.set(file("build/libs/${project.name}-${project.version}.jar"))
+    }
+    assemble {
+        dependsOn(reobfJar)
+    }
 }

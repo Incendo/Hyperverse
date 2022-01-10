@@ -35,9 +35,9 @@ dependencies {
     implementation("net.kyori:adventure-platform-bukkit:4.0.0")
     implementation("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
 
-    implementation(projects.hyperverseNms117)
-    implementation(projects.hyperverseNms118)
     implementation(projects.hyperverseNmsUnsupported)
+    runtimeOnly(project(":hyperverse-nms-1-17", "reobf"))
+    runtimeOnly(project(":hyperverse-nms-1-18", "reobf"))
 }
 
 tasks {
