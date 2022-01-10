@@ -54,7 +54,7 @@ public final class NullRouteCommandSender implements CommandSender {
     }
 
     @Override
-    public void sendMessage(final @NonNull String[] messages) {
+    public void sendMessage(final @NonNull String... messages) {
     }
 
     @Override
@@ -62,7 +62,7 @@ public final class NullRouteCommandSender implements CommandSender {
     }
 
     @Override
-    public void sendMessage(final @Nullable UUID sender, final @NonNull String[] messages) {
+    public void sendMessage(final @Nullable UUID sender, final @NonNull String... messages) {
     }
 
     @Override

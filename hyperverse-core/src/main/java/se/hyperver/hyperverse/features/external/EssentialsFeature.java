@@ -17,6 +17,8 @@
 
 package se.hyperver.hyperverse.features.external;
 
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.IEssentials;
 import com.earth2me.essentials.utils.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,16 +40,22 @@ public final class EssentialsFeature extends PluginFeature {
         final Hyperverse hyperverse = JavaPlugin.getPlugin(Hyperverse.class);
         hyperverse.getLogger().info("Using Essentials to provide safe-teleportation lookup.");
         hyperverse.getServicePipeline().registerServiceImplementation(SafeTeleportService.class,
-                new EssentialsSafeTeleportService(), Collections.emptyList()
+                new EssentialsSafeTeleportService(JavaPlugin.getPlugin(Essentials.class)), Collections.emptyList()
         );
     }
 
     private static class EssentialsSafeTeleportService implements SafeTeleportService {
 
+        private final IEssentials essentials;
+
+        public EssentialsSafeTeleportService(final @NonNull IEssentials essentials) {
+            this.essentials = essentials;
+        }
+
         @Override
         public @Nullable Location handle(final @NonNull Location location) {
             try {
-                return LocationUtil.getSafeDestination(location);
+                return LocationUtil.getSafeDestination(this.essentials, location);
             } catch (final Exception ignored) {
             }
             return null;

@@ -11,11 +11,11 @@ apply {
 dependencies {
     api(projects.hyperverseNmsCommon)
 
-    compileOnlyApi("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnlyApi("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
 
     compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.2.2")
     compileOnly("com.bergerkiller.bukkit:MyWorlds:1.17.1-v2")
-    compileOnly("net.essentialsx:EssentialsX:2.19.0")
+    compileOnly("net.essentialsx:EssentialsX:2.19.2")
     compileOnly("me.clip:placeholderapi:2.10.9")
 
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
@@ -29,10 +29,10 @@ dependencies {
     }
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.spongepowered:configurate-hocon:4.1.2")
-    implementation("cloud.commandframework:cloud-paper:1.6.0")
-    implementation("cloud.commandframework:cloud-minecraft-extras:1.6.0")
-    implementation("cloud.commandframework:cloud-annotations:1.6.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.0.0")
+    implementation("cloud.commandframework:cloud-paper:1.6.1")
+    implementation("cloud.commandframework:cloud-minecraft-extras:1.6.1")
+    implementation("cloud.commandframework:cloud-annotations:1.6.1")
+    implementation("net.kyori:adventure-platform-bukkit:4.0.1")
     implementation("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
 
     implementation(projects.hyperverseNmsUnsupported)
@@ -65,8 +65,8 @@ tasks {
         relocate("org.bstats", "se.hyperver.hyperverse.libs.bstats")
         relocate("co.aikar.commands", "se.hyperver.hyperverse.libs.aikar.commands")
         relocate("co.aikar.locales", "se.hyperver.hyperverse.libs.aikar.locales")
+        relocate("co.aikar.taskchain", "se.hyperver.hyperverse.libs.taskchain")
         relocate("co.aikar.util", "se.hyperver.hyperverse.libs.aikar.util")
-        relocate("co.aijar.taskchain", "se.hyperver.hyperverse.lubs.taskchain")
         relocate("net.jodah.expiringmap", "se.hyperver.hyperverse.libs.expiringmap")
         relocate("net.kyori", "se.hyperver.hyperverse.libs.kyori")
         relocate("cloud.commandframework", "se.hyperver.hyperverse.libs.cloud")
