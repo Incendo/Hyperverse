@@ -76,9 +76,9 @@ subprojects {
 
     tasks {
         withType(JavaCompile::class) {
-            val compiler = serviceOf<JavaToolchainService>().compilerFor {
-                JavaLanguageVersion.of(17)
-            }
+            javaCompiler.set(serviceOf<JavaToolchainService>().compilerFor {
+                languageVersion.set(JavaLanguageVersion.of(17))
+            })
             options.release.set(17)
 
             options.errorprone {
@@ -98,6 +98,12 @@ subprojects {
             // options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
         }
 
+        withType(Javadoc::class) {
+            javadocTool.set(serviceOf<JavaToolchainService>().javadocToolFor {
+                languageVersion.set(JavaLanguageVersion.of(17))
+            })
+        }
+
         named("check") {
             dependsOn(withType(LicenseCheck::class))
         }
@@ -112,7 +118,6 @@ subprojects {
                 releasesOnly()
             }
         }
-        maven("https://mvn.intellectualsites.com/content/groups/public/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.aikar.co/content/groups/aikar/")
         maven("https://papermc.io/repo/repository/maven-public/")
@@ -120,7 +125,6 @@ subprojects {
         maven("https://repo.spongepowered.org/maven")
         maven("https://repo.onarandombox.com/content/repositories/multiverse/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-        maven("https://ci.athion.net/plugin/repository/tools/")
         maven("https://ci.mg-dev.eu/plugin/repository/everything/")
         maven("https://repo.essentialsx.net/releases/")
 

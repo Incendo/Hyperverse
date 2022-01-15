@@ -1,4 +1,4 @@
 dependencies {
     compileOnly(projects.hyperverseNmsCommon)
-    compileOnly("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
 }

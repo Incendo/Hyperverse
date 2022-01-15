@@ -8,10 +8,12 @@ apply {
     plugin<ShadowPlugin>()
 }
 
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+
 dependencies {
     api(projects.hyperverseNmsCommon)
 
-    compileOnlyApi("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
+    compileOnlyApi("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
 
     compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.2.2")
     compileOnly("com.bergerkiller.bukkit:MyWorlds:1.18.1-v2")
