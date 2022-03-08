@@ -247,7 +247,13 @@
         </dependency>
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>Nms-1_18</artifactId>
+            <artifactId>Nms-1_18_1</artifactId>
+            <version>${parent.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>Nms-1_18_2</artifactId>
             <version>${parent.version}</version>
             <scope>runtime</scope>
         </dependency>
