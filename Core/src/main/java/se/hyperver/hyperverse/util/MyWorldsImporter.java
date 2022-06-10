@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.mw.WorldConfig;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -57,21 +58,18 @@ import java.util.UUID;
                     .create(bukkitWorld == null ? UUID.randomUUID() : bukkitWorld.getUID(),
                         configuration);
                 this.worldManager.addWorld(hyperWorld);
-                if (config.spawnPoint != null) {
-                    try {
-                        hyperWorld.createBukkitWorld();
-                        assert hyperWorld.getBukkitWorld() != null;
-                        hyperWorld.getBukkitWorld()
-                            .setSpawnLocation(config.spawnPoint.toLocation());
-                    } catch (HyperWorldValidationException ex) {
-                        ex.printStackTrace();
-                        MessageUtil.sendMessage(sender, Messages.messageCreationUnknownFailure);
-                        return;
-                    }
+                Location spawnLocation = config.getSpawnLocation();
+                try {
+                    hyperWorld.createBukkitWorld();
+                    assert hyperWorld.getBukkitWorld() != null;
+                    hyperWorld.getBukkitWorld()
+                            .setSpawnLocation(spawnLocation);
+                } catch (HyperWorldValidationException ex) {
+                    ex.printStackTrace();
+                    MessageUtil.sendMessage(sender, Messages.messageCreationUnknownFailure);
+                    return;
                 }
             }
-            hyperWorld.setFlagInstance(
-                config.forcedRespawn ? ForceSpawn.FORCE_SPAWN_TRUE : ForceSpawn.FORCE_SPAWN_FALSE);
             if (config.gameMode != null) {
                 hyperWorld.setFlagInstance(
                     GamemodeFlag.GAMEMODE_CREATIVE.createFlagInstance(config.gameMode));

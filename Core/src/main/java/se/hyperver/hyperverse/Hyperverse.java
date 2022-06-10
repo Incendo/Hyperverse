@@ -22,25 +22,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.Stage;
-import com.typesafe.config.ConfigParseOptions;
-import com.typesafe.config.ConfigRenderOptions;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import io.papermc.lib.PaperLib;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Logger;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -50,6 +34,11 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.AbstractConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 import se.hyperver.hyperverse.commands.HyperCommandManager;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
 import se.hyperver.hyperverse.configuration.HyperConfiguration;
@@ -72,6 +61,16 @@ import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.WorldConfiguration;
 import se.hyperver.hyperverse.world.WorldManager;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Plugin main class
@@ -348,19 +347,19 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         final Path messagePath =
             this.getDataFolder().toPath().resolve(String.format("messages_%s.conf", language));
         final AbstractConfigurationLoader<CommentedConfigurationNode> loader =
-            HoconConfigurationLoader.builder().setParseOptions(
-                ConfigParseOptions.defaults().setClassLoader(this.getClass().getClassLoader()))
-                .setRenderOptions(
-                    ConfigRenderOptions.defaults().setComments(true).setFormatted(true)
-                        .setOriginComments(false).setJson(false))
-                .setDefaultOptions(ConfigurationOptions.defaults()).setPath(messagePath).build();
+            HoconConfigurationLoader.builder()
+                    .emitComments(true)
+                    .prettyPrinting(true)
+                    .emitJsonCompatible(false)
+                    .path(messagePath)
+                    .build();
 
         ConfigurationNode translationNode;
         try {
             translationNode = loader.load();
         } catch (IOException e) {
             e.printStackTrace();
-            translationNode = loader.createEmptyNode();
+            translationNode = loader.createNode();
         }
 
         if (!Files.exists(messagePath)) {
@@ -375,9 +374,13 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         final Map<String, String> messages = Messages.getConfiguredMessages();
         final Collection<String> messageKeys = new ArrayList<>(messages.keySet());
         for (final String key : messageKeys) {
-            final ConfigurationNode messageNode = translationNode.getNode(key);
-            if (messageNode.isVirtual()) {
-                messageNode.setValue(messages.get(key));
+            final ConfigurationNode messageNode = translationNode.node(key);
+            if (messageNode.empty()) {
+                try {
+                    messageNode.set(messages.get(key));
+                } catch (SerializationException ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 messages.put(key, messageNode.getString());
             }

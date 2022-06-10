@@ -17,18 +17,14 @@
 
 package se.hyperver.hyperverse.configuration;
 
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.typesafe.config.ConfigParseOptions;
-import com.typesafe.config.ConfigRenderOptions;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.AbstractConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 import se.hyperver.hyperverse.Hyperverse;
 
 import java.io.File;
@@ -52,32 +48,32 @@ public class FileHyperConfiguration implements HyperConfiguration {
         final File configFile = new File(hyperverse.getDataFolder(), "hyperverse.conf");
         final AbstractConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
             .builder()
-            .setParseOptions(ConfigParseOptions.defaults().setClassLoader(hyperverse.getClass().getClassLoader()))
-            .setRenderOptions(ConfigRenderOptions.defaults().setComments(true).setFormatted(true).setOriginComments(false).setJson(false))
-            .setDefaultOptions(ConfigurationOptions.defaults()).setFile(configFile).build();
+                .emitComments(true)
+                .prettyPrinting(true)
+                .emitJsonCompatible(false)
+                .file(configFile)
+                .build();
         FileConfigurationObject configObject = null;
         ConfigurationNode configurationNode;
         try {
             configurationNode = loader.load();
         } catch (final IOException e) {
             e.printStackTrace();
-            configurationNode = loader.createEmptyNode();
+            configurationNode = loader.createNode();
         }
         if (!configFile.exists()) {
             configObject = new FileConfigurationObject();
             try {
-                final CommentedConfigurationNode defaultNode = loader.createEmptyNode();
-                defaultNode.setComment("");
-                loader.save(defaultNode.setValue(TypeToken.of(FileConfigurationObject.class),
-                    configObject));
-            } catch (final IOException | ObjectMappingException e) {
+                final CommentedConfigurationNode defaultNode = loader.createNode();
+                defaultNode.comment("");
+                loader.save(defaultNode.set(FileConfigurationObject.class, configObject));
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                configObject = configurationNode
-                    .getValue(TypeToken.of(FileConfigurationObject.class), new FileConfigurationObject());
-            } catch (final ObjectMappingException e) {
+                configObject = configurationNode.get(FileConfigurationObject.class, new FileConfigurationObject());
+            } catch (final SerializationException e) {
                 e.printStackTrace();
             }
         }

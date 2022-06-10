@@ -17,8 +17,11 @@
 
 package se.hyperver.hyperverse.features.external;
 
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.IEssentials;
 import com.earth2me.essentials.utils.LocationUtil;
 import org.bukkit.Location;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.Hyperverse;
@@ -32,17 +35,20 @@ import java.util.Collections;
  */
 public class EssentialsFeature extends PluginFeature {
 
+    private IEssentials essentials;
+
     @Override public void initializeFeature() {
-        Hyperverse.getPlugin(Hyperverse.class).getLogger().info("Using Essentials to provide safe-teleportation lookup.");
+        JavaPlugin.getPlugin(Hyperverse.class).getLogger().info("Using Essentials to provide safe-teleportation lookup.");
         Hyperverse.getApi().getServicePipeline().registerServiceImplementation(SafeTeleportService.class,
             new EssentialsSafeTeleportService(), Collections.emptyList());
+        this.essentials = JavaPlugin.getPlugin(Essentials.class);
     }
 
-    private static class EssentialsSafeTeleportService implements SafeTeleportService {
+    private class EssentialsSafeTeleportService implements SafeTeleportService {
 
         @Nullable @Override public Location handle(@NotNull final Location location) {
             try {
-                return LocationUtil.getSafeDestination(location);
+                return LocationUtil.getSafeDestination(essentials, location);
             } catch (final Exception ignored) {
             }
             return null;
