@@ -15,43 +15,43 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.spigotnms.v1_14_R1;
+package se.hyperver.hyperverse.spigotnms.v1_19_R1;
 
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import io.papermc.lib.PaperLib;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
-import net.minecraft.server.v1_14_R1.BlockPosition;
-import net.minecraft.server.v1_14_R1.DimensionManager;
-import net.minecraft.server.v1_14_R1.Entity;
-import net.minecraft.server.v1_14_R1.EntityHuman;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EnumDirection;
-import net.minecraft.server.v1_14_R1.NBTCompressedStreamTools;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import net.minecraft.server.v1_14_R1.NBTTagDouble;
-import net.minecraft.server.v1_14_R1.NBTTagList;
-import net.minecraft.server.v1_14_R1.PortalTravelAgent;
-import net.minecraft.server.v1_14_R1.ShapeDetector;
-import net.minecraft.server.v1_14_R1.Vec3D;
-import net.minecraft.server.v1_14_R1.WorldServer;
+
+import net.minecraft.BlockUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.entity.EntityLookup;
+import net.minecraft.world.level.entity.PersistentEntitySectionManager;
+import net.minecraft.world.level.portal.PortalForcer;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.RegexFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,18 +59,18 @@ import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
 import se.hyperver.hyperverse.util.NMS;
 
 @SuppressWarnings("unused")
-@Singleton
 public class NMSImpl implements NMS {
 
     private final TaskFactory taskFactory;
-    private Field entitiesByUUID;
+    private Field entitySectionManager;
+    private Field entityLookup;
     private org.apache.logging.log4j.core.Logger worldServerLogger;
 
-    @Inject public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean shouldGroupProfiles) {
+    @Inject public NMSImpl(final TaskFactory taskFactory, final @HyperConfigShouldGroupProfiles boolean hyperConfiguration) {
         this.taskFactory = taskFactory;
-        if (shouldGroupProfiles) {
+        if (hyperConfiguration) {
             try {
-                final Field field = WorldServer.class.getDeclaredField("LOGGER");
+                final Field field = ServerLevel.class.getDeclaredField("LOGGER");
                 field.setAccessible(true);
                 this.worldServerLogger = (Logger) field.get(null);
             } catch (final Exception e) {
@@ -89,62 +89,47 @@ public class NMSImpl implements NMS {
 
     @Override @Nullable public Location getOrCreateNetherPortal(@NotNull final org.bukkit.entity.Entity entity,
         @NotNull final Location origin) {
-        final WorldServer worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
-        final PortalTravelAgent portalTravelAgent = Objects.requireNonNull(worldServer.getTravelAgent());
+        final ServerLevel worldServer = Objects.requireNonNull(((CraftWorld) origin.getWorld()).getHandle());
+        final PortalForcer portalTravelAgent = Objects.requireNonNull(worldServer.getPortalForcer());
         final Entity nmsEntity = Objects.requireNonNull(((CraftEntity) entity).getHandle());
-        final BlockPosition blockPosition = new BlockPosition(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
-        EnumDirection enumDirection = nmsEntity.getPortalDirection();
-        if (enumDirection == null) {
-            enumDirection = Objects.requireNonNull(nmsEntity.getDirection());
+        final BlockPos blockPosition = new BlockPos(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
+        final WorldBorder worldBorder = worldServer.getWorldBorder();
+        Optional<BlockUtil.FoundRectangle> portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
+                                                           .findPortalAround(Objects.requireNonNull(blockPosition, "position"), worldBorder,128);
+        if (!portalShape.isPresent()) {
+            portalShape = portalTravelAgent.createPortal(blockPosition, nmsEntity.getDirection().getAxis(), nmsEntity,  16);
         }
-        Vec3D mot = nmsEntity.getMot();
-        if (mot == null) {
-            mot = new Vec3D(1, 1, 1);
-        }
-        Vec3D portalOffset = nmsEntity.getPortalOffset();
-        if (portalOffset == null) {
-            portalOffset = new Vec3D(0, 0, 0);
-        }
-        ShapeDetector.Shape portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
-            .a(Objects.requireNonNull(blockPosition, "position"),
-                Objects.requireNonNull(mot, "mot"), Objects.requireNonNull(enumDirection, "direction"), portalOffset.x, portalOffset.y,
-                Objects.requireNonNull(nmsEntity, "entity") instanceof EntityHuman);
-        if (portalShape == null && portalTravelAgent.a(nmsEntity)) {
-            portalShape = portalTravelAgent.a(blockPosition,
-                    nmsEntity.getMot(), nmsEntity.getPortalDirection(), portalOffset.x, portalOffset.y,
-                    nmsEntity instanceof EntityHuman);
-        }
-        if (portalShape == null) {
+        if (!portalShape.isPresent()) {
             return null;
         }
-        return new Location(origin.getWorld(), portalShape.position.getX() + 1, portalShape.position.getY() - 1,
-            portalShape.position.getZ() + 1);
+        final BlockUtil.FoundRectangle rectangle = portalShape.get();
+        return new Location(origin.getWorld(), rectangle.minCorner.getX() + 1, rectangle.minCorner.getY() - 1,
+            rectangle.minCorner.getZ() + 1);
     }
 
     @Override @Nullable public Location getDimensionSpawn(@NotNull final Location origin) {
-        final WorldServer worldServer = ((CraftWorld) origin.getWorld()).getHandle();
-        final BlockPosition dimensionSpawn = worldServer.getDimensionSpawn();
-        if (dimensionSpawn != null) {
-            return new Location(origin.getWorld(), dimensionSpawn.getX(), dimensionSpawn.getY(), dimensionSpawn.getZ());
+        if (Objects.requireNonNull(origin.getWorld()).getEnvironment()
+            == World.Environment.THE_END) {
+            return new Location(origin.getWorld(), 100, 50, 0);
         }
         return origin.getWorld().getSpawnLocation();
     }
 
     @Override public void writePlayerData(@NotNull final Player player, @NotNull final Path file) {
-        final NBTTagCompound playerTag = new NBTTagCompound();
-        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        final CompoundTag playerTag = new CompoundTag();
+        final net.minecraft.world.entity.player.Player entityPlayer = ((CraftPlayer) player).getHandle();
         entityPlayer.save(playerTag);
 
-        if (!playerTag.hasKey("hyperverse")) {
-            playerTag.set("hyperverse", new NBTTagCompound());
+        if (!playerTag.contains("hyperverse")) {
+            playerTag.put("hyperverse", new CompoundTag());
         }
-        final NBTTagCompound hyperverse = playerTag.getCompound("hyperverse");
-        hyperverse.setLong("writeTime", System.currentTimeMillis());
-        hyperverse.setString("version", Bukkit.getPluginManager().getPlugin("Hyperverse").getDescription().getVersion());
+        final CompoundTag hyperverse = playerTag.getCompound("hyperverse");
+        hyperverse.putLong("writeTime", System.currentTimeMillis());
+        hyperverse.putString("version", Bukkit.getPluginManager().getPlugin("Hyperverse").getDescription().getVersion());
 
-        taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
-            try (final OutputStream outputStream = Files.newOutputStream(file)) {
-                NBTCompressedStreamTools.a(playerTag, outputStream);
+        taskFactory.recipe().begin(file).asynchronous(passedFile -> {
+            try (final OutputStream outputStream = Files.newOutputStream(passedFile)) {
+                NbtIo.writeCompressed(playerTag, outputStream);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -153,18 +138,18 @@ public class NMSImpl implements NMS {
 
     @Override public void readPlayerData(@NotNull final Player player, @NotNull final Path file, @NotNull final Runnable whenDone) {
         final Location originLocation = player.getLocation().clone();
-        taskFactory.recipe().begin(Optional.empty()).asynchronous((unused) -> {
+        taskFactory.recipe().begin(Optional.empty()).asynchronous(unused -> {
             try (final InputStream inputStream = Files.newInputStream(file)) {
-                return Optional.of(NBTCompressedStreamTools.a(inputStream));
+                return Optional.of(NbtIo.readCompressed(inputStream));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
             return Optional.empty();
-        }).synchronous(optionalCompound -> {
+        }).synchronous((optionalCompound) -> {
             if (!optionalCompound.isPresent()) {
                 return;
             }
-            final NBTTagCompound compound = (NBTTagCompound) optionalCompound.get();
+            final CompoundTag compound = (CompoundTag) optionalCompound.get();
             PaperLib.getChunkAtAsync(originLocation).thenAccept(chunk -> {
                 // Health and hunger don't update properly, so we
                 // give them a little help
@@ -179,49 +164,56 @@ public class NMSImpl implements NMS {
                 final Location spawnLocation = new Location(Bukkit.getWorld(spawnWorld), spawnX,
                     spawnY, spawnZ);
 
-                final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+                final ServerPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
                 // We re-write the extra Bukkit data as to not
                 // mess up the profile
                 ((CraftPlayer) player).setExtraData(compound);
                 // Set the position to the player's current position
-                compound.set("Pos", doubleList(entityPlayer.locX, entityPlayer.locY, entityPlayer.locZ));
+                Vec3 pos = entityPlayer.position();
+                compound.put("Pos", doubleList(pos.x, pos.y, pos.z));
                 // Set the world to the player's current world
-                compound.setString("world", player.getWorld().getName());
+                compound.putString("world", player.getWorld().getName());
                 // Store persistent values
                 ((CraftPlayer) player).storeBukkitValues(compound);
 
                 // We start by doing a total reset
                 entityPlayer.reset();
-                entityPlayer.f(compound);
+                entityPlayer.load(compound);
 
                 // entityPlayer.updateEffects = true;
                 // entityPlayer.updateAbilities();
                 player.teleport(originLocation);
 
-                final WorldServer worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
-                final DimensionManager dimensionManager = worldServer.worldProvider.getDimensionManager();
+                final ServerLevel worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
+                final DimensionType dimensionManager = worldServer.dimensionType();
 
                 // Prevent annoying message
-                entityPlayer.decouple();
-                worldServer.removePlayer(entityPlayer);
+                // Spigot-obf = decouple()
+                entityPlayer.unRide();
+                worldServer.removePlayerImmediately(entityPlayer, Entity.RemovalReason.CHANGED_DIMENSION);
                 // worldServer.removePlayer above should remove the player from the
                 // map, but that doesn't always happen. This is a last effort
                 // attempt to prevent the annoying "Force re-added" message
                 // from appearing
                 try {
-                    if (this.entitiesByUUID == null) {
-                        this.entitiesByUUID = worldServer.getClass().getDeclaredField("entitiesByUUID");
-                        this.entitiesByUUID.setAccessible(true);
+                    if (this.entitySectionManager == null) {
+                        this.entitySectionManager = worldServer.getClass().getDeclaredField("entityManager");
+                        this.entitySectionManager.setAccessible(true);
                     }
-                    final Map<UUID, Entity> map = (Map<UUID, Entity>) entitiesByUUID.get(worldServer);
-                    map.remove(entityPlayer.getUniqueID());
+                    final PersistentEntitySectionManager<Entity> esm = (PersistentEntitySectionManager<Entity>) this.entitySectionManager.get(worldServer);
+                    if (this.entityLookup == null) {
+                        this.entityLookup = esm.getClass().getDeclaredField("visibleEntityStorage");
+                    }
+                    final EntityLookup<Entity> lookup = (EntityLookup<Entity>) this.entityLookup.get(esm);
+                    lookup.remove(entityPlayer);
                 } catch (final NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
 
-                entityPlayer.server.getPlayerList().moveToWorld(entityPlayer, dimensionManager,
-                    true, originLocation, true);
+                // pre 1.18 code = PlayerList#moveToWorld
+                entityPlayer.server.getPlayerList().remove(entityPlayer);
+                worldServer.getServer().getPlayerList().respawn(entityPlayer, worldServer, true, originLocation, true);
 
                 // Apply health and foodLevel
                 player.setHealth(health);
@@ -237,18 +229,18 @@ public class NMSImpl implements NMS {
         if (craftWorld == null) {
             return null;
         }
-        return EntityHuman.getBed(craftWorld.getHandle(), new BlockPosition(spawnLocation.getBlockX(),
-            spawnLocation.getBlockY(), spawnLocation.getBlockZ()), true)
-            .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.getX(), vec3D.getY(), vec3D.getZ()))
-            .orElse(null);
+        return net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(craftWorld.getHandle(), new BlockPos(spawnLocation.getBlockX(),
+                                                                            spawnLocation.getBlockY(), spawnLocation.getBlockZ()), 0, true, false)
+                          .map(vec3D -> new Location(spawnLocation.getWorld(), vec3D.x(), vec3D.y(), vec3D.z()))
+                          .orElse(null);
     }
 
-    private static NBTTagList doubleList(final double... values) {
-        final NBTTagList nbttaglist = new NBTTagList();
+    private static ListTag doubleList(final double... values) {
+        final ListTag tagList = new ListTag();
         for (final double d : values) {
-            nbttaglist.add(new NBTTagDouble(d));
+            tagList.add(DoubleTag.valueOf(d));
         }
-        return nbttaglist;
+        return tagList;
     }
 
 }

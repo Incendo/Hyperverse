@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Hyperverse</artifactId>
         <groupId>se.hyperver.hyperverse</groupId>
-        <version>0.10.0-SNAPSHOT</version>
+        <version>0.11.0-SNAPSHOT</version>
     </parent>
 
     <name>Core</name>
@@ -28,16 +28,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.17.1-R0.1-SNAPSHOT</version>
             <classifier>javadoc</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.17.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -47,9 +47,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.17.1-R0.1-SNAPSHOT</version>
             <classifier>sources</classifier>
             <scope>provided</scope>
         </dependency>
@@ -223,37 +223,19 @@
         </dependency>
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>Nms-1_14_4</artifactId>
-            <version>${parent.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>Nms-1_15_2</artifactId>
-            <version>${parent.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>Nms-1_16_5</artifactId>
-            <version>${parent.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>se.hyperver.hyperverse</groupId>
             <artifactId>Nms-1_17_1</artifactId>
             <version>${parent.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>Nms-1_18_1</artifactId>
+            <artifactId>Nms-1_18_2</artifactId>
             <version>${parent.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>Nms-1_18_2</artifactId>
+            <artifactId>Nms-1_19</artifactId>
             <version>${parent.version}</version>
             <scope>runtime</scope>
         </dependency>
@@ -266,8 +248,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.10.0</version>
                 <configuration>
+                    <release>17</release>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
@@ -309,7 +292,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

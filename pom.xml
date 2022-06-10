@@ -6,7 +6,7 @@
     <groupId>se.hyperver.hyperverse</groupId>
     <artifactId>Hyperverse</artifactId>
     <!-- Loosely based on https://semver.org/spec/v2.0.0.html -->
-    <version>0.10.0-SNAPSHOT</version>
+    <version>0.11.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>
     <licenses>
@@ -42,12 +42,9 @@
         <module>Core</module>
         <module>AnnotationProcessor</module>
         <module>NmsCommon</module>
-        <module>Nms-1_14_4</module>
-        <module>Nms-1_15_2</module>
-        <module>Nms-1_16_5</module>
         <module>Nms-1_17_1</module>
-        <module>Nms-1_18_1</module>
         <module>Nms-1_18_2</module>
+        <module>Nms-1_19</module>
     </modules>
 
     <build>
@@ -62,7 +59,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
+                <version>3.0.0-M1</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -89,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -159,12 +156,6 @@
         <repository>
             <id>ender.zone</id>
             <url>https://ci.ender.zone/plugin/repository/everything/</url>
-        </repository>
-
-        <repository>
-            <!-- This repository is last because it only supplies Spigot jars versions. -->
-            <id>proxi-nexus</id>
-            <url>https://nexus.proximyst.com/repository/maven-public/</url>
         </repository>
     </repositories>
 

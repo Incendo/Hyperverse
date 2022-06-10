@@ -17,6 +17,7 @@
 
 package se.hyperver.hyperverse.util;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -69,6 +70,11 @@ public final class NullRouteCommandSender implements CommandSender {
 
     @Override @NotNull public Spigot spigot() {
         return new Spigot();
+    }
+
+    // @Override
+    public @NotNull Component name() {
+        return Component.text("null");
     }
 
     @Override public boolean isPermissionSet(@NotNull String name) {
