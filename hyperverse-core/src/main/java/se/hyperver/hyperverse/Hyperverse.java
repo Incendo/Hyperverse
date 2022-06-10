@@ -365,7 +365,6 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
                         .emitJsonCompatible(false)
                         .path(messagePath)
                         .build();
-
         ConfigurationNode translationNode;
         try {
             translationNode = loader.load();
@@ -387,7 +386,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         final Collection<String> messageKeys = new ArrayList<>(messages.keySet());
         for (final String key : messageKeys) {
             final ConfigurationNode messageNode = translationNode.node(key);
-            if (messageNode.virtual()) {
+            if (messageNode.empty()) {
                 try {
                     messageNode.set(messages.get(key));
                 } catch (SerializationException ex) {
