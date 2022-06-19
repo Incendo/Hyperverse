@@ -287,7 +287,8 @@
                         <arg>-parameters</arg>
                     </compilerArgs>
                     <annotationProcessors>
-                        <annotationProcessor>se.hyperver.hyperverse.commands.CommandAnnotationProcessor</annotationProcessor>
+                        <annotationProcessor>se.hyperver.hyperverse.commands.CommandAnnotationProcessor
+                        </annotationProcessor>
                     </annotationProcessors>
                 </configuration>
             </plugin>
@@ -333,6 +334,16 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
