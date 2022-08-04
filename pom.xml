@@ -31,7 +31,7 @@
         <module>NmsCommon</module>
         <module>Nms-1_17_1</module>
         <module>Nms-1_18_2</module>
-        <module>Nms-1_19</module>
+        <module>Nms-1_19_1</module>
     </modules>
 
     <build>

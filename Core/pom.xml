@@ -267,7 +267,7 @@
         </dependency>
         <dependency>
             <groupId>se.hyperver.hyperverse</groupId>
-            <artifactId>Nms-1_19</artifactId>
+            <artifactId>Nms-1_19_1</artifactId>
             <version>${parent.version}</version>
             <scope>runtime</scope>
         </dependency>
