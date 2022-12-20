@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>Nms-1_19_1</artifactId>
+  <artifactId>Nms-1_19_3</artifactId>
 
   <licenses>
     <license>
@@ -30,13 +30,13 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.19.1-R0.1-SNAPSHOT</version>
+      <version>1.19.3-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.19.1-R0.1-SNAPSHOT</version>
+      <version>1.19.3-R0.1-SNAPSHOT</version>
       <classifier>remapped-mojang</classifier>
       <scope>provided</scope>
     </dependency>
