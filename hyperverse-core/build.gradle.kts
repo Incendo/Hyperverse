@@ -40,6 +40,7 @@ dependencies {
     implementation(projects.hyperverseNmsUnsupported)
     runtimeOnly(project(":hyperverse-nms-1-17", "reobf"))
     runtimeOnly(project(":hyperverse-nms-1-18", "reobf"))
+    runtimeOnly(project(":hyperverse-nms-1-19", "reobf"))
 }
 
 tasks {
