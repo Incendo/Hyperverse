@@ -13,7 +13,7 @@ import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
     val indraVersion = "3.0.1"
-    id("net.kyori.indra") version indraVersion apply false
+    id("net.kyori.indra") version indraVersion
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("com.github.hierynomus.license") version "0.16.1" apply false
