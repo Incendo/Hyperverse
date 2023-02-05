@@ -13,7 +13,7 @@ java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 dependencies {
     api(projects.hyperverseNmsCommon)
 
-    compileOnlyApi("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnlyApi(libs.paper)
 
     compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.2.2")
     compileOnly("com.bergerkiller.bukkit:MyWorlds:1.18.1-v2")
@@ -21,19 +21,19 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.10.9")
 
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
-    implementation("co.aikar:taskchain-bukkit:3.7.2")
-    implementation("io.papermc:paperlib:1.0.8")
-    implementation("com.google.inject:guice:5.1.0") {
+    implementation(libs.taskchain)
+    implementation(libs.paperlib)
+    implementation(libs.guice) {
         exclude("com.google.guava", "guava")
     }
-    implementation("com.google.inject.extensions:guice-assistedinject:5.1.0") {
+    implementation(libs.assistedInject) {
         exclude("com.google.guava", "guava")
     }
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.spongepowered:configurate-hocon:4.1.2")
-    implementation("cloud.commandframework:cloud-paper:1.8.0")
-    implementation("cloud.commandframework:cloud-minecraft-extras:1.8.0")
-    implementation("cloud.commandframework:cloud-annotations:1.8.0")
+    implementation(libs.cloudPaper)
+    implementation(libs.cloudMinecraftExtras)
+    implementation(libs.cloudMinecraftExtras)
     implementation("net.kyori:adventure-platform-bukkit:4.2.0")
     implementation("net.kyori:adventure-text-minimessage:4.12.0")
 

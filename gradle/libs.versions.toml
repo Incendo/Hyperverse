@@ -5,6 +5,8 @@ minecraft = "1.17.1-R0.1-SNAPSHOT"
 # Libraries
 cloud = "1.8.0"
 guice = "5.1.0"
+paperlib = "1.0.8"
+taskchain = "3.7.2"
 
 # Gradle plugins
 paperweight = "1.4.1"
@@ -19,7 +21,8 @@ cloudMinecraftExtras = { group = "cloud.commandframework", name = "cloud-minecra
 cloudAnnotations = { group = "cloud.commandframework", name = "cloud-annotations", version.ref = "cloud" }
 guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 assistedInject = { group = "com.google.inject.extensions", name = "guice-assistedinject", version.ref = "guice" }
-
+paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib"}
+taskchain = { group = "co.aikar", name = "taskchain-bukkit", version.ref = "taskchain" }
 
 [plugins]
 # Gradle plugins
