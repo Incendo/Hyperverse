@@ -22,20 +22,20 @@ dependencies {
 
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
     implementation("co.aikar:taskchain-bukkit:3.7.2")
-    implementation("io.papermc:paperlib:1.0.7")
-    implementation("com.google.inject:guice:5.0.1") {
+    implementation("io.papermc:paperlib:1.0.8")
+    implementation("com.google.inject:guice:5.1.0") {
         exclude("com.google.guava", "guava")
     }
-    implementation("com.google.inject.extensions:guice-assistedinject:5.0.1") {
+    implementation("com.google.inject.extensions:guice-assistedinject:5.1.0") {
         exclude("com.google.guava", "guava")
     }
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.spongepowered:configurate-hocon:4.1.2")
-    implementation("cloud.commandframework:cloud-paper:1.6.1")
-    implementation("cloud.commandframework:cloud-minecraft-extras:1.6.1")
-    implementation("cloud.commandframework:cloud-annotations:1.6.1")
-    implementation("net.kyori:adventure-platform-bukkit:4.0.1")
-    implementation("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
+    implementation("cloud.commandframework:cloud-paper:1.8.0")
+    implementation("cloud.commandframework:cloud-minecraft-extras:1.8.0")
+    implementation("cloud.commandframework:cloud-annotations:1.8.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.2.0")
+    implementation("net.kyori:adventure-text-minimessage:4.12.0")
 
     implementation(projects.hyperverseNmsUnsupported)
     runtimeOnly(project(":hyperverse-nms-1-17", "reobf"))

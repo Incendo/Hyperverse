@@ -94,7 +94,7 @@ final class HyperverseExpansion extends PlaceholderExpansion {
 
         switch (identifier.toLowerCase()) {
             case "world_display_name":
-                return MiniMessage.get().stripTokens(hyperWorld.getDisplayName());
+                return MiniMessage.miniMessage().escapeTags(hyperWorld.getDisplayName());
             case "world_name":
                 return worldConfiguration.getName();
             case "world_generator":

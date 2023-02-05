@@ -35,7 +35,7 @@ import java.util.Objects;
 public final class MessageUtil {
 
     private static final BukkitAudiences AUDIENCES = BukkitAudiences.create(JavaPlugin.getPlugin(Hyperverse.class));
-    private static final MiniMessage MINI_MESSAGE = MiniMessage.get();
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
     private MessageUtil() {
     }
@@ -91,7 +91,7 @@ public final class MessageUtil {
             } else {
                 prefixedMessage = Messages.messagePrefixFancy.toString() + replacedMessage;
             }
-            AUDIENCES.sender(recipient).sendMessage(MINI_MESSAGE.parse(prefixedMessage));
+            AUDIENCES.sender(recipient).sendMessage(MINI_MESSAGE.deserialize(prefixedMessage));
         } else {
             final String prefixedMessage = ChatColor.translateAlternateColorCodes(
                     '&',
