@@ -4,7 +4,7 @@ import net.kyori.indra.IndraExtension
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
 import net.kyori.indra.IndraCheckstylePlugin
-import net.kyori.indra.repository.sonatypeSnapshots
+import net.kyori.indra.repository.SonatypeRepositories
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
 import nl.javadude.gradle.plugins.license.LicenseExtension
@@ -12,14 +12,14 @@ import org.gradle.api.plugins.JavaPlugin.*
 import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
-    val indraVersion = "2.0.6"
+    val indraVersion = "3.0.1"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("com.github.hierynomus.license") version "0.16.1" apply false
-    id("com.github.johnrengelman.shadow") version "7.1.0" apply false
-    id("net.ltgt.errorprone") version "2.0.2" apply false
-    id("com.github.ben-manes.versions") version "0.39.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+    id("net.ltgt.errorprone") version "3.0.1" apply false
+    id("com.github.ben-manes.versions") version "0.45.0"
     idea
 }
 
@@ -111,7 +111,7 @@ subprojects {
 
     repositories {
         mavenCentral()
-        sonatypeSnapshots()
+        sonatype.ossSnapshots()
 
         maven("https://oss.sonatype.org/content/repositories/releases") {
             mavenContent {
