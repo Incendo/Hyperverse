@@ -1,9 +1,5 @@
 plugins {
-<<<<<<< HEAD
-    id("io.papermc.paperweight.userdev") version "1.4.1"
-=======
     id("io.papermc.paperweight.userdev") version "1.5.3"
->>>>>>> 216db5c (Fix dependencies)
 }
 
 dependencies {
