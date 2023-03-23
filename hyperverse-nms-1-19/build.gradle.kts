@@ -1,9 +1,9 @@
 plugins {
-    id("io.papermc.paperweight.userdev") version "1.4.1"
+    id("io.papermc.paperweight.userdev") version "1.5.3"
 }
 
 dependencies {
-    paperDevBundle("1.19.3-R0.1-SNAPSHOT")
+    paperDevBundle("1.19.4-R0.1-SNAPSHOT")
     compileOnly(projects.hyperverseNmsCommon)
 }
 

@@ -15,7 +15,7 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.spigotnms.v1_19_R2;
+package se.hyperver.hyperverse.spigotnms.v1_19_R3;
 
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
@@ -49,9 +49,9 @@ import org.apache.logging.log4j.core.filter.RegexFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
