@@ -120,7 +120,7 @@ subprojects {
         }
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.aikar.co/content/groups/aikar/")
-        maven("https://papermc.io/repo/repository/maven-public/")
+        maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.codemc.org/repository/maven-public/")
         maven("https://repo.spongepowered.org/maven")
         maven("https://repo.onarandombox.com/content/repositories/multiverse/")

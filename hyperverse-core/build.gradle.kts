@@ -34,8 +34,8 @@ dependencies {
     implementation(libs.cloudPaper)
     implementation(libs.cloudMinecraftExtras)
     implementation(libs.cloudMinecraftExtras)
-    implementation("net.kyori:adventure-platform-bukkit:4.2.0")
-    implementation("net.kyori:adventure-text-minimessage:4.12.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.3.0")
+    implementation("net.kyori:adventure-text-minimessage:4.1.13")
 
     implementation(projects.hyperverseNmsUnsupported)
     runtimeOnly(project(":hyperverse-nms-1-17", "reobf"))
