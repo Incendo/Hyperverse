@@ -74,7 +74,7 @@ public final class NullRouteCommandSender implements CommandSender {
     public @NonNull String getName() {
         return "null";
     }
-    
+
     public @NotNull Component name() {
         return Component.text("null");
     }
