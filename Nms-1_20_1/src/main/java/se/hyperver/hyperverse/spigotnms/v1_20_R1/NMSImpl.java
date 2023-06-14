@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.spigotnms.v1_19_R2;
+package se.hyperver.hyperverse.spigotnms.v1_20_R1;
 
 import cloud.commandframework.tasks.TaskFactory;
 import com.google.inject.Inject;
@@ -49,10 +49,11 @@ import org.apache.logging.log4j.core.filter.RegexFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
@@ -213,7 +214,7 @@ public class NMSImpl implements NMS {
 
                 // pre 1.18 code = PlayerList#moveToWorld
                 entityPlayer.server.getPlayerList().remove(entityPlayer);
-                worldServer.getServer().getPlayerList().respawn(entityPlayer, worldServer, true, originLocation, true);
+                worldServer.getServer().getPlayerList().respawn(entityPlayer, worldServer, true, originLocation, true, PlayerRespawnEvent.RespawnReason.PLUGIN);
 
                 // Apply health and foodLevel
                 player.setHealth(health);
