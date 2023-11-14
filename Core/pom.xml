@@ -277,6 +277,12 @@
             <version>${parent.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>se.hyperver.hyperverse</groupId>
+            <artifactId>Nms-1_20_2</artifactId>
+            <version>${parent.version}</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
