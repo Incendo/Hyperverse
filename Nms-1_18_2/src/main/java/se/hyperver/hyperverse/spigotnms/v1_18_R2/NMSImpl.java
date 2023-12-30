@@ -96,10 +96,10 @@ public class NMSImpl implements NMS {
         final WorldBorder worldBorder = worldServer.getWorldBorder();
         Optional<BlockUtil.FoundRectangle> portalShape = Objects.requireNonNull(portalTravelAgent, "travel agent")
                                                            .findPortalAround(Objects.requireNonNull(blockPosition, "position"), worldBorder,128);
-        if (!portalShape.isPresent()) {
+        if (portalShape.isEmpty()) {
             portalShape = portalTravelAgent.createPortal(blockPosition, nmsEntity.getDirection().getAxis(), nmsEntity,  16);
         }
-        if (!portalShape.isPresent()) {
+        if (portalShape.isEmpty()) {
             return null;
         }
         final BlockUtil.FoundRectangle rectangle = portalShape.get();
@@ -145,8 +145,8 @@ public class NMSImpl implements NMS {
                 e.printStackTrace();
             }
             return Optional.empty();
-        }).synchronous((optionalCompound) -> {
-            if (!optionalCompound.isPresent()) {
+        }).synchronous(optionalCompound -> {
+            if (optionalCompound.isEmpty()) {
                 return;
             }
             final CompoundTag compound = (CompoundTag) optionalCompound.get();
@@ -181,8 +181,8 @@ public class NMSImpl implements NMS {
                 entityPlayer.reset();
                 entityPlayer.load(compound);
 
-                // entityPlayer.updateEffects = true;
-                // entityPlayer.updateAbilities();
+                entityPlayer.effectsDirty = true;
+                entityPlayer.onUpdateAbilities();
                 player.teleport(originLocation);
 
                 final ServerLevel worldServer = ((CraftWorld) originLocation.getWorld()).getHandle();
