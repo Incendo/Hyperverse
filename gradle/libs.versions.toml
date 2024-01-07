@@ -3,13 +3,13 @@
 minecraft = "1.17.1-R0.1-SNAPSHOT"
 
 # Libraries
-cloud = "1.8.0"
+cloud = "1.8.4"
 guice = "5.1.0"
 paperlib = "1.0.8"
 taskchain = "3.7.2"
 
 # Gradle plugins
-paperweight = "1.4.1"
+paperweight = "1.5.10"
 
 [libraries]
 # Platform
