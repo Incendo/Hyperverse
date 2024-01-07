@@ -41,6 +41,7 @@ dependencies {
     runtimeOnly(project(":hyperverse-nms-1-17", "reobf"))
     runtimeOnly(project(":hyperverse-nms-1-18", "reobf"))
     runtimeOnly(project(":hyperverse-nms-1-19", "reobf"))
+    runtimeOnly(project(":hyperverse-nms-1-20", "reobf"))
 }
 
 tasks {
@@ -55,6 +56,8 @@ tasks {
             exclude(project(":hyperverse-nms-unsupported"))
             exclude(project(":hyperverse-nms-1-17"))
             exclude(project(":hyperverse-nms-1-18"))
+            exclude(project(":hyperverse-nms-1-19"))
+            exclude(project(":hyperverse-nms-1-20"))
         }
         mergeServiceFiles()
 
