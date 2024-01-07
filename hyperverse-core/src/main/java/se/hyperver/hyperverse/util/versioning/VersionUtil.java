@@ -21,8 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 public final class VersionUtil {
 
-    public static final VersionData MC_1_17_1 = new VersionData(1, 17, 1);
-
     private VersionUtil() {
         throw new IllegalStateException("Cannot instantiate static utility class");
     }

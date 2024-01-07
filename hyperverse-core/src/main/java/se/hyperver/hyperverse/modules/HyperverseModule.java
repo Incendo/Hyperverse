@@ -23,7 +23,6 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.internal.ProviderMethodsModule;
-import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.Plugin;
@@ -38,7 +37,9 @@ import se.hyperver.hyperverse.events.SimpleHyperEventFactory;
 import se.hyperver.hyperverse.flags.FlagContainer;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
 import se.hyperver.hyperverse.flags.WorldFlagContainer;
-import se.hyperver.hyperverse.spigotnms.unsupported.NMSImpl;
+import se.hyperver.hyperverse.platform.PlatformProvider;
+import se.hyperver.hyperverse.platform.PlatformProvisionException;
+import se.hyperver.hyperverse.platform.unsupported.NMSImpl;
 import se.hyperver.hyperverse.teleportation.SimpleTeleportationManager;
 import se.hyperver.hyperverse.teleportation.TeleportationManager;
 import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
@@ -55,28 +56,25 @@ import java.util.logging.Logger;
 
 public final class HyperverseModule extends AbstractModule {
 
-    private static final @NonNull String CRAFTSERVER_CLASS_NAME = Bukkit.getServer().getClass().getName();
-    private static final @NonNull String PACKAGE_VERSION =
-            CRAFTSERVER_CLASS_NAME.substring(
-                    "org.bukkit.craftbukkit.".length(),
-                    CRAFTSERVER_CLASS_NAME.indexOf('.', "org.bukkit.craftbukkit.".length())
-            );
-
     private final Logger logger;
     private final Hyperverse hyperverse;
     private final ServicePipeline servicePipeline;
     private final Server server;
 
+    private final PlatformProvider platformProvider;
+
     public HyperverseModule(
             final @NonNull Logger logger,
             final @NonNull ServicePipeline servicePipeline,
             final @NonNull Server server,
+            final @NonNull PlatformProvider platformProvider,
             final @NonNull Hyperverse hyperverse
     ) {
         this.logger = logger;
         this.hyperverse = hyperverse;
         this.servicePipeline = servicePipeline;
         this.server = server;
+        this.platformProvider = platformProvider;
     }
 
     @Override
@@ -88,8 +86,8 @@ public final class HyperverseModule extends AbstractModule {
         // Resolve the NMS implementation
         Class<? extends  NMS> nmsAdapter;
         try {
-            nmsAdapter = (Class<? extends NMS>) Class.forName("se.hyperver.hyperverse.spigotnms." + PACKAGE_VERSION + ".NMSImpl");
-        } catch (final ClassNotFoundException ex) {
+            nmsAdapter = this.platformProvider.providePlatform();
+        } catch (final PlatformProvisionException ex) {
             new RuntimeException("Server version unsupported", ex).printStackTrace();
             this.logger.severe(
                     "Could not find a compatible NMS adapter. Some of Hyperverse's functionality will fail exceptionally."

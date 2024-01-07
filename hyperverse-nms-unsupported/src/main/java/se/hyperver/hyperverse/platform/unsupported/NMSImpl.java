@@ -15,7 +15,7 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.spigotnms.unsupported;
+package se.hyperver.hyperverse.platform.unsupported;
 
 import org.bukkit.Location;
 import org.bukkit.World;

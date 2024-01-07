@@ -15,7 +15,7 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-package se.hyperver.hyperverse.spigotnms.v1_18_R2;
+package se.hyperver.hyperverse.platform.v1_18_2;
 
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
