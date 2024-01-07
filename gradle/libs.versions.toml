@@ -1,4 +1,11 @@
 [versions]
+cloud-build-logic = "0.0.1-SNAPSHOT"
+ktlint = "0.50.0"
+checkstyle = "10.12.5"
+kotlin = "1.9.20"
+shadow = "8.1.1"
+paperweight = "1.5.10"
+
 # Platforms
 minecraft = "1.17.1-R0.1-SNAPSHOT"
 
@@ -7,11 +14,19 @@ cloud = "1.8.4"
 guice = "5.1.0"
 paperlib = "1.0.8"
 taskchain = "3.7.2"
+bstats = "3.0.2"
+configurate = "4.1.2"
 
-# Gradle plugins
-paperweight = "1.5.10"
+# Minecraft Plugins
+multiverse = "4.3.1"
+myworlds = "1.20.4-v3"
+essentialsx = "2.20.1"
+placeholderapi = "2.11.5"
 
 [libraries]
+cloud-build-logic = { module = "org.incendo:cloud-build-logic", version.ref = "cloud-build-logic" }
+gradleKotlinJvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
+
 # Platform
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "minecraft" }
 
@@ -23,7 +38,18 @@ guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 assistedInject = { group = "com.google.inject.extensions", name = "guice-assistedinject", version.ref = "guice" }
 paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib"}
 taskchain = { group = "co.aikar", name = "taskchain-bukkit", version.ref = "taskchain" }
+bstats = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
+configurateHocon = { group = "org.spongepowered", name = "configurate-hocon", version.ref = "configurate"}
+
+# Minecraft Plugins
+multiverse = { group = "com.onarandombox.multiversecore", name = "Multiverse-Core", version.ref = "multiverse" }
+myworlds = { group = "com.bergerkiller.bukkit", name = "MyWorlds", version.ref = "myworlds" }
+essentialsx = { group = "net.essentialsx", name = "EssentialsX", version.ref = "essentialsx" }
+placeholderapi = { group = "me.clip", name = "placeholderapi", version.ref = "placeholderapi" }
 
 [plugins]
-# Gradle plugins
 paperweightUserdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+cloud-buildLogic-spotless = { id = "org.incendo.cloud-build-logic.spotless", version.ref = "cloud-build-logic" }
+cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.publishing.root-project", version.ref = "cloud-build-logic" }
+cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

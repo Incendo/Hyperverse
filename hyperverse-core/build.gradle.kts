@@ -1,25 +1,26 @@
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 
 plugins {
-    id("com.github.johnrengelman.shadow")
+    id("hyperverse.base-conventions")
+    id("hyperverse.publishing-conventions")
+    alias(libs.plugins.shadow)
 }
 
 apply {
     plugin<ShadowPlugin>()
 }
 
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-
 dependencies {
     api(projects.hyperverseNmsCommon)
 
     compileOnlyApi(libs.paper)
 
-    compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.3.1")
-    compileOnly("com.bergerkiller.bukkit:MyWorlds:1.20.4-v3")
-    compileOnly("net.essentialsx:EssentialsX:2.20.1")
-    compileOnly("me.clip:placeholderapi:2.11.5")
+    compileOnly(libs.multiverse)
+    compileOnly(libs.myworlds)
+    compileOnly(libs.essentialsx)
+    compileOnly(libs.placeholderapi)
 
+    // TODO: Remove, because yuck.
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation(libs.taskchain)
     implementation(libs.paperlib)
@@ -29,11 +30,13 @@ dependencies {
     implementation(libs.assistedInject) {
         exclude("com.google.guava", "guava")
     }
-    implementation("org.bstats:bstats-bukkit:3.0.2")
-    implementation("org.spongepowered:configurate-hocon:4.1.2")
+    implementation(libs.bstats)
+    implementation(libs.configurateHocon)
     implementation(libs.cloudPaper)
     implementation(libs.cloudMinecraftExtras)
     implementation(libs.cloudMinecraftExtras)
+
+    // TODO: Remove and use native versions.
     implementation("net.kyori:adventure-platform-bukkit:4.3.2")
     implementation("net.kyori:adventure-text-minimessage:4.14.0")
 
