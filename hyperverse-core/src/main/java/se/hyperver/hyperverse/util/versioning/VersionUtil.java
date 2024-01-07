@@ -15,14 +15,19 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 package se.hyperver.hyperverse.util.versioning;
 
-public class VersionUtil {
+import org.jetbrains.annotations.NotNull;
 
-    public static VersionData MC_1_17_1 = new VersionData(1, 17, 1);
+public final class VersionUtil {
 
-    public static Version parseMinecraftVersion(String minecraftVersion) {
+    public static final VersionData MC_1_17_1 = new VersionData(1, 17, 1);
+
+    private VersionUtil() {
+        throw new IllegalStateException("Cannot instantiate static utility class");
+    }
+
+    public static @NotNull Version parseMinecraftVersion(@NotNull final String minecraftVersion) throws IllegalArgumentException {
         // Expecting 1.X.X-R0.1-SNAPSHOT
         int stripLength = "-R0.1-SNAPSHOT".length();
         int length = minecraftVersion.length();

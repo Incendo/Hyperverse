@@ -9,6 +9,7 @@ import net.ltgt.gradle.errorprone.errorprone
 import nl.javadude.gradle.plugins.license.LicenseExtension
 import org.gradle.api.plugins.JavaPlugin.*
 import org.gradle.kotlin.dsl.support.serviceOf
+import java.nio.charset.StandardCharsets
 
 plugins {
     val indraVersion = "3.1.3"
@@ -30,16 +31,12 @@ apply<IdeaPlugin>()
 
 val targetJavaVersion = 17
 
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-
 subprojects {
     apply<IndraPlugin>()
     apply<IndraPublishingPlugin>()
     apply<ErrorPronePlugin>()
     apply<LicenseBasePlugin>()
     apply<IdeaPlugin>()
-
-    java.toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
 
     if (this.name.startsWith("hyperverse-nms").not()) {
         apply<IndraCheckstylePlugin>()
@@ -59,6 +56,7 @@ subprojects {
         gpl3OnlyLicense()
 
         javaVersions {
+            target(targetJavaVersion)
             testWith(targetJavaVersion)
         }
         checkstyle("8.39")
@@ -82,9 +80,7 @@ subprojects {
 
     tasks {
         withType(JavaCompile::class) {
-            javaCompiler.set(serviceOf<JavaToolchainService>().compilerFor {
-                languageVersion.set(JavaLanguageVersion.of(17))
-            })
+            javaCompiler.set(serviceOf<JavaToolchainService>().compilerFor(java.toolchain))
             options.release.set(targetJavaVersion)
 
             options.errorprone {
@@ -105,9 +101,8 @@ subprojects {
         }
 
         withType(Javadoc::class) {
-            javadocTool.set(serviceOf<JavaToolchainService>().javadocToolFor {
-                languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-            })
+            javadocTool.set(serviceOf<JavaToolchainService>().javadocToolFor(java.toolchain))
+            options.encoding = StandardCharsets.UTF_8.name()
         }
 
         named("check") {

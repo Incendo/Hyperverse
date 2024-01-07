@@ -18,10 +18,12 @@
 
 package se.hyperver.hyperverse.util.versioning;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public record Version(String original, VersionData versionData) {
+public record Version(@NotNull String original, @NotNull VersionData versionData) {
 
     /**
      * Semver pattern, cg1 = major, cg2 = minor, cg3 = patch, cg4 = prerelease and cg5 = buildmetadata
@@ -31,7 +33,7 @@ public record Version(String original, VersionData versionData) {
             "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
 
 
-    public static Version parse(String version) {
+    public static @NotNull Version parse(@NotNull final String version) throws IllegalArgumentException {
         Matcher matcher = SEMVER_PATTERN.matcher(version);
         if (!matcher.find()) {
             throw new IllegalArgumentException("Invalid version: " + version);
@@ -65,7 +67,7 @@ public record Version(String original, VersionData versionData) {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return this.original;
     }
 

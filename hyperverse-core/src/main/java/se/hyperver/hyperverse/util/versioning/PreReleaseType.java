@@ -15,8 +15,9 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 package se.hyperver.hyperverse.util.versioning;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -34,12 +35,12 @@ public enum PreReleaseType {
 
     private final String asString;
 
-    PreReleaseType(String asString) {
+    PreReleaseType(@NotNull final String asString) {
         this.asString = asString;
     }
 
     @Nullable
-    public static PreReleaseType parse(String release) {
+    public static PreReleaseType parse(@NotNull final String release) {
         if (release.isEmpty()) {
             return null;
         }
@@ -52,7 +53,7 @@ public enum PreReleaseType {
         return UNKNOWN;
     }
 
-    public String asString() {
+    public @NotNull String asString() {
         return this.asString;
     }
 }

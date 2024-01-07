@@ -19,6 +19,7 @@
 package se.hyperver.hyperverse.util;
 
 import com.bergerkiller.bukkit.mw.WorldConfig;
+import com.bergerkiller.bukkit.mw.WorldConfigStore;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.bukkit.World;
@@ -28,7 +29,6 @@ import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.exception.HyperWorldValidationException;
 import se.hyperver.hyperverse.flags.implementation.CreatureSpawnFlag;
 import se.hyperver.hyperverse.flags.implementation.DifficultyFlag;
-import se.hyperver.hyperverse.flags.implementation.ForceSpawn;
 import se.hyperver.hyperverse.flags.implementation.GamemodeFlag;
 import se.hyperver.hyperverse.flags.implementation.LocalRespawnFlag;
 import se.hyperver.hyperverse.flags.implementation.MobSpawnFlag;
@@ -64,7 +64,7 @@ public final class MyWorldsImporter {
     }
 
     public void performImport(final @NonNull CommandSender sender) {
-        Collection<WorldConfig> worlds = WorldConfig.all();
+        Collection<WorldConfig> worlds = WorldConfigStore.all();
         MessageUtil
                 .sendMessage(sender, Messages.messageImportPluginInitializing, "%plugin%", "My_Worlds",
                         "%worlds%", String.valueOf(worlds.size())
@@ -96,12 +96,12 @@ public final class MyWorldsImporter {
                                 configuration
                         );
                 this.worldManager.addWorld(hyperWorld);
-                if (config.spawnPoint != null) {
+                if (config.getSpawnLocation() != null) {
                     try {
                         hyperWorld.createBukkitWorld();
                         assert hyperWorld.getBukkitWorld() != null;
                         hyperWorld.getBukkitWorld()
-                                .setSpawnLocation(config.spawnPoint.toLocation());
+                                .setSpawnLocation(config.getSpawnLocation());
                     } catch (HyperWorldValidationException ex) {
                         ex.printStackTrace();
                         MessageUtil.sendMessage(sender, Messages.messageCreationUnknownFailure);
@@ -109,8 +109,6 @@ public final class MyWorldsImporter {
                     }
                 }
             }
-            hyperWorld.setFlagInstance(
-                    config.forcedRespawn ? ForceSpawn.FORCE_SPAWN_TRUE : ForceSpawn.FORCE_SPAWN_FALSE);
             if (config.gameMode != null) {
                 hyperWorld.setFlagInstance(
                         GamemodeFlag.GAMEMODE_CREATIVE.createFlagInstance(config.gameMode));

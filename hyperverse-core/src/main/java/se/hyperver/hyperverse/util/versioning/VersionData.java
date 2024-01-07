@@ -23,30 +23,30 @@ import org.jetbrains.annotations.NotNull;
 public record VersionData(int major, int minor, int patch, PreReleaseType preReleaseType)
         implements Comparable<VersionData> {
 
-    public VersionData(int major, int minor, int patch) {
+    public VersionData(final int major, final int minor, final int patch) {
         this(major, minor, patch, null);
     }
 
-    public VersionData(int major, int minor) {
+    public VersionData(final int major, final int minor) {
         this(major, minor, 0);
     }
 
     @Override
-    public String toString() {
-        return String.format("%d.%d.%d", major, minor, patch);
+    public @NotNull String toString() {
+        return String.format("%d.%d.%d", this.major, this.minor, this.patch);
     }
 
-    public boolean isNewerThan(VersionData other) {
-        return compareTo(other) > 0;
+    public boolean isNewerThan(@NotNull final VersionData other) {
+        return this.compareTo(other) > 0;
     }
 
-    public boolean isOlderThan(VersionData other) {
-        return compareTo(other) < 0;
+    public boolean isOlderThan(@NotNull final VersionData other) {
+        return this.compareTo(other) < 0;
     }
 
 
     @Override
-    public int compareTo(@NotNull VersionData o) {
+    public int compareTo(@NotNull final VersionData o) {
         int majorComp = Integer.compare(this.major, o.major);
         if (majorComp != 0) {
             return majorComp;
