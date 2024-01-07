@@ -1,6 +1,6 @@
 [versions]
 # Platforms
-minecraft = "1.17.1-R0.1-SNAPSHOT"
+minecraft = "1.20.4-R0.1-SNAPSHOT"
 
 # Libraries
 cloud = "1.8.4"
