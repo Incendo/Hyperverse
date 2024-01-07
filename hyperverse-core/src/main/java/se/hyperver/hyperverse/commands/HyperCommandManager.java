@@ -1129,7 +1129,7 @@ public final class HyperCommandManager extends BaseCommand {
 
                 try {
                     final String rawResponse = incendoPaster.upload();
-                    final JsonObject jsonObject = new JsonParser().parse(rawResponse).getAsJsonObject();
+                    final JsonObject jsonObject = JsonParser.parseString(rawResponse).getAsJsonObject();
 
                     if (jsonObject.has("created")) {
                         final String pasteId = jsonObject.get("paste_id").getAsString();
