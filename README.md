@@ -7,7 +7,8 @@
 [![TeamCity](https://ci.intellectualsites.com/app/rest/builds/aggregated/strob:(buildType:(project:(id:Hyperverse_2)))/statusIcon.svg)](https://ci.intellectualsites.com/project.html?projectId=Hyperverse_2&tab=projectOverview&guest=1)
 [![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/hyperverse/badge)](https://www.codefactor.io/repository/github/sauilitired/hyperverse) ![Java CI with Maven](https://github.com/Sauilitired/Hyperverse/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-A Minecraft world management plugin for Bukkit 1.15 (backported to 1.14).
+A Minecraft world management plugin for Bukkit 1.17, 1.18, 1.19 and 1.20. 
+Only the latest minor version is support (i.e. 1.20.4 for 1.20.x)
 More versions may come to be supported in the future.
 
 ## Features
@@ -64,20 +65,20 @@ guidelines can be found in [CONTRIBUTING.md](https://github.com/Sauilitired/Hype
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
+      <version>0.11.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
+      <version>0.11.0-SNAPSHOT</version>
       <classifier>javadoc</classifier>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>se.hyperver.hyperverse</groupId>
       <artifactId>Core</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
+      <version>0.11.0-SNAPSHOT</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
     </dependency>
