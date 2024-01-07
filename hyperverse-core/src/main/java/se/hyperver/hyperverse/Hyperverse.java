@@ -56,8 +56,12 @@ import se.hyperver.hyperverse.listeners.WorldListener;
 import se.hyperver.hyperverse.modules.HyperWorldFactory;
 import se.hyperver.hyperverse.modules.HyperverseModule;
 import se.hyperver.hyperverse.modules.TaskFactoryModule;
+import se.hyperver.hyperverse.platform.PlatformProvider;
+import se.hyperver.hyperverse.platform.ReflectionPlatformProvider;
 import se.hyperver.hyperverse.service.internal.SafeTeleportService;
 import se.hyperver.hyperverse.util.MessageUtil;
+import se.hyperver.hyperverse.util.versioning.Version;
+import se.hyperver.hyperverse.util.versioning.VersionUtil;
 import se.hyperver.hyperverse.world.HyperWorld;
 import se.hyperver.hyperverse.world.HyperWorldCreator;
 import se.hyperver.hyperverse.world.WorldConfiguration;
@@ -69,6 +73,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -86,6 +91,13 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
     private final PluginFeatureManager pluginFeatureManager = new PluginFeatureManager(Bukkit.getServer());
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
+
+    private final List<Version> supportedVersions = List.of(
+            Version.parse("1.17.1"),
+            Version.parse("1.18.2"),
+            Version.parse("1.19.4"),
+            Version.parse("1.20.4")
+    );
 
     private WorldManager worldManager;
     private Injector injector;
@@ -120,10 +132,15 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
                 throw new RuntimeException("Could not create Hyperverse main directory");
             }
         }
+        Version currentMcVersion = VersionUtil.parseMinecraftVersion(Bukkit.getBukkitVersion());
+        if (!this.supportedVersions.contains(currentMcVersion)) {
+            throw new UnsupportedOperationException("Current mc version: " + currentMcVersion + "is not supported");
+        }
+        PlatformProvider platformProvider = new ReflectionPlatformProvider(currentMcVersion);
         try {
             this.injector = Guice.createInjector(
                     Stage.PRODUCTION,
-                    new HyperverseModule(getLogger(), this.servicePipeline, Bukkit.getServer(), this),
+                    new HyperverseModule(getLogger(), this.servicePipeline, Bukkit.getServer(), platformProvider, this),
                     new TaskFactoryModule()
             );
         } catch (final Exception e) {
