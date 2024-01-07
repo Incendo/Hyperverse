@@ -150,7 +150,7 @@
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-assistedinject</artifactId>
-            <version>5.1.0</version>
+            <version>7.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.inject</groupId>
