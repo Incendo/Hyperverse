@@ -9,7 +9,7 @@ paperlib = "1.0.8"
 taskchain = "3.7.2"
 
 # Gradle plugins
-paperweight = "1.5.10"
+paperweight = "1.5.11"
 
 [libraries]
 # Platform
