@@ -222,7 +222,7 @@
         <dependency>
             <groupId>cloud.commandframework</groupId>
             <artifactId>cloud-paper</artifactId>
-            <version>1.6.2</version>
+            <version>1.8.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
