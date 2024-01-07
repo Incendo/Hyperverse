@@ -53,6 +53,7 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import se.hyperver.hyperverse.util.HyperConfigShouldGroupProfiles;
@@ -213,7 +214,7 @@ public class NMSImpl implements NMS {
 
                 // pre 1.18 code = PlayerList#moveToWorld
                 entityPlayer.server.getPlayerList().remove(entityPlayer);
-                worldServer.getServer().getPlayerList().respawn(entityPlayer, worldServer, true, originLocation, true);
+                worldServer.getServer().getPlayerList().respawn(entityPlayer, worldServer, true, originLocation, true, PlayerRespawnEvent.RespawnReason.PLUGIN);
 
                 // Apply health and foodLevel
                 player.setHealth(health);
