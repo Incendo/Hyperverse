@@ -4,7 +4,6 @@ import net.kyori.indra.IndraExtension
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
 import net.kyori.indra.IndraCheckstylePlugin
-import net.kyori.indra.repository.SonatypeRepositories
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
 import nl.javadude.gradle.plugins.license.LicenseExtension
@@ -12,14 +11,14 @@ import org.gradle.api.plugins.JavaPlugin.*
 import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
-    val indraVersion = "3.0.1"
+    val indraVersion = "3.1.3"
     id("net.kyori.indra") version indraVersion
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("com.github.hierynomus.license") version "0.16.1" apply false
-    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
-    id("net.ltgt.errorprone") version "3.0.1" apply false
-    id("com.github.ben-manes.versions") version "0.45.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    id("net.ltgt.errorprone") version "3.1.0" apply false
+    id("com.github.ben-manes.versions") version "0.50.0"
     idea
 }
 
@@ -27,13 +26,20 @@ group = "se.hyperver.hyperverse"
 version = "0.11.0-SNAPSHOT"
 description = "Minecraft world management plugin"
 
-plugins.apply("idea")
+apply<IdeaPlugin>()
+
+val targetJavaVersion = 17
+
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
 
 subprojects {
     apply<IndraPlugin>()
     apply<IndraPublishingPlugin>()
     apply<ErrorPronePlugin>()
     apply<LicenseBasePlugin>()
+    apply<IdeaPlugin>()
+
+    java.toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
 
     if (this.name.startsWith("hyperverse-nms").not()) {
         apply<IndraCheckstylePlugin>()
@@ -53,7 +59,7 @@ subprojects {
         gpl3OnlyLicense()
 
         javaVersions {
-            testWith(17)
+            testWith(targetJavaVersion)
         }
         checkstyle("8.39")
 
@@ -79,7 +85,7 @@ subprojects {
             javaCompiler.set(serviceOf<JavaToolchainService>().compilerFor {
                 languageVersion.set(JavaLanguageVersion.of(17))
             })
-            options.release.set(17)
+            options.release.set(targetJavaVersion)
 
             options.errorprone {
                 /* These are just annoying */
@@ -100,7 +106,7 @@ subprojects {
 
         withType(Javadoc::class) {
             javadocTool.set(serviceOf<JavaToolchainService>().javadocToolFor {
-                languageVersion.set(JavaLanguageVersion.of(17))
+                languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
             })
         }
 
