@@ -1,5 +1,4 @@
 //
-//
 //  Hyperverse - A minecraft world management plugin
 //
 //  This program is free software: you can redistribute it and/or modify

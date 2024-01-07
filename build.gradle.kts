@@ -1,141 +1,41 @@
-import com.hierynomus.gradle.license.LicenseBasePlugin
-import com.hierynomus.gradle.license.tasks.LicenseCheck
-import net.kyori.indra.IndraExtension
-import net.kyori.indra.IndraPlugin
-import net.kyori.indra.IndraPublishingPlugin
-import net.kyori.indra.IndraCheckstylePlugin
-import net.ltgt.gradle.errorprone.ErrorPronePlugin
-import net.ltgt.gradle.errorprone.errorprone
-import nl.javadude.gradle.plugins.license.LicenseExtension
-import org.gradle.api.plugins.JavaPlugin.*
-import org.gradle.kotlin.dsl.support.serviceOf
-import java.nio.charset.StandardCharsets
-
 plugins {
-    val indraVersion = "3.1.3"
-    id("net.kyori.indra") version indraVersion
-    id("net.kyori.indra.checkstyle") version indraVersion apply false
-    id("net.kyori.indra.publishing.sonatype") version indraVersion
-    id("com.github.hierynomus.license") version "0.16.1" apply false
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
-    id("net.ltgt.errorprone") version "3.1.0" apply false
-    id("com.github.ben-manes.versions") version "0.50.0"
-    idea
+    alias(libs.plugins.cloud.buildLogic.rootProject.publishing)
+    alias(libs.plugins.cloud.buildLogic.rootProject.spotless)
 }
 
-group = "se.hyperver.hyperverse"
-version = "0.11.0-SNAPSHOT"
-description = "Minecraft world management plugin"
+repositories {
+    mavenCentral()
+}
 
-apply<IdeaPlugin>()
-
-val targetJavaVersion = 17
+spotlessPredeclare {
+    kotlin { ktlint(libs.versions.ktlint.get()) }
+    kotlinGradle { ktlint(libs.versions.ktlint.get()) }
+}
 
 subprojects {
-    apply<IndraPlugin>()
-    apply<IndraPublishingPlugin>()
-    apply<ErrorPronePlugin>()
-    apply<LicenseBasePlugin>()
-    apply<IdeaPlugin>()
-
-    if (this.name.startsWith("hyperverse-nms").not()) {
-        apply<IndraCheckstylePlugin>()
-    }
-
-    extensions.configure(LicenseExtension::class) {
-        header = rootProject.file("HEADER")
-        mapping("java", "DOUBLESLASH_STYLE")
-        mapping("kt", "DOUBLESLASH_STYLE")
-        includes(listOf("**/*.java", "**/*.kt"))
-    }
-
-    extensions.configure(IndraExtension::class) {
-        github("Incendo", "Hyperverse") {
-            ci(true)
-        }
-        gpl3OnlyLicense()
-
-        javaVersions {
-            target(targetJavaVersion)
-            testWith(targetJavaVersion)
-        }
-        checkstyle("8.39")
-
-        configurePublications {
-            pom {
-                developers {
-                    developer {
-                        id.set("Sauilitired")
-                        name.set("Alexander Söderberg")
-                        url.set("https://alexander-soderberg.com")
-                        email.set("alexander.soderberg@incendo.org")
-                    }
+    if ("nms" in name) {
+        tasks {
+            whenTaskAdded {
+                if ("checkstyle" in name) {
+                    enabled = false
                 }
             }
         }
     }
 
-    /* Disable checkstyle on tests */
-    project.gradle.startParameter.excludedTaskNames.add("checkstyleTest")
-
-    tasks {
-        withType(JavaCompile::class) {
-            javaCompiler.set(serviceOf<JavaToolchainService>().compilerFor(java.toolchain))
-            options.release.set(targetJavaVersion)
-
-            options.errorprone {
-                /* These are just annoying */
-                disable(
-                        "JdkObsolete",
-                        "FutureReturnValueIgnored",
-                        "ImmutableEnumChecker",
-                        "StringSplitter",
-                        "EqualsGetClass",
-                        "CatchAndPrintStackTrace",
-                        "TypeParameterUnusedInFormals",
-                        "EmptyCatch"
-                )
-            }
-            // TODO: Re-enable
-            // options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
+    afterEvaluate {
+        tasks.withType<JavaCompile>().configureEach {
+            options.compilerArgs.remove("-Werror")
         }
-
-        withType(Javadoc::class) {
-            javadocTool.set(serviceOf<JavaToolchainService>().javadocToolFor(java.toolchain))
-            options.encoding = StandardCharsets.UTF_8.name()
-        }
-
-        named("check") {
-            dependsOn(withType(LicenseCheck::class))
-        }
+        tasks.findByName("spotlessConfigsCheck")?.enabled = false
     }
+}
 
-    repositories {
-        mavenCentral()
-        sonatype.ossSnapshots()
-
-        maven("https://oss.sonatype.org/content/repositories/releases") {
-            mavenContent {
-                releasesOnly()
-            }
-        }
-        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-        maven("https://repo.aikar.co/content/groups/aikar/")
-        maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://repo.codemc.org/repository/maven-public/")
-        maven("https://repo.spongepowered.org/maven")
-        maven("https://repo.onarandombox.com/content/repositories/multiverse/")
-        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-        maven("https://ci.mg-dev.eu/plugin/repository/everything/")
-        maven("https://repo.essentialsx.net/releases/")
-
+tasks {
+    spotlessCheck {
+        dependsOn(gradle.includedBuild("build-logic").task(":spotlessCheck") )
     }
-
-    dependencies {
-        COMPILE_ONLY_API_CONFIGURATION_NAME("org.checkerframework", "checker-qual", "3.9.1")
-        TEST_IMPLEMENTATION_CONFIGURATION_NAME("org.junit.jupiter", "junit-jupiter-engine", "5.8.2")
-        "errorprone"("com.google.errorprone", "error_prone_core", "2.10.0")
-        COMPILE_ONLY_API_CONFIGURATION_NAME("com.google.errorprone", "error_prone_annotations", "2.5.1")
-        COMPILE_ONLY_API_CONFIGURATION_NAME("org.jetbrains", "annotations", "23.0.0")
+    spotlessApply {
+        dependsOn(gradle.includedBuild("build-logic").task(":spotlessApply"))
     }
 }

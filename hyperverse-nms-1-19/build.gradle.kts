@@ -1,4 +1,5 @@
 plugins {
+    id("hyperverse.base-conventions")
     alias(libs.plugins.paperweightUserdev)
 }
 
