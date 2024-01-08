@@ -4,6 +4,7 @@ plugins {
     id("hyperverse.base-conventions")
     id("hyperverse.publishing-conventions")
     alias(libs.plugins.shadow)
+    alias(libs.plugins.run.paper)
 }
 
 apply {
@@ -91,5 +92,9 @@ tasks {
 
     build {
         dependsOn(shadowJar)
+    }
+
+    runServer {
+        minecraftVersion("1.20.4")
     }
 }
