@@ -6,6 +6,7 @@ kotlin = "1.9.20"
 shadow = "8.1.1"
 paperweight = "1.5.11"
 run-paper = "2.2.2"
+pluginyml = "0.6.0"
 
 # Platforms
 minecraft = "1.17.1-R0.1-SNAPSHOT"
@@ -55,3 +56,4 @@ cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.
 cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
