@@ -1,10 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("hyperverse.base-conventions")
     id("hyperverse.publishing-conventions")
     alias(libs.plugins.shadow)
     alias(libs.plugins.run.paper)
+    alias(libs.plugins.pluginyml)
 }
 
 apply {
@@ -46,6 +48,49 @@ dependencies {
     runtimeOnly(project(":hyperverse-nms-1-18", "reobf"))
     runtimeOnly(project(":hyperverse-nms-1-19", "reobf"))
     runtimeOnly(project(":hyperverse-nms-1-20", "reobf"))
+}
+
+bukkit {
+    name = "Hyperverse"
+    website = "https://github.com/incendo/Hyperverse"
+    authors = listOf("Citymonstret", "andrewandy")
+    main = "se.hyperver.hyperverse.Hyperverse"
+    softDepend = listOf("Essentials", "Multiverse", "MyWorlds")
+    apiVersion = "1.14"
+    permissions {
+        mapOf(
+            "worlds" to "Allows players to use the Hyperverse command",
+            "reload" to "Allows players to reload the configuration and messages used by Hyperverse",
+            "create" to "Allows players to create new worlds",
+            "list" to "Allows players to list worlds",
+            "teleport" to "Allows players to teleport between worlds",
+            "teleport.other" to "Allows players to teleport other players between worlds",
+            "teleportgroup" to "Allows players to teleport to their last location in a given profile group",
+            "info" to "Allows players to view world info",
+            "unload" to "Allows players to unload worlds",
+            "load" to "Allows players to load worlds",
+            "import" to "Allows players to import worlds",
+            "find" to "Allows players to find the current world of another player",
+            "flag.list" to "Allows player to list available flags",
+            "flag.set" to "Allows players to set world flags",
+            "flag.info" to "Allows players to view information regarding a flag in a given world",
+            "gamerule.set" to "Allows players to world set gamerules",
+            "delete" to "Allows players to delete worlds",
+            "debugpaste" to "Allows players to create debug pastes",
+            "who" to "Allows players to list players",
+            "plugin.import" to "Allows players to import configurations from external plugins",
+            "regenerate" to "Allows players to regenerate worlds"
+        ).forEach { (permission, description) ->
+            register("hyperverse.$permission") {
+                this.description = description
+                this.default = BukkitPluginDescription.Permission.Default.OP
+            }
+        }
+        register("hyperverse.override.gamemode") {
+            description = "Allows players to override world gamemode"
+            default = BukkitPluginDescription.Permission.Default.FALSE
+        }
+    }
 }
 
 tasks {
