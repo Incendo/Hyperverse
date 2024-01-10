@@ -44,7 +44,7 @@ import java.util.Map;
 
 public final class GlobalWorldFlagContainer extends WorldFlagContainer {
 
-    private static Map<String, Class<?>> stringClassMap = new HashMap<>();
+    private static final Map<String, Class<?>> stringClassMap = new HashMap<>();
 
     public GlobalWorldFlagContainer() {
         super(null, (flag, type) -> {
