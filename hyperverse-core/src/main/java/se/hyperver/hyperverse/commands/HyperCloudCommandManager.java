@@ -21,6 +21,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -493,8 +494,9 @@ public final class HyperCloudCommandManager extends BaseCommand {
     }
 
     @Contract("_,_->this")
-    private @NonNull HyperCloudCommandManager registerCommandImport(@NonNull final CommandManager<CommandSender> commandManager,
-                                       final Command.@NonNull Builder<CommandSender> builder
+    private @NonNull HyperCloudCommandManager registerCommandImport(
+            @NonNull final CommandManager<CommandSender> commandManager,
+            final Command.@NonNull Builder<CommandSender> builder
     ) {
         var commandImport = builder.literal("import")
                 .argument(StringArgument.<CommandSender>builder("worldName")
@@ -555,12 +557,28 @@ public final class HyperCloudCommandManager extends BaseCommand {
         }
     }
 
-    @Subcommand("list|l|worlds")
-    @CommandPermission("hyperverse.list")
-    @CommandAlias("hvl")
-    @CommandCompletion("@range:1-10")
-    @Description("{@@command.list}")
-    public void doList(final CommandSender sender, @Default("1") final int page) {
+    @Contract("_,_->this")
+    private HyperCloudCommandManager createCommandList(
+            @NonNull final CommandManager<CommandSender> commandManager,
+            final Command.@NonNull Builder<CommandSender> builder
+    ) {
+        var commandList = builder.literal("list", "l", "worlds")
+                .argument(IntegerArgument.<CommandSender>builder("page")
+                        .asOptionalWithDefault(1))
+                .handler(this::handleList)
+                .permission("hyperverse.list")
+                .meta(CommandMeta.DESCRIPTION, "{@@command.list}")
+                .build();
+        var commandListProxy = commandManager.commandBuilder("hvl")
+                .proxies(commandList)
+                .build();
+        commandManager.command(commandList).command(commandListProxy);
+        return this;
+    }
+
+    public void handleList(CommandContext<CommandSender> context) {
+        final CommandSender sender = context.getSender();
+        final int page = context.get("page");
         final List<HyperWorld> worlds = new ArrayList<>(this.worldManager.getWorlds());
         worlds.sort(Comparator.comparing(world -> world.getConfiguration().getName()));
 
@@ -581,9 +599,9 @@ public final class HyperCloudCommandManager extends BaseCommand {
         Stream<HyperWorld> stream = worlds.subList(min, max).stream().sorted(Comparator.comparing(world -> world
                 .getConfiguration()
                 .getName()));
-        if (sender instanceof Entity) {
+        if (sender instanceof Entity entity) {
             stream = stream.sorted(Comparator
-                    .comparing(world -> !((Entity) sender).getWorld().equals(world.getBukkitWorld())));
+                    .comparing(world -> !entity.getWorld().equals(world.getBukkitWorld())));
         }
         stream.forEachOrdered(hyperWorld -> {
             final WorldConfiguration configuration = hyperWorld.getConfiguration();
@@ -606,7 +624,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
             }
 
             final Message message;
-            if (sender instanceof Entity && ((Entity) sender).getWorld() == hyperWorld.getBukkitWorld()) {
+            if (sender instanceof Entity entity && entity.getWorld() == hyperWorld.getBukkitWorld()) {
                 message = Messages.messageListEntryCurrentWorld;
             } else {
                 message = Messages.messageListEntry;
