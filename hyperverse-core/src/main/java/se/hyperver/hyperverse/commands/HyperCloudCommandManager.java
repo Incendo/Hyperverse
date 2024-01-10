@@ -18,6 +18,7 @@
 package se.hyperver.hyperverse.commands;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.LongArgument;
@@ -56,6 +57,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.commands.parser.EnumParser;
 import se.hyperver.hyperverse.commands.parser.GameRuleParser;
@@ -197,10 +199,9 @@ public final class HyperCloudCommandManager extends BaseCommand {
         );
         // Start building the hypervere command
         var builder = this.commandManager.commandBuilder("hyperverse", "hv");
-        builder = createCommandCreateWorld(builder);
-        builder = createCommandCreateWorld(builder);
+        this.registerCommandCreateWorld(this.commandManager, builder)
+                .registerCommandImport(this.commandManager, builder);
 
-        this.commandManager.command(builder);
     }
 
     private List<String> suggestGreedyPlayerWorlds(CommandContext<CommandSender> context, String input) {
@@ -368,8 +369,12 @@ public final class HyperCloudCommandManager extends BaseCommand {
         commandHelp.showHelp();
     }
 
-    private Command.@NonNull Builder<CommandSender> createCommandCreateWorld(final Command.@NonNull Builder<CommandSender> builder) {
-        return builder.literal("create")
+    @Contract("_,_->this")
+    private HyperCloudCommandManager registerCommandCreateWorld(
+            final @NonNull CommandManager<CommandSender> commandManager,
+            final Command.@NonNull Builder<CommandSender> builder
+    ) {
+        var commandCreateWorld = builder.literal("create")
                 .argument(StringArgument.of("world"))
                 .argument(StringArgument.<CommandSender>builder("generator")
                         .withSuggestionsProvider(this::suggestGenerators)
@@ -393,6 +398,8 @@ public final class HyperCloudCommandManager extends BaseCommand {
                 .handler(this::handleWorldCreation)
                 .permission("hyperverse.create")
                 .meta(CommandMeta.DESCRIPTION, "{@@command.create}");
+        commandManager.command(commandCreateWorld);
+        return this;
         // FIXME: command syntax: command syntax
         // old:  @Syntax("<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed] [generate-structures: true, false] [features: normal, flatland, amplified, bucket] [settings...]")
     }
@@ -485,8 +492,11 @@ public final class HyperCloudCommandManager extends BaseCommand {
         }
     }
 
-    private Command.@NonNull Builder<CommandSender> createCommandImport(final Command.@NonNull Builder<CommandSender> builder) {
-        return builder.literal("import", "hvimport")
+    @Contract("_,_->this")
+    private @NonNull HyperCloudCommandManager registerCommandImport(@NonNull final CommandManager<CommandSender> commandManager,
+                                       final Command.@NonNull Builder<CommandSender> builder
+    ) {
+        var commandImport = builder.literal("import")
                 .argument(StringArgument.<CommandSender>builder("worldName")
                         .withSuggestionsProvider(this::suggestImportCandidates))
                 .argument(StringArgument.<CommandSender>builder("generator")
@@ -496,10 +506,15 @@ public final class HyperCloudCommandManager extends BaseCommand {
                         .<CommandSender, WorldType>ofType(WorldType.class, "worldType")
                         .asOptionalWithDefault("over_world"))
                 .permission("hyperverse.import")
-                .meta(CommandMeta.DESCRIPTION, "{{@@command.import}}");
+                .meta(CommandMeta.DESCRIPTION, "{{@@command.import}}")
+                .build();
+        var commandImportProxy = commandManager.commandBuilder("hvi")
+                .proxies(commandImport);
         // existing command did not have a command syntax
+        commandManager.command(commandImport).command(commandImportProxy);
+        return this;
     }
-    
+
     private void handleWorldImport(@NonNull final CommandContext<CommandSender> context) {
         final CommandSender sender = context.getSender();
         final String worldName = context.get("worldName");
