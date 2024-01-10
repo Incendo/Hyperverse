@@ -123,6 +123,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
     private final GlobalWorldFlagContainer globalFlagContainer;
     private final TaskChainFactory taskChainFactory;
 
+    private final Hyperverse hyperverse;
     private final Server server;
 
     @Inject
@@ -137,6 +138,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
             final FileHyperConfiguration hyperConfiguration,
             final Server server
     ) {
+        this.hyperverse = hyperverse;
         this.worldManager = Objects.requireNonNull(worldManager);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
         this.worldImporterFactory = Objects.requireNonNull(worldImporterFactory);
@@ -196,7 +198,8 @@ public final class HyperCloudCommandManager extends BaseCommand {
         // Start building the hypervere command
         var builder = this.commandManager.commandBuilder("hyperverse", "hv");
         builder = createCommandCreateWorld(builder);
-        
+        builder = createCommandCreateWorld(builder);
+
         this.commandManager.command(builder);
     }
 
@@ -217,7 +220,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
         if (player != null && !context.getOrDefault("self", "false").equalsIgnoreCase("true")) {
             players.remove(player.getName());
         }
-        Stream<? extends Player> stream = Bukkit.getOnlinePlayers().stream();
+        Stream<? extends Player> stream = this.server.getOnlinePlayers().stream();
         if (checkInWorld) {
             final HyperWorld world = context.getOrDefault("hyperworld", null);
             if (world == null) {
@@ -252,7 +255,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
         ) {
             players.remove(player.getName());
         }
-        return Bukkit.getOnlinePlayers().stream()
+        return this.server.getOnlinePlayers().stream()
                 .map(Player::getName)
                 .filter(p -> !players.contains(p.toLowerCase()))
                 .sorted(Comparator.naturalOrder())
@@ -285,7 +288,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
         if (input.contains(":")) {
             return Collections.emptyList();
         }
-        return Arrays.stream(Bukkit.getPluginManager().getPlugins())
+        return Arrays.stream(this.server.getPluginManager().getPlugins())
                 .map(Plugin::getName)
                 .map(str -> str.toLowerCase(Locale.ENGLISH))
                 .toList();
@@ -301,8 +304,11 @@ public final class HyperCloudCommandManager extends BaseCommand {
                 .toList();
     }
 
-    private List<String> suggestImportCandidates(CommandContext<CommandSender> context, String input) {
-        final File baseDirectory = Bukkit.getWorldContainer();
+    private @NonNull List<String> suggestImportCandidates(
+            @NonNull final CommandContext<CommandSender> context,
+            @NonNull final String input
+    ) {
+        final File baseDirectory = this.server.getWorldContainer();
         try (final Stream<Path> files = Files.list(baseDirectory.toPath())) {
             return files.filter(path -> {
                         final File file = path.toFile();
@@ -362,21 +368,27 @@ public final class HyperCloudCommandManager extends BaseCommand {
         commandHelp.showHelp();
     }
 
-    private Command.Builder<CommandSender> createCommandCreateWorld(Command.Builder<CommandSender> builder) {
+    private Command.@NonNull Builder<CommandSender> createCommandCreateWorld(final Command.@NonNull Builder<CommandSender> builder) {
         return builder.literal("create")
                 .argument(StringArgument.of("world"))
-                .argument(StringArgument.of("generator"))
+                .argument(StringArgument.<CommandSender>builder("generator")
+                        .withSuggestionsProvider(this::suggestGenerators)
+                )
+                // WorldType parser already registered in ctor
                 .argument(CommandArgument.
                         <CommandSender, WorldType>ofType(WorldType.class, "type")
-                        .asOptionalWithDefault("overworld"))
+                        .asOptionalWithDefault("overworld")
+                )
+                // WorldStructureSetting parser already registered in ctor
                 .argument(CommandArgument
                         .<CommandSender, WorldStructureSetting>ofType(WorldStructureSetting.class, "generateStructures")
                         .asOptionalWithDefault("true")
                 )
+                // WorldFeatures parser already registered in ctor
                 .argument(CommandArgument
                         .<CommandSender, WorldFeatures>ofType(WorldFeatures.class, "features")
                         .asOptionalWithDefault("normal"))
-                .argument(StringArgument.of("settings", StringArgument.StringMode.GREEDY))
+                .argument(StringArgument.of("settings", StringArgument.StringMode.GREEDY_FLAG_YIELDING))
                 .flag(CommandFlag.builder("specifiedSeed").withArgument(LongArgument.of("specifiedSeed")))
                 .handler(this::handleWorldCreation)
                 .permission("hyperverse.create")
@@ -405,7 +417,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
             }
         }
         // Double check that Bukkit doesn't have the world stored
-        if (Bukkit.getWorld(world) != null) {
+        if (this.server.getWorld(world) != null) {
             MessageUtil.sendMessage(sender, Messages.messageWorldExists);
             return;
         }
@@ -473,17 +485,26 @@ public final class HyperCloudCommandManager extends BaseCommand {
         }
     }
 
-    @Subcommand("import")
-    @CommandPermission("hyperverse.import")
-    @CommandAlias("hvimport")
-    @CommandCompletion("@import-candidates @generators @worldtypes")
-    @Description("{@@command.import}")
-    public void importWorld(
-            final CommandSender sender,
-            final String worldName,
-            final String generator,
-            @Default("over_world") final WorldType worldType
-    ) {
+    private Command.@NonNull Builder<CommandSender> createCommandImport(final Command.@NonNull Builder<CommandSender> builder) {
+        return builder.literal("import", "hvimport")
+                .argument(StringArgument.<CommandSender>builder("worldName")
+                        .withSuggestionsProvider(this::suggestImportCandidates))
+                .argument(StringArgument.<CommandSender>builder("generator")
+                        .withSuggestionsProvider(this::suggestGenerators))
+                // WorldType parser already registered in ctor
+                .argument(CommandArgument
+                        .<CommandSender, WorldType>ofType(WorldType.class, "worldType")
+                        .asOptionalWithDefault("over_world"))
+                .permission("hyperverse.import")
+                .meta(CommandMeta.DESCRIPTION, "{{@@command.import}}");
+        // existing command did not have a command syntax
+    }
+    
+    private void handleWorldImport(@NonNull final CommandContext<CommandSender> context) {
+        final CommandSender sender = context.getSender();
+        final String worldName = context.get("worldName");
+        final String generator = context.get("generator");
+        final WorldType worldType = context.get("worldType");
         if (this.worldManager.getWorld(worldName) != null) {
             MessageUtil.sendMessage(sender, Messages.messageWorldAlreadyImported);
             return;
@@ -511,9 +532,9 @@ public final class HyperCloudCommandManager extends BaseCommand {
         }
         this.worldManager.addWorld(hyperWorld);
         MessageUtil.sendMessage(sender, Messages.messageWorldImportFinished);
-        if (sender instanceof Player) {
+        if (sender instanceof Player player) {
             //Schedule teleport 1-tick later so the world has a chance to load.
-            Bukkit.getScheduler().runTaskLater(Hyperverse.getPlugin(Hyperverse.class),
+            this.server.getScheduler().runTaskLater(this.hyperverse,
                     () -> this.doTeleport((Player) sender, this.worldManager.getWorld(bukkitWorld)), 1L
             );
         }
@@ -628,7 +649,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
         }
         final List<Player> playerList = new ArrayList<>(players.length);
         for (final String rawPlayer : players) {
-            final Player player = Bukkit.getPlayer(rawPlayer);
+            final Player player = this.server.getPlayer(rawPlayer);
             if (player == null) {
                 MessageUtil.sendMessage(sender, Messages.messageNoPlayerFound, "%name%", rawPlayer);
                 return;
@@ -728,7 +749,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
 //public void findPlayer(final CommandSender sender, final String... players) {
     public void findPlayer(final CommandSender sender, final String player) {
         //for (String player : players) {
-        final Player bukkitPlayer = Bukkit.getPlayer(player);
+        final Player bukkitPlayer = this.server.getPlayer(player);
         if (bukkitPlayer == null) {
             MessageUtil.sendMessage(sender, Messages.messageNoPlayerFound, "%name%", player);
             return;
@@ -751,7 +772,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
     @Description("{@@command.who}")
     public void findPlayersPresent(final CommandSender sender, @Optional final String world) {
         if (world != null) {
-            final World bukkitWorld = Bukkit.getWorld(world);
+            final World bukkitWorld = this.server.getWorld(world);
             if (bukkitWorld == null) {
                 MessageUtil.sendMessage(sender, Messages.messageNoSuchWorld);
                 return;
@@ -780,7 +801,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
                     players.toString().trim(), "%world%", hyperWorld.getDisplayName()
             );
         } else {
-            for (final World bukkitWorld : Bukkit.getWorlds()) {
+            for (final World bukkitWorld : this.server.getWorlds()) {
                 this.findPlayersPresent(sender, bukkitWorld.getName());
             }
         }
@@ -963,7 +984,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
             }
 
             if (deleteDirectory) {
-                final Path path = Bukkit.getWorldContainer().toPath()
+                final Path path = this.server.getWorldContainer().toPath()
                         .resolve(hyperWorld.getConfiguration().getName());
                 try {
                     try (Stream<Path> walk = Files.walk(path)) {
@@ -1009,10 +1030,10 @@ public final class HyperCloudCommandManager extends BaseCommand {
                                 + "problem\n\n");
 
                 b.append("# Server Information\n");
-                b.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
+                b.append("Server Version: ").append(this.server.getVersion()).append("\n");
 
                 b.append("Plugins:");
-                for (final Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                for (final Plugin plugin : this.server.getPluginManager().getPlugins()) {
                     b
                             .append("\n  ")
                             .append(plugin.getName())
@@ -1052,7 +1073,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
                 incendoPaster.addFile(new IncendoPaster.PasteFile("information", b.toString()));
 
                 try {
-                    final File logFile = new File(Bukkit.getWorldContainer(), "./logs/latest.log");
+                    final File logFile = new File(this.server.getWorldContainer(), "./logs/latest.log");
                     if (Files.size(logFile.toPath()) > 14_000_000) {
                         throw new IOException("Too big...");
                     }
@@ -1104,7 +1125,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
     @CommandPermission("hyperverse.plugin.import")
     @Description("{@@command.multiverse}")
     public void doMultiverse(final CommandSender sender) {
-        if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
+        if (this.server.getPluginManager().isPluginEnabled("Multiverse-Core")) {
             this.worldImporterFactory.createMultiverseImporter(this.hyperWorldFactory).performImport(sender);
         } else {
             MessageUtil.sendMessage(sender, Messages.messageImportPluginMissing, "%plugin%", "Multiverse");
@@ -1114,7 +1135,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
     @Subcommand("myworlds")
     @CommandPermission("hyperverse.plugin.import")
     public void doMyWorlds(final CommandSender sender) {
-        if (Bukkit.getPluginManager().isPluginEnabled("My_Worlds")) {
+        if (this.server.getPluginManager().isPluginEnabled("My_Worlds")) {
             this.worldImporterFactory.createMyWorldsImporter(this.hyperWorldFactory).performImport(sender);
         } else {
             MessageUtil
@@ -1160,7 +1181,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
                 return;
             }
 
-            final Path path = Bukkit.getWorldContainer().toPath()
+            final Path path = this.server.getWorldContainer().toPath()
                     .resolve(world.getConfiguration().getName());
             try {
                 try (Stream<Path> walk = Files.walk(path)) {
