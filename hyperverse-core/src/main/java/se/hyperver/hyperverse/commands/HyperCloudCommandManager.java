@@ -17,16 +17,18 @@
 
 package se.hyperver.hyperverse.commands;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserParameters;
+import cloud.commandframework.Command;
+import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.standard.LongArgument;
+import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.paper.PaperCommandManager;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
-import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
@@ -35,7 +37,6 @@ import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -46,6 +47,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
@@ -98,7 +100,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -122,6 +123,8 @@ public final class HyperCloudCommandManager extends BaseCommand {
     private final GlobalWorldFlagContainer globalFlagContainer;
     private final TaskChainFactory taskChainFactory;
 
+    private final Server server;
+
     @Inject
     public HyperCloudCommandManager(
             final Hyperverse hyperverse,
@@ -131,7 +134,8 @@ public final class HyperCloudCommandManager extends BaseCommand {
             final WorldConfigurationFactory worldConfigurationFactory,
             final GlobalWorldFlagContainer globalFlagContainer,
             final TaskChainFactory taskFactory,
-            final FileHyperConfiguration hyperConfiguration
+            final FileHyperConfiguration hyperConfiguration,
+            final Server server
     ) {
         this.worldManager = Objects.requireNonNull(worldManager);
         this.hyperWorldFactory = Objects.requireNonNull(hyperWorldFactory);
@@ -140,6 +144,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
         this.globalFlagContainer = Objects.requireNonNull(globalFlagContainer);
         this.taskChainFactory = Objects.requireNonNull(taskFactory);
         this.fileHyperConfiguration = Objects.requireNonNull(hyperConfiguration);
+        this.server = server;
 
         // Create the command manager
         try {
@@ -188,6 +193,11 @@ public final class HyperCloudCommandManager extends BaseCommand {
                 TypeToken.get(WorldFlag.class),
                 unused -> new WorldFlagParser<>(this.globalFlagContainer)
         );
+        // Start building the hypervere command
+        var builder = this.commandManager.commandBuilder("hyperverse", "hv");
+        builder = createCommandCreateWorld(builder);
+        
+        this.commandManager.command(builder);
     }
 
     private List<String> suggestGreedyPlayerWorlds(CommandContext<CommandSender> context, String input) {
@@ -344,7 +354,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
                         case "in" -> inWorld;
                         default -> true;
                     };
-                }).collect(Collectors.toList());
+                }).toList();
     }
 
     @HelpCommand
@@ -352,18 +362,41 @@ public final class HyperCloudCommandManager extends BaseCommand {
         commandHelp.showHelp();
     }
 
-    @Subcommand("create")
-    @Syntax("<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed] [generate-structures: true, false] [features: normal, flatland, amplified, bucket] [settings...]")
-    @CommandPermission("hyperverse.create")
-    @Description("{@@command.create}")
-    @CommandCompletion("@null @generators @worldtypes @null @structures @worldfeatures @null")
-    public void createWorld(
-            final CommandSender sender, final String world, final String generator,
-            @Default("overworld") final WorldType type, @Optional final Long specifiedSeed,
-            @Default("true") final WorldStructureSetting generateStructures, @Default("normal") final WorldFeatures features,
-            @Default final String settings
-    ) {
-        final long seed = specifiedSeed == null ? SeedUtil.randomSeed() : specifiedSeed;
+    private Command.Builder<CommandSender> createCommandCreateWorld(Command.Builder<CommandSender> builder) {
+        return builder.literal("create")
+                .argument(StringArgument.of("world"))
+                .argument(StringArgument.of("generator"))
+                .argument(CommandArgument.
+                        <CommandSender, WorldType>ofType(WorldType.class, "type")
+                        .asOptionalWithDefault("overworld"))
+                .argument(CommandArgument
+                        .<CommandSender, WorldStructureSetting>ofType(WorldStructureSetting.class, "generateStructures")
+                        .asOptionalWithDefault("true")
+                )
+                .argument(CommandArgument
+                        .<CommandSender, WorldFeatures>ofType(WorldFeatures.class, "features")
+                        .asOptionalWithDefault("normal"))
+                .argument(StringArgument.of("settings", StringArgument.StringMode.GREEDY))
+                .flag(CommandFlag.builder("specifiedSeed").withArgument(LongArgument.of("specifiedSeed")))
+                .handler(this::handleWorldCreation)
+                .permission("hyperverse.create")
+                .meta(CommandMeta.DESCRIPTION, "{@@command.create}");
+        // FIXME: command syntax: command syntax
+        // old:  @Syntax("<world> [generator: plugin name, vanilla][:[args]] [type: overworld, nether, end] [seed] [generate-structures: true, false] [features: normal, flatland, amplified, bucket] [settings...]")
+    }
+
+    private void handleWorldCreation(@NonNull final CommandContext<CommandSender> context) {
+        // Command parameters
+        final long seed = context.getOrSupplyDefault("specifiedSeed", SeedUtil::randomSeed);
+        final String world = context.get("world");
+        final String generator = context.get("generator");
+        final WorldStructureSetting structureSetting = context.get("generateStructures");
+        final String settings = context.get("settings");
+        final WorldType worldType = context.get("type");
+        final WorldFeatures features = context.get("features");
+
+        final CommandSender sender = context.getSender();
+
         // Check if the name already exists
         for (final HyperWorld hyperWorld : this.worldManager.getWorlds()) {
             if (hyperWorld.getConfiguration().getName().equalsIgnoreCase(world)) {
@@ -395,11 +428,15 @@ public final class HyperCloudCommandManager extends BaseCommand {
 
         // Check if the generator is actually valid
         final WorldConfiguration worldConfiguration =
-                this.worldConfigurationFactory.builder().setName(world).setGenerator(actualGenerator).setType(type).setSeed(seed)
-                        .setGenerateStructures(generateStructures).setSettings(settings).setWorldFeatures(features)
+                this.worldConfigurationFactory.builder().setName(world)
+                        .setGenerator(actualGenerator)
+                        .setType(worldType)
+                        .setSeed(seed)
+                        .setGenerateStructures(structureSetting)
+                        .setSettings(settings)
+                        .setWorldFeatures(features)
                         .setGeneratorArg(generatorArgs).createWorldConfiguration();
-        final HyperWorld hyperWorld =
-                this.hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
+        final HyperWorld hyperWorld = this.hyperWorldFactory.create(UUID.randomUUID(), worldConfiguration);
         MessageUtil.sendMessage(sender, Messages.messageWorldCreationStarted);
         hyperWorld.sendWorldInfo(sender);
 
@@ -411,9 +448,9 @@ public final class HyperCloudCommandManager extends BaseCommand {
             // Register the world
             this.worldManager.addWorld(hyperWorld);
             MessageUtil.sendMessage(sender, Messages.messageWorldCreationFinished);
-            if (sender instanceof Player) {
+            if (sender instanceof Player player) {
                 // Attempt to teleport them to the world
-                hyperWorld.teleportPlayer((Player) sender);
+                hyperWorld.teleportPlayer(player);
             }
         } catch (final HyperWorldValidationException validationException) {
             switch (validationException.getValidationResult()) {
