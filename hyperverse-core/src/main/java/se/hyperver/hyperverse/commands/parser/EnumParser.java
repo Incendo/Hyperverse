@@ -3,6 +3,7 @@ package se.hyperver.hyperverse.commands.parser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Arrays;
@@ -57,7 +58,7 @@ public final class EnumParser<E extends Enum<E>, C> implements ArgumentParser<C,
             @NonNull final Queue<@NonNull String> inputQueue
     ) {
         if (inputQueue.isEmpty()) {
-            return ArgumentParseResult.failure(new IllegalStateException("Input queue is empty"));
+            return ArgumentParseResult.failure(new NoInputProvidedException(getClass(), commandContext));
         }
         return this.fromStringMapper.apply(inputQueue.poll())
                 .map(ArgumentParseResult::success)
