@@ -33,7 +33,7 @@ public class ReflectionPlatformProvider implements PlatformProvider {
     @Override
     public @NotNull Class<? extends NMS> providePlatform() throws PlatformProvisionException {
         String expectedPackage = minecraftVersion.original().toLowerCase(Locale.ENGLISH).replace('.', '_');
-        String packageName = "se.hyperver.spigotnms.v" + expectedPackage;
+        String packageName = "org.incendo.hyperverse.platform.v" + expectedPackage;
         try {
             Class<?> clazz = Class.forName(packageName + ".NMSImpl");
             return clazz.asSubclass(NMS.class);
