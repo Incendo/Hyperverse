@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-public class ReflectionPlatformProvider implements PlatformProvider {
+public final class ReflectionPlatformProvider implements PlatformProvider {
 
     private final Version minecraftVersion;
     public ReflectionPlatformProvider(@NotNull final Version version) {
@@ -32,13 +32,13 @@ public class ReflectionPlatformProvider implements PlatformProvider {
 
     @Override
     public @NotNull Class<? extends NMS> providePlatform() throws PlatformProvisionException {
-        String expectedPackage = minecraftVersion.original().toLowerCase(Locale.ENGLISH).replace('.', '_');
+        String expectedPackage = this.minecraftVersion.original().toLowerCase(Locale.ENGLISH).replace('.', '_');
         String packageName = "org.incendo.hyperverse.platform.v" + expectedPackage;
         try {
             Class<?> clazz = Class.forName(packageName + ".NMSImpl");
             return clazz.asSubclass(NMS.class);
         } catch (ReflectiveOperationException ex) {
-            throw new PlatformProvisionException("Could not provide platform for version: " + minecraftVersion + "!", ex);
+            throw new PlatformProvisionException("Could not provide platform for version: " + this.minecraftVersion + "!", ex);
         }
     }
 
