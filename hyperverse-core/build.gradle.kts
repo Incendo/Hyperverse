@@ -54,7 +54,7 @@ bukkit {
     name = "Hyperverse"
     website = "https://github.com/incendo/Hyperverse"
     authors = listOf("Citymonstret", "andrewandy")
-    main = "se.hyperver.hyperverse.Hyperverse"
+    main = "org.incendo.hyperverse.Hyperverse"
     softDepend = listOf("Essentials", "Multiverse", "MyWorlds")
     apiVersion = "1.14"
     permissions {
