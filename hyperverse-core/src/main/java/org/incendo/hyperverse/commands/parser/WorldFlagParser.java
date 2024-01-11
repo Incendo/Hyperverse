@@ -56,8 +56,8 @@ public final class WorldFlagParser<C> implements ArgumentParser<C, WorldFlag<?, 
 
     @Override
     public @NonNull List<String> suggestions(
-            @NonNull CommandContext<C> context,
-            @NonNull String input
+            @NonNull final CommandContext<C> context,
+            @NonNull final String input
     ) {
         return this.flagContainer.getFlagMap().values().stream()
                 .map(WorldFlag::getName)

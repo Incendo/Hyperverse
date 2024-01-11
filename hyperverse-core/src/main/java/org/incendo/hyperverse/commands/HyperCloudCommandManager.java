@@ -107,7 +107,6 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @CommandAlias("hyperverse|hv|worlds|world")
@@ -690,7 +689,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
                 .command(commandTeleportSinglePlayerProxy);
     }
 
-    private void handleTeleportSinglePlayer(CommandContext<CommandSender> context) {
+    private void handleTeleportSinglePlayer(@NonNull final CommandContext<CommandSender> context) {
         CommandSender sender = context.getSender();
         if (!(sender instanceof Player player)) {
             throw new IllegalArgumentException("Command can only be used by a player");
@@ -712,7 +711,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
         world.teleportPlayer(player);
     }
 
-    private void handleTeleportSingle(CommandContext<CommandSender> context) {
+    private void handleTeleportSingle(@NonNull final CommandContext<CommandSender> context) {
         Player player = context.get("player");
         HyperWorld world = context.getOrDefault("world", null);
         if (world == null) {
