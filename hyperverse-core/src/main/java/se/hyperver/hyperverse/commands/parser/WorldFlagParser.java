@@ -3,6 +3,7 @@ package se.hyperver.hyperverse.commands.parser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
 import se.hyperver.hyperverse.flags.GlobalWorldFlagContainer;
@@ -27,7 +28,7 @@ public final class WorldFlagParser<C> implements ArgumentParser<C, WorldFlag<?, 
             @NonNull final Queue<@NonNull String> inputQueue
     ) {
         if (inputQueue.isEmpty()) {
-            return ArgumentParseResult.failure(new IllegalStateException("Input queue is empty"));
+            return ArgumentParseResult.failure(new NoInputProvidedException(getClass(), commandContext));
         }
         final WorldFlag<?, ?> flag = this.flagContainer.getFlagFromString(inputQueue.poll().toLowerCase(Locale.ENGLISH));
         if (flag == null) {

@@ -20,11 +20,13 @@ package se.hyperver.hyperverse.commands;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
+import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
@@ -62,6 +64,7 @@ import org.jetbrains.annotations.Contract;
 import se.hyperver.hyperverse.Hyperverse;
 import se.hyperver.hyperverse.commands.parser.EnumParser;
 import se.hyperver.hyperverse.commands.parser.GameRuleParser;
+import se.hyperver.hyperverse.commands.parser.HyperWorldParser;
 import se.hyperver.hyperverse.commands.parser.WorldFlagParser;
 import se.hyperver.hyperverse.commands.parser.WorldStructureSettingParser;
 import se.hyperver.hyperverse.configuration.FileHyperConfiguration;
@@ -201,7 +204,8 @@ public final class HyperCloudCommandManager extends BaseCommand {
         // Start building the hypervere command
         var builder = this.commandManager.commandBuilder("hyperverse", "hv");
         this.registerCommandCreateWorld(this.commandManager, builder)
-                .registerCommandImport(this.commandManager, builder);
+                .registerCommandImport(this.commandManager, builder)
+                .registerCommandTeleport(this.commandManager, builder);
 
     }
 
@@ -635,6 +639,78 @@ public final class HyperCloudCommandManager extends BaseCommand {
                     configuration.getType().name(), "%load_status%", loadStatus
             );
         });
+    }
+
+    private void registerCommandTeleport(
+            @NonNull final CommandManager<CommandSender> commandManager,
+            final Command.@NonNull Builder<CommandSender> builder
+    ) {
+        HyperWorldParser<CommandSender> hyperWorldParser = new HyperWorldParser<>(this.worldManager,
+                HyperWorldParser.WorldState.LOADED, true
+        );
+        var commandTeleportSinglePlayer = builder.literal("teleport", "tp")
+                .argument(CommandArgument.<CommandSender, HyperWorld>ofType(HyperWorld.class, "world")
+                        .withSuggestionsProvider(hyperWorldParser::suggestions))
+                .senderType(Player.class)
+                .handler(this::handleTeleportSinglePlayer)
+                .permission("hyperverse.teleport")
+                .build();
+        var commandTeleport = builder.literal("teleport", "tp")
+                .argument(CommandArgument.<CommandSender, HyperWorld>ofType(HyperWorld.class, "world")
+                        .withSuggestionsProvider(hyperWorldParser::suggestions))
+                .senderType(Player.class)
+                .handler(this::handleTeleportSingle)
+                .permission("hyperverse.teleport")
+                .build();
+        var commandTeleportSinglePlayerProxy = commandManager.commandBuilder("hvtp")
+                .proxies(commandTeleportSinglePlayer).build();
+        var commandTeleportProxy = commandManager.commandBuilder("hvtp")
+                .proxies(commandTeleport).build();
+        commandManager.command(commandTeleport)
+                .command(commandTeleportSinglePlayer)
+                .command(commandTeleportProxy)
+                .command(commandTeleportSinglePlayerProxy);
+    }
+
+    private void handleTeleportSinglePlayer(CommandContext<CommandSender> context) {
+        CommandSender sender = context.getSender();
+        if (!(sender instanceof Player player)) {
+            throw new IllegalArgumentException("Command can only be used by a player");
+        }
+        HyperWorld world = context.getOrDefault("world", null);
+        if (world == null) {
+            MessageUtil.sendMessage(player, Messages.messageNoSuchWorld);
+            return;
+        }
+        if (!world.isLoaded()) {
+            MessageUtil.sendMessage(player, Messages.messageWorldNotLoaded);
+            return;
+        }
+        if (world.getBukkitWorld() == player.getWorld()) {
+            MessageUtil.sendMessage(player, Messages.messageAlreadyInWorld);
+            return;
+        }
+        MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%", world.getDisplayName());
+        world.teleportPlayer(player);
+    }
+
+    private void handleTeleportSingle(CommandContext<CommandSender> context) {
+        Player player = context.get("player");
+        HyperWorld world = context.getOrDefault("world", null);
+        if (world == null) {
+            MessageUtil.sendMessage(player, Messages.messageNoSuchWorld);
+            return;
+        }
+        if (!world.isLoaded()) {
+            MessageUtil.sendMessage(player, Messages.messageWorldNotLoaded);
+            return;
+        }
+        if (world.getBukkitWorld() == player.getWorld()) {
+            MessageUtil.sendMessage(player, Messages.messageAlreadyInWorld);
+            return;
+        }
+        MessageUtil.sendMessage(player, Messages.messageTeleporting, "%world%", world.getDisplayName());
+        world.teleportPlayer(player);
     }
 
     @Subcommand("teleport|tp")

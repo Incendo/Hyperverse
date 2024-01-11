@@ -3,6 +3,7 @@ package se.hyperver.hyperverse.commands.parser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import org.bukkit.GameRule;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import se.hyperver.hyperverse.configuration.Messages;
@@ -19,7 +20,7 @@ public class GameRuleParser<C> implements ArgumentParser<C, GameRule<?>> {
             @NonNull final Queue<@NonNull String> inputQueue
     ) {
         if (inputQueue.isEmpty()) {
-            return ArgumentParseResult.failure(new IllegalStateException("Input queue is empty"));
+            return ArgumentParseResult.failure(new NoInputProvidedException(getClass(), commandContext));
         }
         return java.util.Optional.ofNullable(GameRule.getByName(inputQueue.poll()))
                 .<ArgumentParseResult<GameRule<?>>>map(ArgumentParseResult::success)
