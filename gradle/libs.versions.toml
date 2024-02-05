@@ -5,7 +5,7 @@ checkstyle = "10.12.5"
 kotlin = "1.9.20"
 shadow = "8.1.1"
 paperweight = "1.5.11"
-run-paper = "2.2.2"
+run-paper = "2.2.3"
 pluginyml = "0.6.0"
 
 # Platforms
