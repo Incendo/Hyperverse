@@ -210,3 +210,4 @@ gradle-app.setting
 
 # Ignore the commands folder
 commands
+**/run

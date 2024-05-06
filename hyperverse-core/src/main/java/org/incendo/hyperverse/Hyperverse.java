@@ -96,7 +96,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             Version.parse("1.17.1"),
             Version.parse("1.18.2"),
             Version.parse("1.19.4"),
-            Version.parse("1.20.4")
+            Version.parse("1.20.4"),
+            Version.parse("1.20.6")
     );
 
     private WorldManager worldManager;
