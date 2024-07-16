@@ -19,6 +19,7 @@ package org.incendo.hyperverse.util.versioning;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,8 +32,24 @@ public record Version(@NotNull String original, @NotNull VersionData versionData
     public static final Pattern SEMVER_PATTERN = Pattern.compile(
             "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
 
+    public static @NotNull Version parseMinecraft(@NotNull final String version) throws IllegalArgumentException {
+        String[] split = version.split("\\.");
+        if (split.length < 2) {
+            throw new IllegalArgumentException("Invalid minecraft version: " + version);
+        }
+        if (split.length == 2) {
+            StringJoiner joiner = new StringJoiner(".");
+            // insert a .0 to make it correctly formatted
+            joiner.add(split[0]);
+            joiner.add("0");
+            joiner.add(split[1]);
+            Version formatted = parseSemVer(joiner.toString());
+            return new Version(version, formatted.versionData());
+        }
+        return parseSemVer(version);
+    }
 
-    public static @NotNull Version parse(@NotNull final String version) throws IllegalArgumentException {
+    public static @NotNull Version parseSemVer(@NotNull final String version) throws IllegalArgumentException {
         Matcher matcher = SEMVER_PATTERN.matcher(version);
         if (!matcher.find()) {
             throw new IllegalArgumentException("Invalid version: " + version);

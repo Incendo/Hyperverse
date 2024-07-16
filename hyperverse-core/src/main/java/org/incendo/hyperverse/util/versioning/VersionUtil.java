@@ -34,7 +34,7 @@ public final class VersionUtil {
         }
         String strippedVersion = minecraftVersion.substring(0, length - stripLength);
         try {
-            return Version.parse(strippedVersion);
+            return Version.parseMinecraft(strippedVersion);
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Invalid minecraft version: " + minecraftVersion, ex);
         }

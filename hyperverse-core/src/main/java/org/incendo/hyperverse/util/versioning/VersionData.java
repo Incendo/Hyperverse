@@ -19,7 +19,7 @@ package org.incendo.hyperverse.util.versioning;
 
 import org.jetbrains.annotations.NotNull;
 
-public record VersionData(int major, int minor, int patch, PreReleaseType preReleaseType)
+public record VersionData(int major, int minor, Integer patch, PreReleaseType preReleaseType)
         implements Comparable<VersionData> {
 
     public VersionData(final int major, final int minor, final int patch) {
