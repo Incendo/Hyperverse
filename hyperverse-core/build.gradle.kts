@@ -62,6 +62,9 @@ dependencies {
     runtimeOnly(project(":hyperverse-nms-1-21")) {
         targetConfiguration = "reobf"
     }
+    runtimeOnly(project(":hyperverse-nms-1-21-3")) {
+        targetConfiguration = "reobf"
+    }
 }
 
 bukkit {
@@ -123,6 +126,7 @@ tasks {
             exclude(project(":hyperverse-nms-1-20"))
             exclude(project(":hyperverse-nms-1-20-6"))
             exclude(project(":hyperverse-nms-1-21"))
+            exclude(project(":hyperverse-nms-1-21-3"))
         }
         mergeServiceFiles()
 
@@ -160,6 +164,6 @@ tasks {
 
     runServer {
         java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.3")
     }
 }

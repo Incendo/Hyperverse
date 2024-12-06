@@ -98,7 +98,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             Version.parseMinecraft("1.19.4"),
             Version.parseMinecraft("1.20.4"),
             Version.parseMinecraft("1.20.6"),
-            Version.parseMinecraft("1.21")
+            Version.parseMinecraft("1.21"),
+            Version.parseMinecraft("1.21.3")
     );
 
     private WorldManager worldManager;
@@ -136,7 +137,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
         }
         Version currentMcVersion = VersionUtil.parseMinecraftVersion(Bukkit.getBukkitVersion());
         if (!this.supportedVersions.contains(currentMcVersion)) {
-            throw new UnsupportedOperationException("Current mc version: " + currentMcVersion + "is not supported");
+            throw new UnsupportedOperationException("Current mc version: " + currentMcVersion + " is not supported");
         }
         PlatformProvider platformProvider = new ReflectionPlatformProvider(currentMcVersion);
         try {
