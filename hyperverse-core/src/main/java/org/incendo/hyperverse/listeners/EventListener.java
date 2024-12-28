@@ -200,7 +200,7 @@ public final class EventListener implements Listener {
                         }
                     }
                     this.nms.writePlayerData(event.getPlayer(), oldWorldDirectory.resolve(
-                            String.format("%s.nbt", event.getPlayer().getUniqueId().toString())));
+                            String.format("%s.nbt", event.getPlayer().getUniqueId())));
                 }
             }
         }
@@ -244,7 +244,7 @@ public final class EventListener implements Listener {
                     }
                 }
                 final Path playerData = newWorldDirectory
-                        .resolve(String.format("%s.nbt", player.getUniqueId().toString()));
+                        .resolve(String.format("%s.nbt", player.getUniqueId()));
                 if (Files.exists(playerData)) {
                     final GameMode originalGameMode = player.getGameMode();
                     this.nms.readPlayerData(event.getPlayer(), playerData,
@@ -476,7 +476,7 @@ public final class EventListener implements Listener {
                     this.plugin.getLogger().warning(String
                             .format(
                                     "Failed to find/create a portal surrounding %s",
-                                    destination.toString()
+                                    destination
                             ));
                 }
             }

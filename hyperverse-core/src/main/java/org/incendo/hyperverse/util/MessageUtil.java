@@ -82,16 +82,16 @@ public final class MessageUtil {
             if (replacedMessage.contains(ChatColor.COLOR_CHAR + "")) {
                 prefixedMessage = ChatColor.translateAlternateColorCodes(
                         '&',
-                        Messages.messagePrefix.toString() + replacedMessage
+                        Messages.messagePrefix + replacedMessage
                 );
             } else {
-                prefixedMessage = Messages.messagePrefixFancy.toString() + replacedMessage;
+                prefixedMessage = Messages.messagePrefixFancy + replacedMessage;
             }
             recipient.sendMessage(MINI_MESSAGE.deserialize(prefixedMessage));
         } else {
             final String prefixedMessage = ChatColor.translateAlternateColorCodes(
                     '&',
-                    Messages.messagePrefix.toString() + replacedMessage
+                    Messages.messagePrefix + replacedMessage
             );
             recipient.sendMessage(prefixedMessage);
         }
