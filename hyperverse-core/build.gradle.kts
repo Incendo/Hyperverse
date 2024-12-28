@@ -62,6 +62,9 @@ dependencies {
     runtimeOnly(project(":hyperverse-nms-1-21")) {
         targetConfiguration = "reobf"
     }
+    runtimeOnly(project(":hyperverse-nms-1-21-1")) {
+        targetConfiguration = "reobf"
+    }
     runtimeOnly(project(":hyperverse-nms-1-21-3")) {
         targetConfiguration = "reobf"
     }
