@@ -264,7 +264,6 @@ public final class WorldConfiguration implements Cloneable {
         try (final BufferedWriter bufferedWriter = Files
                 .newBufferedWriter(Objects.requireNonNull(path))) {
             GSON.toJson(this, WorldConfiguration.class, GSON.newJsonWriter(bufferedWriter));
-            return;
         } catch (final Exception e) {
             e.printStackTrace();
         }
