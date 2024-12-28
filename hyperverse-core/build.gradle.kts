@@ -37,13 +37,7 @@ dependencies {
     implementation(libs.cloudPaper)
     implementation(libs.cloudMinecraftExtras)
 
-    // TODO: Remove and use native versions.
-    implementation("net.kyori:adventure-text-minimessage:4.17.0")
-
     implementation(projects.hyperverseNmsUnsupported)
-    runtimeOnly(project(":hyperverse-nms-1-17")) {
-        targetConfiguration = "reobf"
-    }
     runtimeOnly(project(":hyperverse-nms-1-18")) {
         targetConfiguration = "reobf"
     }
@@ -73,7 +67,7 @@ bukkit {
     authors = listOf("Citymonstret", "andrewandy")
     main = "org.incendo.hyperverse.Hyperverse"
     softDepend = listOf("Essentials", "Multiverse", "MyWorlds")
-    apiVersion = "1.17"
+    apiVersion = "1.18"
     permissions {
         mapOf(
             "worlds" to "Allows players to use the Hyperverse command",
@@ -120,7 +114,6 @@ tasks {
     shadowJar {
         minimize {
             exclude(project(":hyperverse-nms-unsupported"))
-            exclude(project(":hyperverse-nms-1-17"))
             exclude(project(":hyperverse-nms-1-18"))
             exclude(project(":hyperverse-nms-1-19"))
             exclude(project(":hyperverse-nms-1-20"))
@@ -143,7 +136,6 @@ tasks {
         relocate("co.aikar.taskchain", "org.incendo.hyperverse.libs.taskchain")
         relocate("co.aikar.util", "org.incendo.hyperverse.libs.aikar.util")
         relocate("net.jodah.expiringmap", "org.incendo.hyperverse.libs.expiringmap")
-        relocate("net.kyori.adventure.text.minimessage", "org.incendo.hyperverse.libs.minimessage")
         relocate("cloud.commandframework", "org.incendo.hyperverse.libs.cloud")
         relocate("org.spongepowered.configurate", "org.incendo.hyperverse.libs.configurate")
         relocate("io.leangen.geantyref", "org.incendo.hyperverse.libs.geantyref")

@@ -9,7 +9,7 @@ run-paper = "2.3.0"
 pluginyml = "0.6.0"
 
 # Platforms
-minecraft = "1.17.1-R0.1-SNAPSHOT"
+minecraft = "1.18.2-R0.1-SNAPSHOT"
 
 # Libraries
 cloud = "1.8.4"
