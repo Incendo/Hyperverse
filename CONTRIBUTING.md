@@ -14,7 +14,7 @@ but does not necessarily have to.
 
 ## World Interaction
 
-Load chunks asynchronously using PaperLib whenever possible.
+Load chunks asynchronously whenever possible.
 
 ## Dependency Injection
 

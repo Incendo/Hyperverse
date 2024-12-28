@@ -19,7 +19,6 @@ package org.incendo.hyperverse.platform.v1_20_6;
 
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.inject.Inject;
-import io.papermc.lib.PaperLib;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -152,7 +151,7 @@ public class NMSImpl implements NMS {
                 return;
             }
             final CompoundTag compound = (CompoundTag) optionalCompound.get();
-            PaperLib.getChunkAtAsync(originLocation).thenAccept(chunk -> {
+            originLocation.getWorld().getChunkAtAsync(originLocation).thenAccept(chunk -> {
                 // Health and hunger don't update properly, so we
                 // give them a little help
                 final float health = compound.getFloat("Health");

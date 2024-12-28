@@ -17,9 +17,11 @@
 
 package org.incendo.hyperverse.listeners;
 
+import com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent;
+import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
+import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import io.papermc.lib.PaperLib;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -71,6 +73,7 @@ import org.incendo.hyperverse.database.LocationType;
 import org.incendo.hyperverse.database.PersistentLocation;
 import org.incendo.hyperverse.events.PlayerSeekSpawnEvent;
 import org.incendo.hyperverse.events.PlayerSetSpawnEvent;
+import org.incendo.hyperverse.flags.implementation.AdvancementFlag;
 import org.incendo.hyperverse.flags.implementation.CreatureSpawnFlag;
 import org.incendo.hyperverse.flags.implementation.EndFlag;
 import org.incendo.hyperverse.flags.implementation.GamemodeFlag;
@@ -127,10 +130,6 @@ public final class EventListener implements Listener {
         this.scheduler = scheduler;
         this.plugin = plugin;
         this.nms = nms;
-        // Register pre-spawn listeners
-        if (PaperLib.isPaper()) {
-            pluginManager.registerEvents(new PaperListener(this.worldManager), plugin);
-        }
     }
 
     /**
@@ -472,9 +471,7 @@ public final class EventListener implements Listener {
                 if (location != null) {
                     this.teleportationTimeout
                             .put(event.getEntity().getUniqueId(), System.currentTimeMillis());
-                    PaperLib.teleportAsync(event.getEntity(), location,
-                            PlayerTeleportEvent.TeleportCause.COMMAND
-                    );
+                    event.getEntity().teleportAsync(location, PlayerTeleportEvent.TeleportCause.COMMAND);
                 } else {
                     this.plugin.getLogger().warning(String
                             .format(
@@ -497,9 +494,7 @@ public final class EventListener implements Listener {
             final Location destination =
                     hyperWorld.getTeleportationManager().endDestination(event.getEntity());
             if (destination != null) {
-                PaperLib.teleportAsync(event.getEntity(), destination,
-                        PlayerTeleportEvent.TeleportCause.COMMAND
-                );
+                event.getEntity().teleportAsync(destination, PlayerTeleportEvent.TeleportCause.COMMAND);
             }
         }
     }
@@ -585,4 +580,43 @@ public final class EventListener implements Listener {
         ), true, false);
     }
 
+    @EventHandler
+    public void onEntityPreSpawn(final @NonNull PreCreatureSpawnEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getSpawnLocation().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        if (hyperWorld.getFlag(CreatureSpawnFlag.class)) {
+            return;
+        }
+        if (event.getReason() != CreatureSpawnEvent.SpawnReason.NATURAL) {
+            return;
+        }
+        event.setCancelled(true);
+        event.setShouldAbortSpawn(true);
+    }
+
+    @EventHandler
+    public void onMobPreSpawn(final @NonNull PlayerNaturallySpawnCreaturesEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        if (hyperWorld.getFlag(MobSpawnFlag.class)) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onAdvancementGrant(final @NonNull PlayerAdvancementCriterionGrantEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        if (hyperWorld.getFlag(AdvancementFlag.class)) {
+            return;
+        }
+        event.setCancelled(true);
+    }
 }

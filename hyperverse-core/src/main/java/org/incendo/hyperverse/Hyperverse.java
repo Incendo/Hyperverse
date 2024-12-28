@@ -24,7 +24,6 @@ import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
-import io.papermc.lib.PaperLib;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -99,6 +98,7 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             Version.parseMinecraft("1.20.4"),
             Version.parseMinecraft("1.20.6"),
             Version.parseMinecraft("1.21"),
+            Version.parseMinecraft("1.21.1"),
             Version.parseMinecraft("1.21.3")
     );
 
@@ -236,10 +236,6 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
 
         // Initialize bStats metrics tracking
         new Metrics(this, BSTATS_ID);
-
-        // Add paper suggestion
-        PaperLib.suggestPaper(this);
-
     }
 
     @Override

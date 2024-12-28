@@ -14,7 +14,6 @@ minecraft = "1.17.1-R0.1-SNAPSHOT"
 # Libraries
 cloud = "1.8.4"
 guice = "5.1.0"
-paperlib = "1.0.8"
 taskchain = "3.7.2"
 bstats = "3.0.2"
 configurate = "4.1.2"
@@ -38,7 +37,6 @@ cloudMinecraftExtras = { group = "cloud.commandframework", name = "cloud-minecra
 cloudAnnotations = { group = "cloud.commandframework", name = "cloud-annotations", version.ref = "cloud" }
 guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 assistedInject = { group = "com.google.inject.extensions", name = "guice-assistedinject", version.ref = "guice" }
-paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib"}
 taskchain = { group = "co.aikar", name = "taskchain-bukkit", version.ref = "taskchain" }
 bstats = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
 configurateHocon = { group = "org.spongepowered", name = "configurate-hocon", version.ref = "configurate"}

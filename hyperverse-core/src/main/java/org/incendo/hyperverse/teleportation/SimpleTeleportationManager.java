@@ -19,7 +19,6 @@ package org.incendo.hyperverse.teleportation;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
@@ -102,7 +101,7 @@ public final class SimpleTeleportationManager implements TeleportationManager {
             final @NonNull Location location
     ) {
         if (this.configuration.shouldSafeTeleport()) {
-            return PaperLib.getChunkAtAsync(location).thenApply(
+            return location.getWorld().getChunkAtAsync(location).thenApply(
                     chunk -> location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid());
         } else {
             return CompletableFuture.completedFuture(true);
@@ -112,11 +111,11 @@ public final class SimpleTeleportationManager implements TeleportationManager {
     @Override
     public @NonNull CompletableFuture<@NonNull Location> findSafe(final @NonNull Location location) {
         if (this.configuration.shouldSafeTeleport()) {
-            return PaperLib.getChunkAtAsync(location).thenApply(chunk ->
+            return location.getWorld().getChunkAtAsync(location).thenApply(chunk ->
                     this.hyperverse.getServicePipeline().pump(location).through(SafeTeleportService.class)
                             .getResult());
         } else {
-            return PaperLib.getChunkAtAsync(location).thenApply(c -> location);
+            return location.getWorld().getChunkAtAsync(location).thenApply(c -> location);
         }
     }
 
@@ -125,8 +124,7 @@ public final class SimpleTeleportationManager implements TeleportationManager {
             final @NonNull Player player,
             final @NonNull Location location
     ) {
-        PaperLib.teleportAsync(player, Objects.requireNonNull(location)).thenAccept(l ->
-                player.setPortalCooldown(100));
+        player.teleportAsync(location).thenAccept(l -> player.setPortalCooldown(100));
     }
 
     @Override
