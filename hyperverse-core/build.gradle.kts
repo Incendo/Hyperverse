@@ -129,6 +129,7 @@ tasks {
             exclude(project(":hyperverse-nms-1-20"))
             exclude(project(":hyperverse-nms-1-20-6"))
             exclude(project(":hyperverse-nms-1-21"))
+            exclude(project(":hyperverse-nms-1-21-1"))
             exclude(project(":hyperverse-nms-1-21-3"))
         }
         mergeServiceFiles()
