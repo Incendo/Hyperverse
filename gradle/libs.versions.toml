@@ -3,18 +3,17 @@ cloud-build-logic = "0.0.3"
 ktlint = "0.50.0"
 checkstyle = "10.12.5"
 kotlin = "1.9.20"
-shadow = "8.1.1"
+shadow = "8.3.5"
 paperweight = "1.7.1"
 run-paper = "2.3.0"
 pluginyml = "0.6.0"
 
 # Platforms
-minecraft = "1.17.1-R0.1-SNAPSHOT"
+minecraft = "1.18.2-R0.1-SNAPSHOT"
 
 # Libraries
 cloud = "1.8.4"
 guice = "5.1.0"
-paperlib = "1.0.8"
 taskchain = "3.7.2"
 bstats = "3.0.2"
 configurate = "4.1.2"
@@ -38,7 +37,6 @@ cloudMinecraftExtras = { group = "cloud.commandframework", name = "cloud-minecra
 cloudAnnotations = { group = "cloud.commandframework", name = "cloud-annotations", version.ref = "cloud" }
 guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 assistedInject = { group = "com.google.inject.extensions", name = "guice-assistedinject", version.ref = "guice" }
-paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib"}
 taskchain = { group = "co.aikar", name = "taskchain-bukkit", version.ref = "taskchain" }
 bstats = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
 configurateHocon = { group = "org.spongepowered", name = "configurate-hocon", version.ref = "configurate"}
@@ -54,6 +52,6 @@ paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "pa
 cloud-buildLogic-spotless = { id = "org.incendo.cloud-build-logic.spotless", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.publishing.root-project", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }

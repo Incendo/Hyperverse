@@ -26,7 +26,6 @@ dependencies {
     // TODO: Remove, because yuck.
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation(libs.taskchain)
-    implementation(libs.paperlib)
     implementation(libs.guice) {
         exclude("com.google.guava", "guava")
     }
@@ -37,16 +36,8 @@ dependencies {
     implementation(libs.configurateHocon)
     implementation(libs.cloudPaper)
     implementation(libs.cloudMinecraftExtras)
-    implementation(libs.cloudMinecraftExtras)
-
-    // TODO: Remove and use native versions.
-    implementation("net.kyori:adventure-platform-bukkit:4.3.2")
-    implementation("net.kyori:adventure-text-minimessage:4.14.0")
 
     implementation(projects.hyperverseNmsUnsupported)
-    runtimeOnly(project(":hyperverse-nms-1-17")) {
-        targetConfiguration = "reobf"
-    }
     runtimeOnly(project(":hyperverse-nms-1-18")) {
         targetConfiguration = "reobf"
     }
@@ -62,6 +53,12 @@ dependencies {
     runtimeOnly(project(":hyperverse-nms-1-21")) {
         targetConfiguration = "reobf"
     }
+    runtimeOnly(project(":hyperverse-nms-1-21-1")) {
+        targetConfiguration = "reobf"
+    }
+    runtimeOnly(project(":hyperverse-nms-1-21-3")) {
+        targetConfiguration = "reobf"
+    }
 }
 
 bukkit {
@@ -70,7 +67,7 @@ bukkit {
     authors = listOf("Citymonstret", "andrewandy")
     main = "org.incendo.hyperverse.Hyperverse"
     softDepend = listOf("Essentials", "Multiverse", "MyWorlds")
-    apiVersion = "1.14"
+    apiVersion = "1.18"
     permissions {
         mapOf(
             "worlds" to "Allows players to use the Hyperverse command",
@@ -117,12 +114,13 @@ tasks {
     shadowJar {
         minimize {
             exclude(project(":hyperverse-nms-unsupported"))
-            exclude(project(":hyperverse-nms-1-17"))
             exclude(project(":hyperverse-nms-1-18"))
             exclude(project(":hyperverse-nms-1-19"))
             exclude(project(":hyperverse-nms-1-20"))
             exclude(project(":hyperverse-nms-1-20-6"))
             exclude(project(":hyperverse-nms-1-21"))
+            exclude(project(":hyperverse-nms-1-21-1"))
+            exclude(project(":hyperverse-nms-1-21-3"))
         }
         mergeServiceFiles()
 
@@ -132,14 +130,12 @@ tasks {
             }
         }
 
-        relocate("io.papermc.lib", "org.incendo.hyperverse.libs.paperlib")
         relocate("org.bstats", "org.incendo.hyperverse.libs.bstats")
         relocate("co.aikar.commands", "org.incendo.hyperverse.libs.aikar.commands")
         relocate("co.aikar.locales", "org.incendo.hyperverse.libs.aikar.locales")
         relocate("co.aikar.taskchain", "org.incendo.hyperverse.libs.taskchain")
         relocate("co.aikar.util", "org.incendo.hyperverse.libs.aikar.util")
         relocate("net.jodah.expiringmap", "org.incendo.hyperverse.libs.expiringmap")
-        relocate("net.kyori", "org.incendo.hyperverse.libs.kyori")
         relocate("cloud.commandframework", "org.incendo.hyperverse.libs.cloud")
         relocate("org.spongepowered.configurate", "org.incendo.hyperverse.libs.configurate")
         relocate("io.leangen.geantyref", "org.incendo.hyperverse.libs.geantyref")
@@ -160,6 +156,6 @@ tasks {
 
     runServer {
         java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.3")
     }
 }

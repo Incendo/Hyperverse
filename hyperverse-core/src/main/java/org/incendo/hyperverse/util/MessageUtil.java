@@ -17,13 +17,10 @@
 
 package org.incendo.hyperverse.util;
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.incendo.hyperverse.Hyperverse;
 import org.incendo.hyperverse.configuration.Message;
 import org.incendo.hyperverse.configuration.Messages;
 
@@ -34,7 +31,6 @@ import java.util.Objects;
  */
 public final class MessageUtil {
 
-    private static final BukkitAudiences AUDIENCES = BukkitAudiences.create(JavaPlugin.getPlugin(Hyperverse.class));
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
     private MessageUtil() {
@@ -86,16 +82,16 @@ public final class MessageUtil {
             if (replacedMessage.contains(ChatColor.COLOR_CHAR + "")) {
                 prefixedMessage = ChatColor.translateAlternateColorCodes(
                         '&',
-                        Messages.messagePrefix.toString() + replacedMessage
+                        Messages.messagePrefix + replacedMessage
                 );
             } else {
-                prefixedMessage = Messages.messagePrefixFancy.toString() + replacedMessage;
+                prefixedMessage = Messages.messagePrefixFancy + replacedMessage;
             }
-            AUDIENCES.sender(recipient).sendMessage(MINI_MESSAGE.deserialize(prefixedMessage));
+            recipient.sendMessage(MINI_MESSAGE.deserialize(prefixedMessage));
         } else {
             final String prefixedMessage = ChatColor.translateAlternateColorCodes(
                     '&',
-                    Messages.messagePrefix.toString() + replacedMessage
+                    Messages.messagePrefix + replacedMessage
             );
             recipient.sendMessage(prefixedMessage);
         }

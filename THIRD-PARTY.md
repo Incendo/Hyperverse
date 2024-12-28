@@ -1,4 +1,4 @@
-Lists of 29 third-party dependencies.
+Lists of 28 third-party dependencies.
 - (Public Domain) [AOP alliance (aopalliance:aopalliance:1.0)](http://aopalliance.sourceforge.net)
 - (MIT) [DelegatingMap (co.aikar:DelegatingMap:1.0.0-20180331.052245-5)]()
 - (MIT) [Table (co.aikar:Table:1.0.0-20180331.054128-7)]()
@@ -16,7 +16,6 @@ Lists of 29 third-party dependencies.
 - (ISC License) [ORMLite JDBC (com.j256.ormlite:ormlite-jdbc:5.1)](http://ormlite.sourceforge.net/)
 - (Apache License, Version 2.0) [config (com.typesafe:config:1.3.1)](https://github.com/typesafehub/config)
 - (The Apache Software License, Version 2.0) [Commons Lang (commons-lang:commons-lang:2.6)](http://commons.apache.org/lang/)
-- (MIT) [PaperLib (io.papermc:paperlib:1.0.2)](https://github.com/PaperMC/PaperLib)
 - (The Apache Software License, Version 2.0) [javax.inject (javax.inject:javax.inject:1)](http://code.google.com/p/atinject/)
 - (MIT) [MiniMessage (me.minidigger:MiniMessage:1.0.1)](https://github.com/MiniDigger/MiniMessage)
 - (Apache License, Version 2.0) [ExpiringMap (net.jodah:expiringmap:0.5.8)](http://github.com/jhalterman/expiringmap/)

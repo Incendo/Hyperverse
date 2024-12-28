@@ -93,7 +93,7 @@ public final class IncendoPaster {
      *
      * @return Unmodifiable collection
      */
-    public final @NonNull Collection<@NonNull PasteFile> getFiles() {
+    public @NonNull Collection<@NonNull PasteFile> getFiles() {
         return Collections.unmodifiableCollection(this.files);
     }
 
@@ -150,7 +150,7 @@ public final class IncendoPaster {
      * @return Status message
      * @throws Throwable any and all exceptions
      */
-    public final @NonNull String upload() throws Throwable {
+    public @NonNull String upload() throws Throwable {
         final URL url = new URL(UPLOAD_PATH);
         final URLConnection connection = url.openConnection();
         final HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
@@ -177,7 +177,7 @@ public final class IncendoPaster {
         }
         final StringBuilder input = new StringBuilder();
         try (final BufferedReader inputStream = new BufferedReader(
-                new InputStreamReader(httpURLConnection.getInputStream(), StandardCharsets.UTF_8.name()))) {
+                new InputStreamReader(httpURLConnection.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = inputStream.readLine()) != null) {
                 input.append(line).append("\n");
