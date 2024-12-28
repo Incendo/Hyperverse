@@ -38,7 +38,7 @@ dependencies {
     implementation(libs.cloudMinecraftExtras)
 
     // TODO: Remove and use native versions.
-    implementation("net.kyori:adventure-text-minimessage:4.18.0")
+    implementation("net.kyori:adventure-text-minimessage:4.17.0")
 
     implementation(projects.hyperverseNmsUnsupported)
     runtimeOnly(project(":hyperverse-nms-1-17")) {
