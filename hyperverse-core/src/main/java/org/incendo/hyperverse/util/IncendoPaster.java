@@ -177,7 +177,7 @@ public final class IncendoPaster {
         }
         final StringBuilder input = new StringBuilder();
         try (final BufferedReader inputStream = new BufferedReader(
-                new InputStreamReader(httpURLConnection.getInputStream(), StandardCharsets.UTF_8.name()))) {
+                new InputStreamReader(httpURLConnection.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = inputStream.readLine()) != null) {
                 input.append(line).append("\n");
