@@ -73,7 +73,7 @@ bukkit {
     authors = listOf("Citymonstret", "andrewandy")
     main = "org.incendo.hyperverse.Hyperverse"
     softDepend = listOf("Essentials", "Multiverse", "MyWorlds")
-    apiVersion = "1.14"
+    apiVersion = "1.17"
     permissions {
         mapOf(
             "worlds" to "Allows players to use the Hyperverse command",
