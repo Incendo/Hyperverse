@@ -98,7 +98,8 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
             Version.parseMinecraft("1.19.4"),
             Version.parseMinecraft("1.20.4"),
             Version.parseMinecraft("1.20.6"),
-            Version.parseMinecraft("1.21")
+            Version.parseMinecraft("1.21.1"),
+            Version.parseMinecraft("1.21.3")
     );
 
     private WorldManager worldManager;

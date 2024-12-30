@@ -44,22 +44,25 @@ dependencies {
     implementation("net.kyori:adventure-text-minimessage:4.14.0")
 
     implementation(projects.hyperverseNmsUnsupported)
-    runtimeOnly(project(":hyperverse-nms-1-17")) {
+    runtimeOnly(projects.hyperverseNms117) {
         targetConfiguration = "reobf"
     }
-    runtimeOnly(project(":hyperverse-nms-1-18")) {
+    runtimeOnly(projects.hyperverseNms118) {
         targetConfiguration = "reobf"
     }
-    runtimeOnly(project(":hyperverse-nms-1-19")) {
+    runtimeOnly(projects.hyperverseNms119) {
         targetConfiguration = "reobf"
     }
-    runtimeOnly(project(":hyperverse-nms-1-20")) {
+    runtimeOnly(projects.hyperverseNms120) {
         targetConfiguration = "reobf"
     }
-    runtimeOnly(project(":hyperverse-nms-1-20-6")) {
+    runtimeOnly(projects.hyperverseNms1206) {
         targetConfiguration = "reobf"
     }
-    runtimeOnly(project(":hyperverse-nms-1-21")) {
+    runtimeOnly(projects.hyperverseNms121) {
+        targetConfiguration = "reobf"
+    }
+    runtimeOnly(projects.hyperverseNms1213) {
         targetConfiguration = "reobf"
     }
 }
