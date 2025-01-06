@@ -79,7 +79,7 @@ public final class IncendoPaster {
     public static String readFile(final @NonNull File file) throws IOException {
         final List<String> lines;
         try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            lines = reader.lines().collect(Collectors.toList());
+            lines = reader.lines().toList();
         }
         final StringBuilder content = new StringBuilder();
         for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {
