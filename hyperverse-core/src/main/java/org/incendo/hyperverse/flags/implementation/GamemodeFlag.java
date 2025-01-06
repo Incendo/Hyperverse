@@ -70,7 +70,6 @@ public final class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
             case CREATIVE -> GAMEMODE_CREATIVE;
             case ADVENTURE -> GAMEMODE_ADVENTURE;
             case SPECTATOR -> GAMEMODE_SPECTATOR;
-            default -> throw new IllegalArgumentException("Unknown gamemode: " + value.name());
         };
     }
 
