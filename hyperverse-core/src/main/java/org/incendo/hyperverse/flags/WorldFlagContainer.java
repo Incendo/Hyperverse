@@ -155,8 +155,9 @@ public class WorldFlagContainer implements FlagContainer {
 
     @Override
     public final @NonNull FlagContainer getHighestClassContainer() {
-        if (this.getParentContainer() != null) {
-            return this.getParentContainer();
+        FlagContainer parentContainer = this.getParentContainer();
+        if (parentContainer != null) {
+            return parentContainer;
         }
         return this;
     }
@@ -173,8 +174,9 @@ public class WorldFlagContainer implements FlagContainer {
         if (flag != null) {
             return flag;
         } else {
-            if (this.getParentContainer() != null) {
-                return this.getParentContainer().getFlagErased(flagClass);
+            FlagContainer parentContainer = this.getParentContainer();
+            if (parentContainer != null) {
+                return parentContainer.getFlagErased(flagClass);
             }
         }
         return null;
@@ -196,8 +198,9 @@ public class WorldFlagContainer implements FlagContainer {
         if (flag != null) {
             return castUnsafe(flag);
         } else {
-            if (this.getParentContainer() != null) {
-                return this.getParentContainer().getFlag(flagClass);
+            FlagContainer parentContainer = this.getParentContainer();
+            if (parentContainer != null) {
+                return parentContainer.getFlag(flagClass);
             }
         }
         return null;

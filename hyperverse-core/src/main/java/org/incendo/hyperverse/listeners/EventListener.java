@@ -166,7 +166,7 @@ public final class EventListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onTeleport(final @NonNull PlayerTeleportEvent event) {
         if (this.hyperConfiguration.shouldPersistLocations()) {
             final Location from = event.getFrom();
@@ -356,7 +356,7 @@ public final class EventListener implements Listener {
         event.setRespawnLocation(seekSpawnEvent.getRespawnLocation());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntityDamageEvent(final @NonNull EntityDamageByEntityEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getEntity().getWorld());
         if (hyperWorld == null) {
@@ -377,7 +377,7 @@ public final class EventListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerPortalEvent(final @NonNull PlayerPortalEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {
@@ -499,7 +499,7 @@ public final class EventListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntityPortalEvent(final @NonNull EntityPortalEvent event) {
         if (event.getEntityType() == EntityType.PLAYER) {
             return;
@@ -516,21 +516,6 @@ public final class EventListener implements Listener {
             event.setCancelled(true);
         } else if (event.getFrom().getBlock().getType() == Material.END_PORTAL && !hyperWorld
                 .getFlag(EndFlag.class).isEmpty()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onEntityPreSpawn(final @NonNull CreatureSpawnEvent event) {
-        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getLocation().getWorld());
-        if (hyperWorld == null) {
-            return;
-        }
-        if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL) {
-            return;
-        }
-        final Entity entity = event.getEntity();
-        if (shouldCancelSpawn(hyperWorld, entity)) {
             event.setCancelled(true);
         }
     }
@@ -597,6 +582,21 @@ public final class EventListener implements Listener {
     }
 
     @EventHandler
+    public void onEntitySpawn(final @NonNull CreatureSpawnEvent event) {
+        final HyperWorld hyperWorld = this.worldManager.getWorld(event.getLocation().getWorld());
+        if (hyperWorld == null) {
+            return;
+        }
+        if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL) {
+            return;
+        }
+        final Entity entity = event.getEntity();
+        if (shouldCancelSpawn(hyperWorld, entity)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onMobPreSpawn(final @NonNull PlayerNaturallySpawnCreaturesEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {
@@ -608,7 +608,7 @@ public final class EventListener implements Listener {
         event.setCancelled(true);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onAdvancementGrant(final @NonNull PlayerAdvancementCriterionGrantEvent event) {
         final HyperWorld hyperWorld = this.worldManager.getWorld(event.getPlayer().getWorld());
         if (hyperWorld == null) {

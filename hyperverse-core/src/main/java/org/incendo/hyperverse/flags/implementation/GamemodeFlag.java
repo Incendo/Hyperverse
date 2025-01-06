@@ -39,25 +39,13 @@ public final class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
 
     @Override
     public GamemodeFlag parse(final @NonNull String input) throws FlagParseException {
-        switch (input.toLowerCase()) {
-            case "survival":
-            case "0":
-            case "s":
-                return GAMEMODE_SURVIVAL;
-            case "creative":
-            case "1":
-            case "c":
-                return GAMEMODE_CREATIVE;
-            case "adventure":
-            case "2":
-            case "a":
-                return GAMEMODE_ADVENTURE;
-            case "spectator":
-            case "3":
-                return GAMEMODE_SPECTATOR;
-            default:
-                throw new FlagParseException(this, input, "There is no such game mode");
-        }
+        return switch (input.toLowerCase()) {
+            case "survival", "0", "s" -> GAMEMODE_SURVIVAL;
+            case "creative", "1", "c" -> GAMEMODE_CREATIVE;
+            case "adventure", "2", "a" -> GAMEMODE_ADVENTURE;
+            case "spectator", "3" -> GAMEMODE_SPECTATOR;
+            default -> throw new FlagParseException(this, input, "There is no such game mode");
+        };
     }
 
     @Override
@@ -77,18 +65,13 @@ public final class GamemodeFlag extends WorldFlag<GameMode, GamemodeFlag> {
 
     @Override
     protected GamemodeFlag flagOf(final @NonNull GameMode value) {
-        switch (value) {
-            case SURVIVAL:
-                return GAMEMODE_SURVIVAL;
-            case CREATIVE:
-                return GAMEMODE_CREATIVE;
-            case ADVENTURE:
-                return GAMEMODE_ADVENTURE;
-            case SPECTATOR:
-                return GAMEMODE_SPECTATOR;
-            default:
-                throw new IllegalArgumentException("Unknown gamemode: " + value.name());
-        }
+        return switch (value) {
+            case SURVIVAL -> GAMEMODE_SURVIVAL;
+            case CREATIVE -> GAMEMODE_CREATIVE;
+            case ADVENTURE -> GAMEMODE_ADVENTURE;
+            case SPECTATOR -> GAMEMODE_SPECTATOR;
+            default -> throw new IllegalArgumentException("Unknown gamemode: " + value.name());
+        };
     }
 
     @Override
