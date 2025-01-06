@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * Single class paster for the Incendo paste service
@@ -105,9 +104,9 @@ public final class IncendoPaster {
     public void addFile(final @NonNull PasteFile file) {
         // Check to see that no duplicate files are submitted
         for (final PasteFile pasteFile : this.files) {
-            if (pasteFile.fileName.equalsIgnoreCase(file.getFileName())) {
+            if (pasteFile.fileName.equalsIgnoreCase(file.fileName())) {
                 throw new IllegalArgumentException(
-                        String.format("Found duplicate file with name %s", file.getFileName()));
+                        String.format("Found duplicate file with name %s", file.fileName()));
             }
         }
         this.files.add(file);
@@ -125,7 +124,7 @@ public final class IncendoPaster {
         Iterator<PasteFile> fileIterator = this.files.iterator();
         while (fileIterator.hasNext()) {
             final PasteFile file = fileIterator.next();
-            builder.append(file.getFileName());
+            builder.append(file.fileName());
             if (fileIterator.hasNext()) {
                 builder.append(",");
             }
@@ -134,8 +133,8 @@ public final class IncendoPaster {
         fileIterator = this.files.iterator();
         while (fileIterator.hasNext()) {
             final PasteFile file = fileIterator.next();
-            builder.append("\"file-").append(file.getFileName()).append("\": \"")
-                    .append(file.getContent().replaceAll("\"", "\\\\\"")).append("\"");
+            builder.append("\"file-").append(file.fileName()).append("\": \"")
+                    .append(file.content().replaceAll("\"", "\\\\\"")).append("\"");
             if (fileIterator.hasNext()) {
                 builder.append(",\n");
             }
@@ -171,7 +170,8 @@ public final class IncendoPaster {
                         .warning(String.format("Paste Too Big > Size: %dMB", size / 1_000_000));
             }
             throw new IllegalStateException(String
-                    .format("Server returned status: %d %s", httpURLConnection.getResponseCode(),
+                    .format(
+                            "Server returned status: %d %s", httpURLConnection.getResponseCode(),
                             httpURLConnection.getResponseMessage()
                     ));
         }
@@ -189,27 +189,19 @@ public final class IncendoPaster {
 
     /**
      * Simple class that represents a paste file
+     * Construct a new paste file
+     *
+     * @param fileName File name, cannot be empty, nor null
+     * @param content  File content, cannot be empty, nor null
      */
-    public static final class PasteFile {
-
-        private final String fileName;
-        private final String content;
-
-        /**
-         * Construct a new paste file
-         *
-         * @param fileName File name, cannot be empty, nor null
-         * @param content  File content, cannot be empty, nor null
-         */
-        public PasteFile(final @NonNull String fileName, final @NonNull String content) {
+    public record PasteFile(@NonNull String fileName, @NonNull String content) {
+        public PasteFile {
             if (fileName.isEmpty()) {
                 throw new IllegalArgumentException("file name cannot be null, nor empty");
             }
             if (content.isEmpty()) {
                 throw new IllegalArgumentException("content cannot be null, nor empty");
             }
-            this.fileName = fileName;
-            this.content = content;
         }
 
         /**
@@ -217,7 +209,8 @@ public final class IncendoPaster {
          *
          * @return File name
          */
-        public @NonNull String getFileName() {
+        @Override
+        public @NonNull String fileName() {
             return this.fileName;
         }
 
@@ -226,7 +219,8 @@ public final class IncendoPaster {
          *
          * @return File content
          */
-        public @NonNull String getContent() {
+        @Override
+        public @NonNull String content() {
             return this.content;
         }
 
