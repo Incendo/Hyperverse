@@ -97,7 +97,7 @@ public class WorldFlagContainer implements FlagContainer {
 
     @Override
     public final @NonNull Map<Class<?>, WorldFlag<?, ?>> getFlagMap() {
-        return ImmutableMap.<Class<?>, WorldFlag<?, ?>>builder().putAll(this.flagMap).build();
+        return ImmutableMap.copyOf(this.flagMap);
     }
 
     @Override
