@@ -44,7 +44,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import io.leangen.geantyref.TypeToken;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -1277,7 +1276,7 @@ public final class HyperCloudCommandManager extends BaseCommand {
         final PluginDescriptionFile description = plugin.getDescription();
         Stream.of(
                 "<gold>Plugin Version:</gold> <gray>" + description.getVersion() + "</gray>",
-                "<gold>Author(s):</gold> <gray>" + StringUtils.join(description.getAuthors(), ", ") + "</gray>",
+                "<gold>Author(s):</gold> <gray>" + String.join(", ", description.getAuthors()) + "</gray>",
                 "<gold>Website:</gold> <gray><hover:show_text:\"<gray>Click to open</gray>\"><click:open_url:https://hyperver.se>https://hyperver.se</click></hover></gray>"
         ).forEach(msg ->
                 MessageUtil.sendMessage(sender, new Message("plugin.internal", "<dark_gray>[</dark_gray><gold>Hyperverse</gold"
