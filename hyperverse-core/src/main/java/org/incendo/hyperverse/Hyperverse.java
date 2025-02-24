@@ -93,10 +93,6 @@ public final class Hyperverse extends JavaPlugin implements HyperverseAPI, Liste
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
 
     private final List<Version> supportedVersions = List.of(
-            Version.parseMinecraft("1.17.1"),
-            Version.parseMinecraft("1.18.2"),
-            Version.parseMinecraft("1.19.4"),
-            Version.parseMinecraft("1.20.4"),
             Version.parseMinecraft("1.20.6"),
             Version.parseMinecraft("1.21.1"),
             Version.parseMinecraft("1.21.3"),
